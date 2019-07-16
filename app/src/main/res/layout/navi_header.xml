@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/navi_head"
+        android:src="@mipmap/ic_launcher"
+        android:layout_width="66dp"
+        android:layout_height="66dp"
+        android:layout_centerInParent="true"
+        />
+    <TextView
+        android:id="@+id/nicheng"
+        android:layout_below="@id/navi_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="昵称："/>
+    <TextView
+        android:id="@+id/zhanghao"
+        android:layout_below="@id/nicheng"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="账号："/>
+
+</RelativeLayout>
