@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/comment_btn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="评论"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/favour_btn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="点赞"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/friend_btn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="好友"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>

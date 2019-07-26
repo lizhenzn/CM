@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.view.GravityCompat;
@@ -18,25 +19,24 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
 private DrawerLayout drawerLayout;
 private NavigationView navigationView;
 private Toolbar toolbar;
-private TextView titleTV,nichengTV;
-private ImageView navi_head;
+private TextView nichengTV,zhangHaoTV;
+private static TextView titleTV;
+private ImageView navi_head,head_home;
 private static String path="/sdcard/Clothes/MyInfo/head";
 private SharedPreferences sharedPreferences;
 private SharedPreferences.Editor editor;
+private final int LOGIN=1;
 
 //每一个页面写一次setToolbarText()函数   ******************************************************************************
     @Override
@@ -50,15 +50,17 @@ private SharedPreferences.Editor editor;
         setToolbarText("搭配");
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.mipmap.ic_launcher_round);
+            //actionBar.setDisplayHomeAsUpEnabled(true);
+            //actionBar.setHomeAsUpIndicator(R.mipmap.ic_launcher_round);
         }
         navigationView.setCheckedItem(R.id.setting);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()){
-
+                    case R.id.settin:{
+                        navi_head.setImageResource(R.drawable.unlogin);
+                    }break;
                     default:
                         break;
 
@@ -66,12 +68,27 @@ private SharedPreferences.Editor editor;
                 return true;
             }
         });
+        //点击侧滑栏头像，进入信息编辑界面
         navi_head.setOnClickListener(new View.OnClickListener() {
+            Intent intent=null;
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this,MyInfoActivity.class);
+                //如果图片是默认的未登录图片，说明还没有登陆,点击进入登陆活动
+                if(navi_head.getDrawable().getCurrent().getConstantState().equals(getResources().getDrawable(R.drawable.unlogin).getConstantState())){
+                    intent=new Intent(MainActivity.this, LoginActivity.class);
+                    startActivityForResult(intent,LOGIN);
+                }else{
+                intent=new Intent(MainActivity.this,MyInfoActivity.class);
                 startActivity(intent);
+                }
 
+            }
+        });
+        //点击左上角头像，打开侧滑栏
+        head_home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
             }
         });
 
@@ -98,9 +115,10 @@ private SharedPreferences.Editor editor;
 
 
     //设置页面标题
-    public void setToolbarText(CharSequence title) {
+    public static void setToolbarText(CharSequence title) {
         titleTV.setText(title);
     }
+
     //初始化各控件
     public void init(){
         sharedPreferences=getSharedPreferences("myInfo",MODE_PRIVATE);
@@ -111,7 +129,9 @@ private SharedPreferences.Editor editor;
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer);
         View headerView= navigationView.inflateHeaderView(R.layout.navi_header);             //动态加载headerview，为了其中头像点击事件
         navi_head=(ImageView)headerView.findViewById(R.id.navi_head);
+        head_home=(ImageView)findViewById(R.id.head_home);
         nichengTV=(TextView)headerView.findViewById(R.id.nicheng);
+        zhangHaoTV=(TextView)headerView.findViewById(R.id.zhanghao);
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
         setInfo();        //调用设置头像、昵称函数
@@ -123,6 +143,10 @@ private SharedPreferences.Editor editor;
             @SuppressWarnings("deprecation")    
             Drawable drawable=new BitmapDrawable(bitmap);
             navi_head.setImageDrawable(drawable);
+            head_home.setImageDrawable(drawable);
+            //toolbar.setNavigationIcon(drawable);
+            //ImageView homeIM=(ImageView)findViewById(android.R.id.home);
+           // homeIM.setImageDrawable(drawable);
         }
         else{
             //如果SD卡没有，从服务器获取，然后保存到SD
@@ -150,7 +174,6 @@ private SharedPreferences.Editor editor;
             Drawable drawable=getApplication().getResources().getDrawable(tabs1.getIcon());
             tab_iv.setImageDrawable(drawable);
             tab_tv.setText(tabs1.getName());
-            //setToolbarText(tabs1.getName());         //设置标题
             tabSpec.setIndicator(indicator);
             fragmentTabHost.addTab(tabSpec,tabs1.getaClass(),null);
 
@@ -159,6 +182,17 @@ private SharedPreferences.Editor editor;
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode){
+            case LOGIN:{
+                if(resultCode==RESULT_OK){
+                    zhangHaoTV.setText("账号： "+data.getStringExtra("zhanghao"));
+                }
 
-
+            }break;
+            default:break;
+        }
+    }
 }

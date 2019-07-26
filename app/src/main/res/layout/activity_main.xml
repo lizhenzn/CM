@@ -14,10 +14,16 @@
             android:id="@+id/toolabr"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/colornew"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             >
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/head_home"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginLeft="6dp"
+                android:layout_gravity="center_vertical" />
             <TextView
                 android:id="@+id/title_tv"
                 android:layout_width="wrap_content"
@@ -34,6 +40,10 @@
             android:layout_width="match_parent"
             android:layout_height="616dp"
             android:layout_weight="1"></FrameLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#CCCCCC"/>
         <android.support.v4.app.FragmentTabHost
                 android:id="@+id/tabhost"
                 android:layout_width="match_parent"

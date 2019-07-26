@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.cm.R;
+import com.example.cm.MainActivity;
+
+import static com.example.cm.MainActivity.setToolbarText;
 
 public class MatchFragment extends Fragment {
     private Context context;
@@ -18,6 +21,13 @@ public class MatchFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setToolbarText("搭配");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setToolbarText("搭配");
     }
 
     @Nullable
