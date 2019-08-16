@@ -22,12 +22,12 @@
             android:layout_height="2dp"
             android:background="#CECECE"/>
         <!--消息界面-->
-        <com.example.cm.friend.MyListView
+        <ListView
             android:id="@+id/chat_lv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-                                       >
-        </com.example.cm.friend.MyListView>
+            android:clickable="true">
+        </ListView>
 
     </LinearLayout>
 

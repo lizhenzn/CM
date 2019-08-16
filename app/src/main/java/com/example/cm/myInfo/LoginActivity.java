@@ -10,6 +10,7 @@ import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -19,6 +20,9 @@ import android.widget.TextView;
 
 import com.example.cm.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LoginActivity extends Activity implements View.OnClickListener{
     private Button loginBtn,pswEnBtn;
     private ImageView headIM_login;
@@ -27,6 +31,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     private Spinner spinner;
     private final int REGISTER=1;
     private  boolean VISIABLE;
+    private ArrayAdapter<CharSequence> adapterXML;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,10 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
             }
         });
+
+
+        adapterXML= (ArrayAdapter<CharSequence>) ArrayAdapter.createFromResource(this,R.array.datalist,R.layout.support_simple_spinner_dropdown_item);
+        spinner.setAdapter(adapterXML);
     }
 
     @Override
@@ -101,7 +110,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                 startActivityForResult(intent, REGISTER);
                 overridePendingTransition(R.anim.out_from_left,R.anim.in_from_right);
             }break;
-            case R.id.invisible:{
+            case R.id.visible:{
                 if(VISIABLE){
                     //设置可见
                     pswET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
@@ -122,6 +131,15 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Intent intent=null;
+        switch (requestCode){
+            case REGISTER:{
+                if(resultCode==RESULT_OK){
+                userET.setText(data.getStringExtra("zhanghao"));
+                }
+            }break;
+            default:break;
+        }
 
     }
 }

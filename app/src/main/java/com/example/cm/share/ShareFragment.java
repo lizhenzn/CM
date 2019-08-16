@@ -12,10 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+
 import com.example.cm.ConnectService;
 import com.example.cm.R;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
+
+import main.CallBackMethods;
+import main.TransferManager;
+import main.UserInfo;
 
 import static com.example.cm.MainActivity.setToolbarText;
 
@@ -45,13 +50,45 @@ public class ShareFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
-                Log.d("login000001before", "onClick: ");
+                /*UserInfo user=new UserInfo();
+                user.setUserName("lizhen");
+                user.setEmail("229010ad655");
+                user.setPassWord("123456");
+                TransferManager transferManager=new TransferManager();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        transferManager.doRegister(user, new CallBackMethods() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d("doRegister","666");
+                            }
 
-                //Intent intent1=new Intent(getActivity(),ConnectService.class);
-                //context.startService(intent1);
+                            @Override
+                            public void onError() {
+
+                            }
+
+                            @Override
+                            public void onFailed() {
+
+                            }
+
+                            @Override
+                            public void onBadLink() {
+
+                            }
+                        });
+                    }
+                }).start();*/
+                ConnectService connectService=new ConnectService();
+                connectService.getConnection();
+                //if(connectService.login("lizhen","zn521128"))
+                    //Log.d("loginOpenfile","Success");
+               //boolean b= connectService.login("admin","zn521128");
+                 Log.d("login","loginOpenfile");
                 Log.d("login000001", "onClick: ");
+               // ConnectService.getConnection();
                 //ConnectService.login("lizhen","zn521128");
             }
         });
