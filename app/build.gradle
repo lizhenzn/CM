@@ -11,6 +11,13 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    android {
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -37,8 +44,13 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
+
+    implementation 'de.measite.minidns:minidns-hla:0.2.2'
+    implementation files('libs/WebUtils-0.7.0-jar-with-dependencies.jar')
+
     implementation files('libs/WebUtils-0.7.0-jar-with-dependencies.jar')
     implementation files('libs/jxmpp-core-0.4.0-alpha1.jar')
     implementation files('libs/smack-android-4.1.9.jar')
     implementation files('libs/jxmpp-util-cache-0.4.0-alpha1.jar')
+
 }
