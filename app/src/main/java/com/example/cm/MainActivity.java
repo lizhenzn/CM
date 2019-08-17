@@ -26,8 +26,13 @@ import android.widget.TextView;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
 
+//import main.CallBackMethods;
+//import main.ImgUploader;
+//import main.TransferManager;
+//import main.UserInfo;
+
 public class MainActivity extends AppCompatActivity{
-private DrawerLayout drawerLayout;
+    private DrawerLayout drawerLayout;
 private NavigationView navigationView;
 private Toolbar toolbar;
 private TextView nichengTV,zhangHaoTV;
@@ -37,7 +42,7 @@ private static String path="/sdcard/Clothes/MyInfo/head";
 private SharedPreferences sharedPreferences;
 private SharedPreferences.Editor editor;
 private final int LOGIN=1;
-
+    private static final String TAG = "MainActivity";
 //每一个页面写一次setToolbarText()函数   ******************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {

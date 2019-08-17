@@ -3,9 +3,12 @@ package com.example.cm.share;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +20,15 @@ import com.example.cm.R;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class ShareFragment extends Fragment {
     private Context context;
     private View view;
+    private List<ShareItem> shareItemList = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,6 +62,18 @@ public class ShareFragment extends Fragment {
                 //ConnectService.login("lizhen","zn521128");
             }
         });
+
+        initShareItems();
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        ShareAdapter adapter = new ShareAdapter(shareItemList);
+        recyclerView.setAdapter(adapter);
         return  view;
+    }
+
+    private void initShareItems() {
+        for (int i = 0; i <= 9; i++) {
+            shareItemList.add(new ShareItem(R.drawable.friend1,R.drawable.friend1,"test!!!!!!!!!!!!!!!!!!!!!!!!!!!",R.drawable.givelike,R.drawable.comment));
+        }
     }
 }
