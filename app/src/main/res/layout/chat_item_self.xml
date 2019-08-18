@@ -4,23 +4,24 @@
     android:padding="10dp">
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/chat_itemIV"
+        android:layout_alignParentEnd="true"
         android:layout_width="36dp"
-        android:layout_height="36dp" />
+        android:layout_height="36dp"
+        android:layout_alignParentRight="true" />
     <com.example.cm.util.EmoticonsTextView
         android:id="@+id/chat_itemName"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@+id/chat_itemIV"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@+id/chat_itemIV"
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <com.example.cm.util.EmoticonsTextView
         android:id="@+id/chat_itemMes"
         android:layout_below="@+id/chat_itemName"
-        android:layout_toRightOf="@id/chat_itemIV"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/left"
+        android:layout_toLeftOf="@id/chat_itemIV"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-
 
 </RelativeLayout>

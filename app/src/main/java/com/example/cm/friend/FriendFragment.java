@@ -8,13 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,12 +19,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.friend.chat.ChatActivity;
+import com.example.cm.friend.chat.ChatListAdapter;
 import com.example.cm.myInfo.MyInfoActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.example.cm.MainActivity.setToolbarText;
 
@@ -76,7 +74,7 @@ public class FriendFragment extends Fragment  {
                 {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent intent=new Intent(getActivity(),MyInfoActivity.class);
+                        Intent intent=new Intent(getActivity(), ChatActivity.class);
                         startActivity(intent);
                         Toast.makeText(getContext(),"点击  "+position,Toast.LENGTH_SHORT).show();
                         Log.d("friend", "onItemClick: ");
