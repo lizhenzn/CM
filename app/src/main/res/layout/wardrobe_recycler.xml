@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
+
+    <ImageView
+        android:id="@+id/wardrobeR_IV"
+        android:scaleType="centerCrop"
+        android:layout_width="120dp"
+        android:layout_height="120dp" />
+    </android.support.v7.widget.CardView>
+
+
+</android.support.constraint.ConstraintLayout>

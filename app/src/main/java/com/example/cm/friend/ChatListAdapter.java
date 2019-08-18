@@ -29,18 +29,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChatListAdapter extends BaseAdapter implements View.OnClickListener,View.OnTouchListener {
+public class ChatListAdapter extends BaseAdapter  {
    // private  ArrayList<ChatListMessage> listMessageArrayList;          //会话列表的类列表 image、name、message、time、type
     private List<HashMap<String,Object>> list;
-    private DisplayMetrics displayMetrics;    //屏幕大小
+    //private DisplayMetrics displayMetrics;    //屏幕大小
     private Context context;
     private View beforeView;
     private List<ViewHolder> viewHolders;
     public ChatListAdapter(){}
-    public ChatListAdapter(List<HashMap<String,Object>>list,Context context,DisplayMetrics displayMetrics){
+    public ChatListAdapter(List<HashMap<String,Object>>list,Context context){
         this.list=list;
         this.context=context;
-        this.displayMetrics=displayMetrics;
+
         viewHolders=new ArrayList<>();
     }
 
@@ -66,18 +66,18 @@ public class ChatListAdapter extends BaseAdapter implements View.OnClickListener
             convertView= LayoutInflater.from(context).inflate(R.layout.chat_lv_item,null);
             viewHolder=new ViewHolder();
             //绑定布局
-            viewHolder.hsv=(HorizontalScrollView)convertView.findViewById(R.id.hsv);
-            viewHolder.relativeLayout=(RelativeLayout) convertView.findViewById(R.id.chat_relativeL);
+            //viewHolder.hsv=(HorizontalScrollView)convertView.findViewById(R.id.hsv);
+            //viewHolder.relativeLayout=(RelativeLayout) convertView.findViewById(R.id.chat_relativeL);
             viewHolder.headImage=(ImageView)convertView.findViewById(R.id.chat_iv);
             viewHolder.nameTV=(TextView) convertView.findViewById(R.id.chat_XMtv);
 
             viewHolder.mesTV=(TextView) convertView.findViewById(R.id.chat_Megtv);
             viewHolder.timeTV=(TextView) convertView.findViewById(R.id.Meg_time);
             //添加标记 按钮
-            viewHolder.topBtn=(Button)convertView.findViewById(R.id.ZD_btn);
+            /*viewHolder.topBtn=(Button)convertView.findViewById(R.id.ZD_btn);
             viewHolder.topBtn.setTag(position);
             viewHolder.deleteBtn=(Button)convertView.findViewById(R.id.delete_btn);
-            viewHolder.deleteBtn.setTag(position);
+            viewHolder.deleteBtn.setTag(position);*/
             //
             convertView.setTag(viewHolder);
 
@@ -89,8 +89,8 @@ public class ChatListAdapter extends BaseAdapter implements View.OnClickListener
                  viewHolders.add(viewHolder);
         }
         //设置左边的LinearLayout宽度为屏幕宽度
-        ViewGroup.LayoutParams params=viewHolder.relativeLayout.getLayoutParams();
-        params.width=displayMetrics.widthPixels;
+        //ViewGroup.LayoutParams params=viewHolder.relativeLayout.getLayoutParams();
+       // params.width=displayMetrics.widthPixels;
 
         Map<String,Object> map=list.get(position);
         viewHolder.headImage.setImageDrawable(context.getResources().getDrawable(Integer.parseInt(map.get("headImage")+"")));
@@ -100,110 +100,18 @@ public class ChatListAdapter extends BaseAdapter implements View.OnClickListener
         String time=simpleDateFormat.format(new Date());
         //viewHolder.timeTV.setText(map.get("time")+"");
         viewHolder.timeTV.setText(time);
-        //注册点击事件
-        viewHolder.hsv.setOnTouchListener(this);
-        //viewHolder.hsv.setOnClickListener(this);
-        //viewHolder.headImage.setOnClickListener(this);
-        //viewHolder.linearLayout1.setOnTouchListener(this);
-        //viewHolder.linearLayout2.setOnTouchListener(this);
-        viewHolder.topBtn.setOnClickListener(this);
-        viewHolder.deleteBtn.setOnClickListener(this);
+
+
 
         return convertView;
     }
 
-    @Override
-    public void onClick(View v) {
-        int position=(int)v.getTag();
-        switch(v.getId()){
-            case R.id.ZD_btn:{
-                HashMap<String,Object>map=list.get(position);
-                list.remove(position);
-                list.add(0,map);
-            }break;
-            case R.id.delete_btn:{
-                list.remove(position);
-            }break;
-            /*case R.id.chat_ll1:{
-                Intent intent[]=new Intent[1];
-                intent[0] = new Intent(context, MyInfoActivity.class);
-                context.startActivities(intent);
-            }break;
-
-            case R.id.chat_ll2:{
-                Intent intent[]=new Intent[1];
-                intent[0] = new Intent(context, MyInfoActivity.class);
-                context.startActivities(intent);
-            }break;*/
-            default:break;
-        }
-        //恢复
-        ViewHolder viewHolder=viewHolders.get(position);
-        viewHolder.hsv.scrollTo(0,0);
-        notifyDataSetChanged();
-
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-            float down = 0;//按下坐标
-            float up = 0;//抬起坐标
-            ViewHolder holder = (ViewHolder) v.getTag();
-            switch (event.getAction()) {
-                //按下动作
-                case MotionEvent.ACTION_DOWN:
-                    down = event.getX();
-                    if (beforeView != null) {
-                        //将上一次操作的滚动条恢复原样
-                        ViewHolder beforeHolder = (ViewHolder) beforeView.getTag();
-                        beforeHolder.hsv.smoothScrollTo(0, 0);
-                    }
-                    //这是一次测试
-                    break;
-                //抬起动作
-                case MotionEvent.ACTION_UP:
-                    //记录此次操作
-                    beforeView = v;
-                    up = event.getX();
-                    if (down == up) {
-                        // 手势未移动，即点击
-                        Intent intent[]=new Intent[1];
-                        intent[0]=new Intent(context,MyInfoActivity.class);
-                        context.startActivities(intent);
-                        Log.d("233333", "onTouch: ");
-                        Toast.makeText(context,"233333",Toast.LENGTH_LONG).show();
-                    } else {
-                        int scrol = holder.hsv.getScrollX();
-                        if (scrol < 100) {
-                            //滚动距离小于屏幕1/4，回滚
-                            holder.hsv.smoothScrollTo(0, 0);
-                        }
-                        else {
-                            //移动到最后端
-                            holder.hsv.smoothScrollTo(1000, 0);
-                        }
-                    }
-                    /**
-                     * 返回true，表示不需要父组件再去处理此事件
-                     * 返回false，不能实现上面的全滚动效果
-                     */
-                    return true;
-            }
-            return false;
-        }
-
-
-
 
     class ViewHolder{
-        HorizontalScrollView hsv;
-        RelativeLayout relativeLayout;
         ImageView headImage;
         TextView  nameTV;
         TextView mesTV;
         TextView timeTV;
-        Button topBtn;
-        Button deleteBtn;
     }
 
 }
