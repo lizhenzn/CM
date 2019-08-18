@@ -16,10 +16,14 @@ import com.example.cm.R;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> {
     private List<ShareItem> ShareItemList;
     private static final String TAG = "ShareAdapter";
     static class ViewHolder extends RecyclerView.ViewHolder{
+        CircleImageView HeadImage;
+        TextView UserName;
         ImageView ClothesUp;
         ImageView ClothesDown;
         TextView Description;
@@ -28,6 +32,8 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
 
         public ViewHolder(View view) {
             super(view);
+            HeadImage = view.findViewById(R.id.headImage);
+            UserName = view.findViewById(R.id.userName);
             ClothesUp = view.findViewById(R.id.clothes_up);
             ClothesDown = view.findViewById(R.id.clothes_down);
             Description = view.findViewById(R.id.description);
@@ -59,6 +65,8 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         ShareItem shareItem = ShareItemList.get(position);
+        viewHolder.HeadImage.setImageResource(shareItem.getIdHeadImage());
+        viewHolder.UserName.setText(shareItem.getUserName());
         viewHolder.ClothesUp.setImageResource(shareItem.getIdClothesUp());
         viewHolder.ClothesDown.setImageResource(shareItem.getIdClothesDown());
         viewHolder.Description.setText(shareItem.getDescription());
