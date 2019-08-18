@@ -17,7 +17,7 @@
         android:roundIcon="@drawable/cm"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".friend.ChatActivity"></activity>
+        <activity android:name=".friend.chat.ChatActivity"></activity>
         <activity android:name=".friend.ContantActivity" />
         <activity android:name=".myInfo.RegisterActivity" />
 
@@ -30,6 +30,7 @@
         <activity android:name=".myInfo.EditNiChengActivity" />
         <activity android:name=".myInfo.MyInfoActivity" />
         <activity android:name=".MainActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

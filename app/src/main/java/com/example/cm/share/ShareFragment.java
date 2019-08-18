@@ -11,12 +11,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+import org.jivesoftware.smackx.iqregister.AccountManager;
 
 
 import com.example.cm.ConnectService;
 import com.example.cm.R;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
+import com.example.cm.util.Connect;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+
+import java.io.IOException;
 
 import main.CallBackMethods;
 import main.TransferManager;
@@ -24,7 +35,7 @@ import main.UserInfo;
 
 import static com.example.cm.MainActivity.setToolbarText;
 
-public class ShareFragment extends Fragment {
+public class ShareFragment extends Fragment implements View.OnClickListener {
     private Context context;
     private View view;
 
@@ -47,7 +58,14 @@ public class ShareFragment extends Fragment {
         context=getActivity();
         view=View.inflate(context, R.layout.share,null);
         Button button=(Button)view.findViewById(R.id.share_btn);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button login=(Button)view.findViewById(R.id.login_share);
+        Button disconnect=(Button)view.findViewById(R.id.disConnect);
+        button.setOnClickListener(this);
+        login.setOnClickListener(this);
+        disconnect.setOnClickListener(this);
+
+
+       /* button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 /*UserInfo user=new UserInfo();
@@ -81,8 +99,16 @@ public class ShareFragment extends Fragment {
                         });
                     }
                 }).start();*/
-                ConnectService connectService=new ConnectService();
-                connectService.getConnection();
+              /*  Connect connect=new Connect(getActivity());
+                XMPPTCPConnection xmpptcpConnection=connect.getXmppConnection();
+                if(xmpptcpConnection!=null)
+                    Toast.makeText(context,"Connect Openfile Success!", Toast.LENGTH_LONG).show();
+                else
+                    Toast.makeText(context,"Connect Openfile Fail!", Toast.LENGTH_LONG).show();
+
+
+
+
                 //if(connectService.login("lizhen","zn521128"))
                     //Log.d("loginOpenfile","Success");
                //boolean b= connectService.login("admin","zn521128");
@@ -91,7 +117,23 @@ public class ShareFragment extends Fragment {
                // ConnectService.getConnection();
                 //ConnectService.login("lizhen","zn521128");
             }
-        });
+        });*/
+
         return  view;
+    }
+
+    @Override
+    public void onClick(View v) {
+        Connect connect=new Connect(getActivity());
+
+        switch(v.getId()){
+            case R.id.share_btn:{
+            }break;
+            case R.id.login_share:{
+            }break;
+            case R.id.disConnect:{
+            }break;
+            default:break;
+        }
     }
 }

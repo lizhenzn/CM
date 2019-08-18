@@ -10,4 +10,5 @@
     <color name="colorGray">#72C7CAC7</color>
     <color name="colorBlue">#F21F62F0</color>
     <color name="colorStatBar">#BDBBBB</color>
+    <color name="colorRed">#FF0000</color>
 </resources>

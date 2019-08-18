@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.cm.R;
+import com.example.cm.util.Connect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,18 +96,33 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        Intent intent=null;
         switch(v.getId()){
             case R.id.login:{
-                intent=new Intent();
-                intent.putExtra("zhanghao",String.valueOf(userET.getText()));
-                setResult(RESULT_OK,intent);
-                //页面切换动画
-                overridePendingTransition(R.anim.out_from_left,R.anim.in_from_right);
-                this.finish();
+                new LoginActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Connect connect=new Connect(LoginActivity.this);
+                        String user= String.valueOf(userET.getText());
+                        String passwd= String.valueOf(pswET.getText());
+                        //登陆成功
+                        if(connect.login(user,passwd)){
+                            Intent intent=new Intent();
+                            intent.putExtra("zhanghao",String.valueOf(userET.getText()));
+                            setResult(RESULT_OK,intent);
+                            //页面切换动画
+                            overridePendingTransition(R.anim.out_from_left,R.anim.in_from_right);
+                            LoginActivity.this.finish();
+                        }else{//登陆失败
+                            Intent intent=new Intent();
+                            setResult(RESULT_CANCELED,intent);
+                        }
+                    }
+                });
+
+
             }break;
             case R.id.register:{
-                intent=new Intent(this,RegisterActivity.class);
+                Intent intent=new Intent(this,RegisterActivity.class);
                 startActivityForResult(intent, REGISTER);
                 overridePendingTransition(R.anim.out_from_left,R.anim.in_from_right);
             }break;
