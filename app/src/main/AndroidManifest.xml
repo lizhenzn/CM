@@ -16,7 +16,8 @@
         android:roundIcon="@drawable/wardrobe1"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".myInfo.RegisterActivity"></activity>
+        <activity android:name=".share.Comments"></activity>
+        <activity android:name=".myInfo.RegisterActivity" />
 
         <service
             android:name=".ConnectService"

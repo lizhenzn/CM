@@ -48,7 +48,6 @@ private final int LOGIN=1;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //getSupportActionBar().hide();
         init();
         initTabhost();

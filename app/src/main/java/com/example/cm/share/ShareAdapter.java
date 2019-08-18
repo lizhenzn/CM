@@ -1,13 +1,16 @@
 package com.example.cm.share;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cm.R;
 
@@ -15,7 +18,7 @@ import java.util.List;
 
 public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> {
     private List<ShareItem> ShareItemList;
-
+    private static final String TAG = "ShareAdapter";
     static class ViewHolder extends RecyclerView.ViewHolder{
         ImageView ClothesUp;
         ImageView ClothesDown;
@@ -36,12 +39,20 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
 }
         public ShareAdapter(List<ShareItem> ShareItemList){
             this.ShareItemList=ShareItemList;
+
     }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.share_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
+        viewHolder.Comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(v.getContext(),Comments.class);
+                v.getContext().startActivity(intent);
+            }
+        });
         return viewHolder;
     }
 
@@ -53,6 +64,7 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         viewHolder.Description.setText(shareItem.getDescription());
         viewHolder.GiveLike.setImageResource(shareItem.getIdGiveLike());
         viewHolder.Comment.setImageResource(shareItem.getIdComment());
+
     }
 
     @Override
