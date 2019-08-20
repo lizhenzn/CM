@@ -52,52 +52,6 @@ public class MatchFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context=getActivity();
         view=View.inflate(context, R.layout.match,null);
-        Button button=view.findViewById(R.id.testButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-
-
-//                                TransferManager trans=new TransferManager();
-//                                UserInfo userInfo=new UserInfo();
-//                                userInfo.setUserName("TSaber7");
-//                                userInfo.setPassWord("12345");
-//                                userInfo.setFakeName("pubbydog");
-//                                trans.doUpdate(userInfo, new CallBackMethods() {
-//                                    @Override
-//                                    public void onSuccess() {
-//                                        Log.d(TAG, "onSuccess: ");
-//                                    }
-//
-//                                    @Override
-//                                    public void onError() {
-//                                        Log.d(TAG, "onError: ");
-//                                    }
-//
-//                                    @Override
-//                                    public void onFailed() {
-//                                        Log.d(TAG, "onFailed: ");
-//                                    }
-//
-//                                    @Override
-//                                    public void onBadLink() {
-//                                        Log.d(TAG, "onBadLink: ");
-//                                    }
-//                                });
-
-
-
-
-
-                   }
-              }).start();
-
-            }
-        });
         return  view;
     }
 }

@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,10 +20,34 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> {
+public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ShareItem> ShareItemList;
+    // 普通布局
+    private final int TYPE_ITEM = 1;
+    // 脚布局
+    private final int TYPE_FOOTER = 2;
+    // 当前加载状态，默认为加载完成
+    private int loadState = 2;
+    // 正在加载
+    public final int LOADING = 1;
+    // 加载完成
+    public final int LOADING_COMPLETE = 2;
+    // 加载到底
+    public final int LOADING_END = 3;
+
+    @Override
+    public int getItemViewType(int position) {
+        // 最后一个item设置为FooterView
+        if (position+1==getItemCount()) {
+            return TYPE_FOOTER;
+        } else {
+            return TYPE_ITEM;
+        }
+    }
+
     private static final String TAG = "ShareAdapter";
-    static class ViewHolder extends RecyclerView.ViewHolder{
+
+    private class RecyclerViewHolder extends RecyclerView.ViewHolder {
         CircleImageView HeadImage;
         TextView UserName;
         ImageView ClothesUp;
@@ -30,7 +56,7 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         ImageButton GiveLike;
         ImageButton Comment;
 
-        public ViewHolder(View view) {
+        public RecyclerViewHolder(View view) {
             super(view);
             HeadImage = view.findViewById(R.id.headImage);
             UserName = view.findViewById(R.id.userName);
@@ -42,43 +68,107 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         }
 
 
-}
-        public ShareAdapter(List<ShareItem> ShareItemList){
-            this.ShareItemList=ShareItemList;
+    }
+
+    private class FootViewHolder extends RecyclerView.ViewHolder {
+
+        TextView tvLoading;
+
+        FootViewHolder(View itemView) {
+            super(itemView);
+            tvLoading = (TextView) itemView.findViewById(R.id.foot_tip);
+        }
+    }
+
+    public ShareAdapter(List<ShareItem> ShareItemList) {
+        this.ShareItemList = ShareItemList;
 
     }
+
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.share_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.Comment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(v.getContext(),Comments.class);
-                v.getContext().startActivity(intent);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == TYPE_ITEM) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.share_item, parent, false);
+            RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.getContext().startActivity(new Intent(v.getContext(), PresentShareItem.class));
+                }
+            });
+            viewHolder.Comment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), Comments.class);
+                    v.getContext().startActivity(intent);
+                }
+            });
+            return viewHolder;
+        } else if (viewType == TYPE_FOOTER) {
+            Log.d(TAG, "onCreateViewHolder: create foot_tip");
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.share_foot_item, parent, false);
+            FootViewHolder footViewHolder = new FootViewHolder(v);
+            return footViewHolder;
+        }
+        return null;
+
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        Log.d(TAG, "onBindViewHolder: loadState="+loadState);
+        if (viewHolder instanceof RecyclerViewHolder) {
+            Log.d(TAG, "onBindViewHolder: is RecyclerViewHolder");
+            RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) viewHolder;
+            ShareItem shareItem = ShareItemList.get(position);
+            recyclerViewHolder.HeadImage.setImageResource(shareItem.getIdHeadImage());
+            recyclerViewHolder.UserName.setText(shareItem.getUserName());
+            recyclerViewHolder.ClothesUp.setImageResource(shareItem.getIdClothesUp());
+            recyclerViewHolder.ClothesDown.setImageResource(shareItem.getIdClothesDown());
+            recyclerViewHolder.Description.setText(shareItem.getDescription());
+            recyclerViewHolder.GiveLike.setImageResource(shareItem.getIdGiveLike());
+            recyclerViewHolder.Comment.setImageResource(shareItem.getIdComment());
+        } else if (viewHolder instanceof FootViewHolder) {
+            FootViewHolder footViewHolder = (FootViewHolder) viewHolder;
+            switch (loadState) {
+
+                case LOADING: // 正在加载
+
+//                    footViewHolder.pbLoading.setVisibility(View.VISIBLE);
+                    footViewHolder.tvLoading.setVisibility(View.VISIBLE);
+                    footViewHolder.tvLoading.setText("正在加载" );
+                    Log.d(TAG, "onBindViewHolder: LOADING ");
+//                    footViewHolder.llEnd.setVisibility(View.GONE);
+                    break;
+
+                case LOADING_COMPLETE: // 加载完成
+//                    footViewHolder.pbLoading.setVisibility(View.INVISIBLE);
+                    footViewHolder.tvLoading.setVisibility(View.INVISIBLE);Log.d(TAG, "onBindViewHolder:LOADING_COMPLETE ");
+//                    footViewHolder.llEnd.setVisibility(View.GONE);
+                    break;
+
+                case LOADING_END: // 加载到底
+//                    footViewHolder.pbLoading.setVisibility(View.GONE);
+                    footViewHolder.tvLoading.setVisibility(View.GONE);
+                    Log.d(TAG, "onBindViewHolder: LOADING_END");
+//                    footViewHolder.llEnd.setVisibility(View.VISIBLE);
+                    break;
+
+                default:
+                    break;
             }
-        });
-        return viewHolder;
+        }
     }
-
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        ShareItem shareItem = ShareItemList.get(position);
-        viewHolder.HeadImage.setImageResource(shareItem.getIdHeadImage());
-        viewHolder.UserName.setText(shareItem.getUserName());
-        viewHolder.ClothesUp.setImageResource(shareItem.getIdClothesUp());
-        viewHolder.ClothesDown.setImageResource(shareItem.getIdClothesDown());
-        viewHolder.Description.setText(shareItem.getDescription());
-        viewHolder.GiveLike.setImageResource(shareItem.getIdGiveLike());
-        viewHolder.Comment.setImageResource(shareItem.getIdComment());
-
+    public int getItemCount () {
+        return ShareItemList.size()+1 ;
     }
-
-    @Override
-    public int getItemCount() {
-        return ShareItemList.size();
+    public void setLoadState(int loadState) {
+        this.loadState = loadState;
+        notifyDataSetChanged();
     }
-
-
+    public int getLoadState(){
+        return this.loadState;
+    }
 }
