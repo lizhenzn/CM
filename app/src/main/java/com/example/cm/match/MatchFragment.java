@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import main.CallBackMethods;
-import main.ImgUploader;
+import main.ImgManager;
 import main.TransferManager;
 import main.UserInfo;
 

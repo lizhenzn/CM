@@ -1,5 +1,6 @@
 package com.example.cm.share;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -9,6 +10,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -40,10 +42,11 @@ public class ShareFragment extends Fragment {
     private static final String TAG = "ShareFragment";
     private Context context;
     private View view;
-    private List<ShareItem> shareItemList = new ArrayList<>();
+    private List<ShareItem> shareItemList ;
     private RecyclerView recyclerView;
     private ShareAdapter shareAdapter;
     private LinearLayoutManager mLayoutManager;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -117,18 +120,37 @@ public class ShareFragment extends Fragment {
 
 
         init();
-//        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-//        recyclerView = recyclerView;
-//        mLayoutManager=new LinearLayoutManager(context);
-//        recyclerView.setLayoutManager(mLayoutManager);
-//        ShareAdapter adapter = new ShareAdapter(shareItemList);
-//        recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new ShareItemDecoration());
+
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                init();
+                                shareAdapter.notifyDataSetChanged();
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
         return  view;
     }
     private void init() {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
+        shareItemList=new ArrayList<>();
         // 模拟获取数据
         getData();
         shareAdapter = new ShareAdapter(shareItemList);
@@ -143,9 +165,23 @@ public class ShareFragment extends Fragment {
                 Log.d(TAG, "onLoadMore: loadState="+shareAdapter.getLoadState());
                if (shareItemList.size() < 52) {
                     // 模拟获取网络数据，延时1s
-                    getData();
-                   shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
-
+                   new Thread(new Runnable() {
+                       @Override
+                       public void run() {
+                           try {
+                               Thread.sleep(2000);
+                           } catch (InterruptedException e) {
+                               e.printStackTrace();
+                           }
+                           getActivity().runOnUiThread(new Runnable() {
+                               @Override
+                               public void run() {
+                                   getData();
+                                   shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
+                               }
+                           });
+                       }
+                   }).start();
                 } else {
                     // 显示加载到底的提示
                     shareAdapter.setLoadState(shareAdapter.LOADING_END);
