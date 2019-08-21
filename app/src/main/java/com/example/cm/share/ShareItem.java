@@ -1,19 +1,21 @@
 package com.example.cm.share;
 
+import java.io.File;
+
 public class ShareItem {
     private int idHeadImage;
     private String UserName;
-    private int idClothesUp;
-    private int idClothesDown;
+    private File ClothesUp;
+    private File ClothesDown;
     private String description;
     private int idGiveLike;
     private int idComment;
 
-    public ShareItem(int idHeadImage,String UserName,int idClothesUp, int idClothesDown, String description, int idGiveLike, int idComment) {
+    public ShareItem(int idHeadImage,String UserName,File ClothesUp, File ClothesDown, String description, int idGiveLike, int idComment) {
         this.idHeadImage = idHeadImage;
         this.UserName = UserName;
-        this.idClothesUp = idClothesUp;
-        this.idClothesDown = idClothesDown;
+        this.ClothesUp = ClothesUp;
+        this.ClothesDown = ClothesDown;
         this.description = description;
         this.idGiveLike = idGiveLike;
         this.idComment = idComment;
@@ -26,12 +28,12 @@ public class ShareItem {
     String getUserName() {
         return UserName;
     }
-    int getIdClothesUp() {
-        return idClothesUp;
+    File getClothesUp() {
+        return ClothesUp;
     }
 
-    int getIdClothesDown() {
-        return idClothesDown;
+    File getClothesDown() {
+        return ClothesDown;
     }
 
     String getDescription() {

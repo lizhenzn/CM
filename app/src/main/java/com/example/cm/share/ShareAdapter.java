@@ -1,6 +1,7 @@
 package com.example.cm.share;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -124,8 +125,8 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ShareItem shareItem = ShareItemList.get(position);
             recyclerViewHolder.HeadImage.setImageResource(shareItem.getIdHeadImage());
             recyclerViewHolder.UserName.setText(shareItem.getUserName());
-            recyclerViewHolder.ClothesUp.setImageResource(shareItem.getIdClothesUp());
-            recyclerViewHolder.ClothesDown.setImageResource(shareItem.getIdClothesDown());
+            recyclerViewHolder.ClothesUp.setImageURI(Uri.fromFile(shareItem.getClothesUp()));
+            recyclerViewHolder.ClothesDown.setImageURI(Uri.fromFile(shareItem.getClothesDown()));
             recyclerViewHolder.Description.setText(shareItem.getDescription());
             recyclerViewHolder.GiveLike.setImageResource(shareItem.getIdGiveLike());
             recyclerViewHolder.Comment.setImageResource(shareItem.getIdComment());

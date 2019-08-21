@@ -14,6 +14,7 @@ import android.widget.Button;
 
 import com.example.cm.R;
 import com.example.cm.MainActivity;
+import com.example.cm.util.ServerFunction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,6 +53,23 @@ public class MatchFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context=getActivity();
         view=View.inflate(context, R.layout.match,null);
+
+        Button button = view.findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        for(int i=1;i<=12;i++){
+//
+//                            ServerFunction.sendPost("test","第"+i+"条分享",2,"/sdcard/test/"+"saber"+i+"_up.jpg",
+//                                    "/sdcard/test/"+"saber"+i+"_down.jpg","TSaber7",0);
+//                        }
+//                    }
+//                }).start();
+            }
+        });
         return  view;
     }
 }

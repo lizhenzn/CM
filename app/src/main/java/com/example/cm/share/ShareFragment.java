@@ -24,6 +24,7 @@ import com.example.cm.ConnectService;
 import com.example.cm.R;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
+import com.example.cm.util.ServerFunction;
 
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class ShareFragment extends Fragment {
     private ShareAdapter shareAdapter;
     private LinearLayoutManager mLayoutManager;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ServerFunction serverFunction;
 
 
 
@@ -71,6 +73,7 @@ public class ShareFragment extends Fragment {
 
         context=getActivity();
         view=View.inflate(context, R.layout.share,null);
+        serverFunction=new ServerFunction(context.getCacheDir());
         Button button=(Button)view.findViewById(R.id.share_btn);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,20 +132,13 @@ public class ShareFragment extends Fragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                init();
-                                shareAdapter.notifyDataSetChanged();
-                                swipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
+
+                        init();
+                        shareAdapter.notifyDataSetChanged();
+                        swipeRefreshLayout.setRefreshing(false);
                     }
+
+
                 }).start();
             }
         });
@@ -152,7 +148,14 @@ public class ShareFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         shareItemList=new ArrayList<>();
         // 模拟获取数据
-        getData();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                serverFunction.refresh();
+                getData();
+            }
+        }).start();
+
         shareAdapter = new ShareAdapter(shareItemList);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(shareAdapter);
@@ -168,19 +171,12 @@ public class ShareFragment extends Fragment {
                    new Thread(new Runnable() {
                        @Override
                        public void run() {
-                           try {
-                               Thread.sleep(2000);
-                           } catch (InterruptedException e) {
-                               e.printStackTrace();
-                           }
-                           getActivity().runOnUiThread(new Runnable() {
-                               @Override
-                               public void run() {
+
                                    getData();
                                    shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
                                }
-                           });
-                       }
+
+
                    }).start();
                 } else {
                     // 显示加载到底的提示
@@ -190,8 +186,14 @@ public class ShareFragment extends Fragment {
         });
     }
     private void getData() {
+        serverFunction.loadPostList();
         for (int i = 0; i <= 9; i++) {
-            shareItemList.add(new ShareItem(R.drawable.friend1,"TSaber7",R.drawable.friend1,R.drawable.friend1,"test!!!!!!!!!!!!!!!!!!!!!!!!!!!",R.drawable.givelike,R.drawable.comment));
+            shareItemList.add(new ShareItem(R.drawable.friend1,"TSaber7",serverFunction.getSmallUpImg(),
+                    serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
+            if(!serverFunction.nextPost()){
+                break;
+            }
+
         }
     }
 
