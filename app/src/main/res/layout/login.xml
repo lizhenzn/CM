@@ -49,8 +49,9 @@
             android:layout_height="60dp"
             android:layout_centerHorizontal="true"
             android:hint="账号"
+            android:text="test001"
             android:background="@null"
-            android:inputType="number" />
+             />
 
         <Spinner
             android:id="@+id/spinner"
@@ -87,6 +88,7 @@
             android:layout_height="60dp"
             android:background="@null"
             android:hint="密码"
+            android:text="222333"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_marginTop="14dp"

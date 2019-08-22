@@ -9,35 +9,41 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.cm.friend.chat.GroupInfo;
+import com.example.cm.myInfo.FriendInfo;
+import com.example.cm.myInfo.SmackUserInfo;
+
 import com.example.cm.R;
+import com.example.cm.myInfo.SmackUserInfo;
+import com.example.cm.util.Connect;
 
 import java.util.List;
 
+import main.UserInfo;
+
 public class ContantAdapter extends BaseExpandableListAdapter {
-    private List<GroupInfo> groupList;
     private Context context;
-    public ContantAdapter(Context context,List<GroupInfo> groupInfoList){
+    public ContantAdapter(Context context){
         this.context=context;
-        this.groupList=groupInfoList;
     }
     @Override
     public int getGroupCount() {
-        return groupList.size();
+        return Connect.groupInfoList.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return groupList.get(groupPosition).getUserInfoList().size();
+        return Connect.groupInfoList.get(groupPosition).getFriendInfoList().size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return groupList.get(groupPosition);
+        return Connect.groupInfoList.get(groupPosition);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return groupList.get(groupPosition).getUserInfoList().get(childPosition);
+        return Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition);
     }
 
     @Override
@@ -61,7 +67,7 @@ public class ContantAdapter extends BaseExpandableListAdapter {
         if(convertView==null)
             convertView=View.inflate(context, R.layout.expend_group,null);
         TextView groupTV=(TextView)convertView.findViewById(R.id.expand_groupTV);
-        groupTV.setText(groupList.get(groupPosition).getGroupName());
+        groupTV.setText(Connect.groupInfoList.get(groupPosition).getGroupName());
         if(isExpanded){//列表展开
 
         }else{//列表没有展开
@@ -78,8 +84,8 @@ public class ContantAdapter extends BaseExpandableListAdapter {
             convertView=View.inflate(context,R.layout.expand_child,null);
             childViewHolder.headIV=(ImageView)convertView.findViewById(R.id.contant_groupIV);
             childViewHolder.userTV=(TextView) convertView.findViewById(R.id.contant_groupTV);
-            childViewHolder.headIV.setImageResource(groupList.get(groupPosition).getUserInfoList().get(childPosition).getHeadPhoto());
-            childViewHolder.userTV.setText(groupList.get(groupPosition).getUserInfoList().get(childPosition).getUserName());
+            childViewHolder.headIV.setImageBitmap(Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getHeadBt());
+            childViewHolder.userTV.setText(Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getUserName());
             convertView.setTag(childViewHolder);
         }else{
             childViewHolder= (ViewHolder) convertView.getTag();
@@ -96,43 +102,5 @@ public class ContantAdapter extends BaseExpandableListAdapter {
         TextView userTV;
     }
 }
-class GroupInfo{
-    private String GroupName;
-    private List<UserInfo> userInfoList;
 
-    public void setGroupName(String groupName) {
-        GroupName = groupName;
-    }
 
-    public String getGroupName() {
-        return GroupName;
-    }
-
-    public List<UserInfo> getUserInfoList() {
-        return userInfoList;
-    }
-
-    public void setUserInfoList(List<UserInfo> userInfoList) {
-        this.userInfoList = userInfoList;
-    }
-}
-class UserInfo {
-    private int headPhoto;
-    private String userName;
-
-    public int getHeadPhoto() {
-        return headPhoto;
-    }
-
-    public void setHeadPhoto(int headPhoto) {
-        this.headPhoto = headPhoto;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-}

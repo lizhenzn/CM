@@ -21,11 +21,14 @@ import android.widget.Toast;
 import com.example.cm.R;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.ChatListAdapter;
+import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.MyInfoActivity;
+import com.example.cm.util.Connect;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import static com.example.cm.MainActivity.setToolbarText;
 
@@ -35,7 +38,7 @@ public class FriendFragment extends Fragment  {
     private ListView chatLV;
     private ChatListAdapter chatListAdapter;
     private List<HashMap<String,Object>> list;      //会话列表
-
+    static boolean working;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +53,7 @@ public class FriendFragment extends Fragment  {
            FragmentManager fragmentManager;
 
     {
+
         //调用子FragmentManager替换Fragment
         FriendBtnFragment friendBtnFragment=new FriendBtnFragment();
         //ChatLvFragment chatLvFragment=new ChatLvFragment();
@@ -66,20 +70,30 @@ public class FriendFragment extends Fragment  {
 
         //DisplayMetrics displayMetrics=new DisplayMetrics();
         //getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        initChatList();
-        chatListAdapter=new ChatListAdapter(list,getActivity());
+        //initChatList();
+        chatListAdapter=new ChatListAdapter(getActivity());
         chatLV.setAdapter(chatListAdapter);
+        Log.d("test", "onCreateView: ");
+        if(Connect.haveNewMessage) {
+            chatListAdapter.notifyDataSetChanged();
+            Connect.haveNewMessage=false;
+        }
+
+
+
         //点击进入聊天界面
                chatLV.setOnItemClickListener(new AdapterView.OnItemClickListener()
                 {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent intent=new Intent(getActivity(), ChatActivity.class);
+                        intent.putExtra("userName",Connect.friendInfoList.get(position).getUserName());
                         startActivity(intent);
                         Toast.makeText(getContext(),"点击  "+position,Toast.LENGTH_SHORT).show();
                         Log.d("friend", "onItemClick: ");
                     }
                 });
+
         //长按显示置顶删除等
         chatLV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             String []choose={"置顶","删除"};
@@ -105,38 +119,50 @@ public class FriendFragment extends Fragment  {
         });
          return view;
     }
-    //初始化会话界面列表
-    public void initChatList(){
-        HashMap<String,Object> map=new HashMap<String, Object>();
-        list=new ArrayList<>();
-        map.put("headImage",R.drawable.ic_launcher_foreground);
-        map.put("name","张三");
-        map.put("message","Hello,World!");
-        map.put("time","2019.6.6 19:10");
-        list.add(map);
-        map=new HashMap<>();
-        map.put("headImage",R.drawable.ic_launcher_foreground);
-        map.put("name","李四");
-        map.put("message","Hello,World!");
-        map.put("time","2019.5.6 19:10");
-        list.add(map);
-        for(int i=0;i<36;i++) {
-            map = new HashMap<>();
-            map.put("headImage", R.drawable.ic_launcher_foreground);
-            map.put("name", "王五"+i);
-            map.put("message", "Hello,World!");
-            map.put("time", "2019.6.6 19:10");
-            list.add(map);
-        }
 
-    }
 
 
 
     @Override
     public void onResume() {
         super.onResume();
+        working=true;
+        Log.d("test", "onResume: ");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("test", "run: ");
+                while(working) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (Connect.haveNewMessage||ChatActivity.isSend) {
+                                chatListAdapter.notifyDataSetChanged();
+                                Connect.haveNewMessage = false;
+                                ChatActivity.isSend=false;
+                            }
+                        }
+                    });
+                    synchronized((Object)FriendFragment.working){
+                        if(!working)break;
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+        //chatListAdapter.notifyDataSetChanged();
         setToolbarText("会话");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        working=false;
+        Log.d("test", "onPause: ");
     }
 
 }

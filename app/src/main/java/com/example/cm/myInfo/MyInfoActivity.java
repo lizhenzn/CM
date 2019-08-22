@@ -3,6 +3,7 @@ package com.example.cm.myInfo;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.DialogInterface;
@@ -40,6 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.util.AlbumUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -128,10 +130,8 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.head_view:
-                if(ContextCompat.checkSelfPermission(MyInfoActivity.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(MyInfoActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-                }
+               if(!AlbumUtil.checkStorage(MyInfoActivity.this))
+                     AlbumUtil.requestStorage(MyInfoActivity.this);
                 else
                     openAlbum();
                 break;
@@ -208,12 +208,20 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode){
             case OPEN_ALBUM:
                 if(resultCode==RESULT_OK){
-                    handleImageOnKitKat(data);
+                    String imagePath=AlbumUtil.getImageAbsolutePath(data,MyInfoActivity.this);//调用工具类处理返回的数据  得到图片绝对路径
+                    if(imagePath!=null){
+                        Bitmap bitmap= BitmapFactory.decodeFile(imagePath);
+                        head_left_iv.setImageBitmap(bitmap);   //设置头像
+                        //setPicToView(bitmap);
+                    }else
+                        Toast.makeText(MyInfoActivity.this,"Failed to get image",Toast.LENGTH_SHORT).show();
+
                 }
                 break;
             case 2:
@@ -224,7 +232,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                 break;
         }
     }
-    @TargetApi(19)
+   /* @TargetApi(19)
     private void handleImageOnKitKat(Intent data){
         String imagePath=null;
         Uri uri=data.getData();
@@ -289,7 +297,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
 
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

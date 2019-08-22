@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,9 +18,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cm.R;
 import com.example.cm.util.Connect;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatMessageListener;
+import org.jivesoftware.smack.packet.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,26 +106,40 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.login:{
-                new LoginActivity().runOnUiThread(new Runnable() {
+                new Thread(new Runnable() {
+
                     @Override
                     public void run() {
                         Connect connect=new Connect(LoginActivity.this);
                         String user= String.valueOf(userET.getText());
                         String passwd= String.valueOf(pswET.getText());
+                        boolean isLogined=connect.login(user,passwd);
+
                         //登陆成功
-                        if(connect.login(user,passwd)){
+                        if(isLogined){
+                            LoginActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(LoginActivity.this,"登陆成功",Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
                             Intent intent=new Intent();
                             intent.putExtra("zhanghao",String.valueOf(userET.getText()));
                             setResult(RESULT_OK,intent);
                             //页面切换动画
                             overridePendingTransition(R.anim.out_from_left,R.anim.in_from_right);
+
                             LoginActivity.this.finish();
                         }else{//登陆失败
-                            Intent intent=new Intent();
-                            setResult(RESULT_CANCELED,intent);
+
+                           // Intent intent=new Intent();
+                           // setResult(RESULT_CANCELED,intent);
                         }
                     }
-                });
+
+                }).start();
+
 
 
             }break;
