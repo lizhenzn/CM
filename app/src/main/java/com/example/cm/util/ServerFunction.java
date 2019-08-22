@@ -45,14 +45,15 @@ public class ServerFunction {
         shareManager.rewind();
     }
     public  void loadPostList(){
-        currentPostList=shareManager.nextPostBatch(cacheDir);
         currentPostPosition=0;
+        shareManager.resetTransferFlags();
+        currentPostList=shareManager.nextPostBatch(cacheDir);
     }
     public boolean nextPost(){
         currentPostPosition++;
         if (currentPostPosition > 9)
             return false;
-        if(currentPostPosition>currentPostList.size())
+        if(currentPostPosition>currentPostList.size()-1)
             return false;
         return true;
     }
@@ -65,6 +66,7 @@ public class ServerFunction {
         shareManager.getImage4Posts(cacheDir,currentPostList,true);
     }
     public File getSmallUpImg(){
+        Log.d("test", "getSmallUpImg: "+currentPostPosition);
         return new File(cacheDir.getAbsolutePath()+"/"+"small_"+currentPostList.get(currentPostPosition).getImgs().get(0));
     }
     public File getSmallDownImg(){
@@ -84,5 +86,6 @@ public class ServerFunction {
     public String getDescription(){
        return  currentPostList.get(currentPostPosition).getContent();
     }
+    public int getCurrentPostPosition(){return currentPostPosition;}
 
 }

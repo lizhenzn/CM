@@ -118,15 +118,19 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        Log.d(TAG, "onBindViewHolder: loadState="+loadState);
         if (viewHolder instanceof RecyclerViewHolder) {
-            Log.d(TAG, "onBindViewHolder: is RecyclerViewHolder");
-            RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) viewHolder;
             ShareItem shareItem = ShareItemList.get(position);
+            RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) viewHolder;
+            if(shareItem.isBlankItemFlag()){
+                recyclerViewHolder.ClothesUp.setImageResource(R.drawable.friend1);
+                recyclerViewHolder.ClothesDown.setImageResource(R.drawable.friend1);
+            }
+            if(!shareItem.isBlankItemFlag()){
+                recyclerViewHolder.ClothesUp.setImageURI(Uri.fromFile(shareItem.getClothesUp()));
+                recyclerViewHolder.ClothesDown.setImageURI(Uri.fromFile(shareItem.getClothesDown()));
+            }
             recyclerViewHolder.HeadImage.setImageResource(shareItem.getIdHeadImage());
             recyclerViewHolder.UserName.setText(shareItem.getUserName());
-            recyclerViewHolder.ClothesUp.setImageURI(Uri.fromFile(shareItem.getClothesUp()));
-            recyclerViewHolder.ClothesDown.setImageURI(Uri.fromFile(shareItem.getClothesDown()));
             recyclerViewHolder.Description.setText(shareItem.getDescription());
             recyclerViewHolder.GiveLike.setImageResource(shareItem.getIdGiveLike());
             recyclerViewHolder.Comment.setImageResource(shareItem.getIdComment());
@@ -168,6 +172,10 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void setLoadState(int loadState) {
         this.loadState = loadState;
         notifyDataSetChanged();
+    }
+
+    public void changeItem() {
+
     }
     public int getLoadState(){
         return this.loadState;
