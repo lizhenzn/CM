@@ -25,12 +25,11 @@ import android.widget.TextView;
 
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
+import com.example.cm.util.Connect;
 
 //import main.CallBackMethods;
 //import main.ImgUploader;
 //import main.TransferManager;
-//import main.UserInfo;
-
 public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawerLayout;
 private NavigationView navigationView;
@@ -64,6 +63,9 @@ private final int LOGIN=1;
                 switch (menuItem.getItemId()){
                     case R.id.settin:{
                         navi_head.setImageResource(R.drawable.unlogin);
+                    }break;
+                    case R.id.navi_sign_out:{
+                        Connect.signOut();   //退出登录
                     }break;
                     default:
                         break;
@@ -148,6 +150,8 @@ private final int LOGIN=1;
             Drawable drawable=new BitmapDrawable(bitmap);
             navi_head.setImageDrawable(drawable);
             head_home.setImageDrawable(drawable);
+            //navi_head.setImageDrawable(Connect.getHeadImage("lizhen"));
+            //head_home.setImageDrawable(Connect.getHeadImage("lizhen"));
             //toolbar.setNavigationIcon(drawable);
             //ImageView homeIM=(ImageView)findViewById(android.R.id.home);
            // homeIM.setImageDrawable(drawable);
@@ -197,6 +201,16 @@ private final int LOGIN=1;
 
             }break;
             default:break;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //退出登录
+        if(Connect.xmpptcpConnection!=null){
+            Connect.signOut();
+            Connect.xmpptcpConnection=null;
         }
     }
 }

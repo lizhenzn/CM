@@ -59,46 +59,6 @@ public class ShareFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*UserInfo user=new UserInfo();
-                user.setUserName("lizhen");
-                user.setEmail("229010ad655");
-                user.setPassWord("123456");
-                TransferManager transferManager=new TransferManager();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        transferManager.doRegister(user, new CallBackMethods() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d("doRegister","666");
-                            }
-
-                            @Override
-                            public void onError() {
-
-                            }
-
-                            @Override
-                            public void onFailed() {
-
-                            }
-
-                            @Override
-                            public void onBadLink() {
-
-                            }
-                        });
-                    }
-                }).start();*/
-                //ConnectService connectService=new ConnectService();
-               // connectService.getConnection();
-                //if(connectService.login("lizhen","zn521128"))
-                    //Log.d("loginOpenfile","Success");
-               //boolean b= connectService.login("admin","zn521128");
-                 Log.d("login","loginOpenfile");
-                Log.d("login000001", "onClick: ");
-               // ConnectService.getConnection();
-                //ConnectService.login("lizhen","zn521128");
             }
         });
 

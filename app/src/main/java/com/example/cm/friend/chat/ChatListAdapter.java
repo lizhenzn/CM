@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.cm.R;
 import com.example.cm.myInfo.MyInfoActivity;
+import com.example.cm.util.Connect;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,16 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.cm.R.drawable.cm;
+
 public class ChatListAdapter extends BaseAdapter  {
    // private  ArrayList<ChatListMessage> listMessageArrayList;          //会话列表的类列表 image、name、message、time、type
-    private List<HashMap<String,Object>> list;
     //private DisplayMetrics displayMetrics;    //屏幕大小
     private Context context;
     private View beforeView;
     private List<ViewHolder> viewHolders;
     public ChatListAdapter(){}
-    public ChatListAdapter(List<HashMap<String,Object>>list,Context context){
-        this.list=list;
+    public ChatListAdapter(Context context){
         this.context=context;
 
         viewHolders=new ArrayList<>();
@@ -46,12 +47,12 @@ public class ChatListAdapter extends BaseAdapter  {
 
     @Override
     public int getCount() {
-        return list.size();
+        return Connect.friendInfoList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return list.get(position);
+        return Connect.messageMap.get(Connect.friendInfoList.get(position).getUserName());
     }
 
     @Override
@@ -66,8 +67,6 @@ public class ChatListAdapter extends BaseAdapter  {
             convertView= LayoutInflater.from(context).inflate(R.layout.chat_lv_item,null);
             viewHolder=new ViewHolder();
             //绑定布局
-            //viewHolder.hsv=(HorizontalScrollView)convertView.findViewById(R.id.hsv);
-            //viewHolder.relativeLayout=(RelativeLayout) convertView.findViewById(R.id.chat_relativeL);
             viewHolder.headImage=(ImageView)convertView.findViewById(R.id.chat_iv);
             viewHolder.nameTV=(TextView) convertView.findViewById(R.id.chat_XMtv);
 
@@ -91,15 +90,25 @@ public class ChatListAdapter extends BaseAdapter  {
         //设置左边的LinearLayout宽度为屏幕宽度
         //ViewGroup.LayoutParams params=viewHolder.relativeLayout.getLayoutParams();
        // params.width=displayMetrics.widthPixels;
-
-        Map<String,Object> map=list.get(position);
-        viewHolder.headImage.setImageDrawable(context.getResources().getDrawable(Integer.parseInt(map.get("headImage")+"")));
-        viewHolder.nameTV.setText(map.get("name")+"");
-        viewHolder.mesTV.setText(map.get("message")+"");
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("EE HH:MMM");
-        String time=simpleDateFormat.format(new Date());
+           //设置会话列表信息显示各个好友最后一条信息时间、内容
+        String userName=Connect.friendInfoList.get(position).getUserName();
+        List<Message> messageList=Connect.messageMap.get(userName);            //对应friendName的聊天信息列表
+        //viewHolder.headImage.setImageDrawable(context.getResources().getDrawable(Integer.parseInt(map.get(Connect.friendInfoList.get(position).get("friendName").getHeadBt())));
+        //viewHolder.headImage.setImageBitmap(map.get(Connect.friendInfoList.get(position).get("friendInfo").getHeadBt()));
+        viewHolder.headImage.setImageResource(cm);
+        viewHolder.nameTV.setText(userName);
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("HH:MM:SS");
+        if(messageList.size()>=1) {
+            viewHolder.mesTV.setText(messageList.get(messageList.size() - 1).getBody());  //设置为最后一条信息
+            String time = simpleDateFormat.format(messageList.get(messageList.size() - 1).getDate());  //最后一条信息的时间
+            viewHolder.timeTV.setText(time);
+        }
+        else
+        {
+            viewHolder.mesTV.setText(null);  //设置为最后一条信息//
+            viewHolder.timeTV.setText("");
+        }
         //viewHolder.timeTV.setText(map.get("time")+"");
-        viewHolder.timeTV.setText(time);
 
 
 

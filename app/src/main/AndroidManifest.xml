@@ -18,10 +18,11 @@
         android:roundIcon="@drawable/cm"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".friend.chat.ChatActivity"></activity>
+        <activity android:name=".friend.AddFriendActivity"></activity>
+        <activity android:name=".friend.chat.ChatActivity" />
         <activity android:name=".friend.ContantActivity" />
         <activity android:name=".myInfo.RegisterActivity" />
-        <activity android:name=".share.Comments"></activity>
+        <activity android:name=".share.Comments" />
         <activity android:name=".myInfo.RegisterActivity" />
 
         <service
@@ -33,7 +34,6 @@
         <activity android:name=".myInfo.EditNiChengActivity" />
         <activity android:name=".myInfo.MyInfoActivity" />
         <activity android:name=".MainActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

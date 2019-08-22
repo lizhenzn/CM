@@ -1,5 +1,7 @@
 package com.example.cm.friend.chat;
 
+import java.util.Date;
+
 public class Message {
     public static final int SELF_MSG = 1;//自己的消息
     public static final int FRIENDS_MSG = 2;//对方的消息
@@ -7,7 +9,9 @@ public class Message {
     private String body;
     private String to;
     private int type;//区分自己还是好友的消息
+    private String messageType;        //text  photo
     private String stanzaId;
+    private Date date;           //消息时间
 
     public String getFrom() {
         return from;
@@ -47,5 +51,21 @@ public class Message {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 }

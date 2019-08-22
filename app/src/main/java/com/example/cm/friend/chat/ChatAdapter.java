@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cm.R;
+import com.example.cm.util.Connect;
 import com.example.cm.util.EmoticonsTextView;
 
 import java.util.List;
@@ -57,7 +58,7 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
         if(messageList.get(position).getType()==1) {
             viewHolder.nameTV.setText(messageList.get(position).getFrom());
         }else {
-            viewHolder.nameTV.setText(messageList.get(position).getTo());
+            viewHolder.nameTV.setText(messageList.get(position).getFrom());
         }
         viewHolder.mesTV.setText(messageList.get(position).getBody());
         return convertView;
