@@ -2,6 +2,7 @@ package com.example.cm.share;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -67,12 +68,21 @@ public class ShareFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         ShareAdapter adapter = new ShareAdapter(shareItemList);
         recyclerView.setAdapter(adapter);
+        recyclerView.addItemDecoration(new ShareItemDecoration());
         return  view;
     }
 
     private void initShareItems() {
         for (int i = 0; i <= 9; i++) {
-            shareItemList.add(new ShareItem(R.drawable.friend1,R.drawable.friend1,"test!!!!!!!!!!!!!!!!!!!!!!!!!!!",R.drawable.givelike,R.drawable.comment));
+            shareItemList.add(new ShareItem(R.drawable.friend1,"TSaber7",R.drawable.friend1,R.drawable.friend1,"test!!!!!!!!!!!!!!!!!!!!!!!!!!!",R.drawable.givelike,R.drawable.comment));
         }
+    }
+}
+
+class ShareItemDecoration extends RecyclerView.ItemDecoration{
+    @Override
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state){
+        super.getItemOffsets(outRect, view, parent, state);
+        outRect.set(0,30,0,30);
     }
 }

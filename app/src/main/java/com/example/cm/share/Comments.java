@@ -1,9 +1,11 @@
 package com.example.cm.share;
 
+import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.example.cm.R;
 
@@ -20,6 +22,7 @@ public class Comments extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new CommentAdapter(CommentList));
+        recyclerView.addItemDecoration(new CommentItemDecoration());
     }
 
     private void initComments() {
@@ -28,4 +31,11 @@ public class Comments extends AppCompatActivity {
         }
     }
 
+}
+class CommentItemDecoration extends RecyclerView.ItemDecoration{
+    @Override
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state){
+        super.getItemOffsets(outRect, view, parent, state);
+        outRect.set(20,20,20,20);
+    }
 }
