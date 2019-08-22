@@ -15,11 +15,15 @@ public class ServerFunction {
     private  ArrayList<PostInfo> currentPostList;
     private  int currentPostPosition;
 
+
     public ServerFunction(File cacheDir){
         this.cacheDir = cacheDir;
         this.shareManager=new ShareManager();
         currentPostList=null;
         currentPostPosition=0;
+    }
+    public ShareManager getShareManager(){
+        return shareManager;
     }
     public  boolean sendPost( String title, String content, int img_num, String clothes_up,String clothes_down,  String username, int like_num) {
         PostInfo postInfo = new PostInfo();
@@ -56,25 +60,25 @@ public class ServerFunction {
     public String getUserName(){
         return currentPostList.get(currentPostPosition).getUsername();
     }
+    public void loadSmallImg(){
+        shareManager.getImage4Posts(cacheDir,currentPostList,true);
+        shareManager.getImage4Posts(cacheDir,currentPostList,true);
+    }
     public File getSmallUpImg(){
-        shareManager.getImage4Post(cacheDir,currentPostList.get(currentPostPosition),true);
-        Log.d("test", "getSmallUpImg: "+new File(cacheDir.getAbsolutePath()+"/"+"small_"+currentPostList.get(currentPostPosition).getImgs().get(0)).exists());
         return new File(cacheDir.getAbsolutePath()+"/"+"small_"+currentPostList.get(currentPostPosition).getImgs().get(0));
     }
     public File getSmallDownImg(){
-        shareManager.getImage4Post(cacheDir,currentPostList.get(currentPostPosition),true);
-        Log.d("test", "getSmallDownImg: "+currentPostList.get(currentPostPosition).getImgs().size());
-        Log.d("test", "getSmallDownImg: "+currentPostList.get(currentPostPosition).getImgs().get(0));
-        Log.d("test", "getSmallDownImg: "+currentPostList.get(currentPostPosition).getImgs().get(1));
-        Log.d("test", "getSmallDownImg: "+"done");
         return new File(cacheDir.getAbsolutePath()+"/"+"small_"+currentPostList.get(currentPostPosition).getImgs().get(1));
     }
+
+    public void loadImg(){
+        shareManager.getImage4Posts(cacheDir,currentPostList,false);
+        shareManager.getImage4Posts(cacheDir,currentPostList,false);
+    }
     public File getUpImg(){
-        shareManager.getImage4Post(cacheDir,currentPostList.get(currentPostPosition),false);
         return new File(cacheDir.getAbsolutePath()+"/"+currentPostList.get(currentPostPosition).getImgs().get(0));
     }
     public File getDown(){
-        shareManager.getImage4Post(cacheDir,currentPostList.get(currentPostPosition),false);
         return new File(cacheDir.getAbsolutePath()+"/"+currentPostList.get(currentPostPosition).getImgs().get(1));
     }
     public String getDescription(){

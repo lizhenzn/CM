@@ -69,77 +69,19 @@ public class ShareFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-
         context=getActivity();
         view=View.inflate(context, R.layout.share,null);
         serverFunction=new ServerFunction(context.getCacheDir());
         Button button=(Button)view.findViewById(R.id.share_btn);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /*UserInfo user=new UserInfo();
-                user.setUserName("lizhen");
-                user.setEmail("229010ad655");
-                user.setPassWord("123456");
-                TransferManager transferManager=new TransferManager();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        transferManager.doRegister(user, new CallBackMethods() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d("doRegister","666");
-                            }
-
-                            @Override
-                            public void onError() {
-
-                            }
-
-                            @Override
-                            public void onFailed() {
-
-                            }
-
-                            @Override
-                            public void onBadLink() {
-
-                            }
-                        });
-                    }
-                }).start();*/
-                //ConnectService connectService=new ConnectService();
-               // connectService.getConnection();
-                //if(connectService.login("lizhen","zn521128"))
-                    //Log.d("loginOpenfile","Success");
-               //boolean b= connectService.login("admin","zn521128");
-                 Log.d("login","loginOpenfile");
-                Log.d("login000001", "onClick: ");
-               // ConnectService.getConnection();
-                //ConnectService.login("lizhen","zn521128");
-            }
-        });
-
-
         init();
         recyclerView.addItemDecoration(new ShareItemDecoration());
-
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
                         init();
                         shareAdapter.notifyDataSetChanged();
                         swipeRefreshLayout.setRefreshing(false);
-                    }
-
-
-                }).start();
             }
         });
         return  view;
@@ -148,14 +90,8 @@ public class ShareFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         shareItemList=new ArrayList<>();
         // 模拟获取数据
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                serverFunction.refresh();
-                getData();
-            }
-        }).start();
-
+        serverFunction.refresh();
+        getData();
         shareAdapter = new ShareAdapter(shareItemList);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(shareAdapter);
@@ -168,16 +104,10 @@ public class ShareFragment extends Fragment {
                 Log.d(TAG, "onLoadMore: loadState="+shareAdapter.getLoadState());
                if (shareItemList.size() < 52) {
                     // 模拟获取网络数据，延时1s
-                   new Thread(new Runnable() {
-                       @Override
-                       public void run() {
 
                                    getData();
                                    shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
-                               }
 
-
-                   }).start();
                 } else {
                     // 显示加载到底的提示
                     shareAdapter.setLoadState(shareAdapter.LOADING_END);
@@ -186,17 +116,22 @@ public class ShareFragment extends Fragment {
         });
     }
     private void getData() {
-        serverFunction.loadPostList();
+        serverFunction.getShareManager().transfer_over=false;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                serverFunction.loadPostList();
+            }
+        }).start();
+        while(!serverFunction.getShareManager().transfer_over) {}
         for (int i = 0; i <= 9; i++) {
             shareItemList.add(new ShareItem(R.drawable.friend1,"TSaber7",serverFunction.getSmallUpImg(),
                     serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
             if(!serverFunction.nextPost()){
                 break;
             }
-
         }
     }
-
 }
 
 class ShareItemDecoration extends RecyclerView.ItemDecoration{
