@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -42,7 +44,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -196,6 +203,7 @@ public class Connect {
         ChatManager manager = ChatManager.getInstanceFor(Connect.xmpptcpConnection);
         //设置信息的监听
         final ChatMessageListener messageListener = new ChatMessageListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void processMessage(Chat chat, Message message) {
                 //当消息返回为空的时候，表示用户正在聊天窗口编辑信息并未发出消息
@@ -212,15 +220,18 @@ public class Connect {
                         if(jsonObject.getString("type").equals("text")) {
                             message1.setBody(jsonObject.getString("data"));
                         }else{
-                            message1.setBody("图片");
+                            message1.setBody("[图片]");
                             //将接收到的字符串解析成bitmap
+                            String encodeImageStr=jsonObject.getString("data");
+                            Bitmap bitmap=AlbumUtil.byte2Bitmap(AlbumUtil.encodedStr2byte(encodeImageStr));
+                            message1.setPhoto(bitmap);
                             //message1.setPhoto(jsonObject.getString("photo"));
                            //message1.setPhoto(new BitmapFactory(R.drawable.unlogin));
                         }
                              message1.setFrom(message.getFrom().split("/")[0]);
                              message1.setTo(message.getTo());
                              //message1.setDate((Date) jsonObject.get("date"));
-                        message1.setDate(new Date());
+                             message1.setDate(new Date());
                              message1.setType(2);
                         haveNewMessage=true;
                         //ChatActivity.chatAdapter.notifyDataSetInvalidated();
@@ -315,20 +326,85 @@ public class Connect {
         messageMap=new HashMap<>();
         friendInfoList=new ArrayList<>();
     }
-    public static void getUserImage(String user){
+    /*获取用户头像
+    *param userName
+    */
+    public static Drawable getUserImage(String user){
+        Drawable drawable=null;
         VCard vCard=new VCard();
         try {
             vCard.load(xmpptcpConnection,user);
             vCard.getAvatar();
             Log.d("获取头像测试", "getUserImage: "+vCard.toString());
+            byte []bytes=vCard.getAvatar();
+            ByteArrayInputStream bais=new ByteArrayInputStream(vCard.getAvatar());
+            Bitmap bitmap=BitmapFactory.decodeStream(bais);
+            BitmapDrawable bitmapDrawable=new BitmapDrawable(bitmap);
+            drawable=bitmapDrawable;
+
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
+            Log.d("**/***//**获取头像", "getUserImage: 获取头像异常");
         } catch (XMPPException.XMPPErrorException e) {
+            e.printStackTrace();
+            Log.d("**/***//**获取头像", "getUserImage: 获取头像异常");
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+            Log.d("**/***//**获取头像", "getUserImage: 获取头像异常");
+        }
+        return drawable;
+    }
+    /*修改头像
+    *param XMPPConnection
+    * *param String 图片的绝对路径
+    */
+    public static void changeImage(XMPPConnection connection,String absoluteRoad)
+            throws XMPPException, IOException {
+
+        VCard vcard = new VCard();
+        try {
+            vcard.load(xmpptcpConnection);
+        } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
+        File photoFile=new File(absoluteRoad);
+        byte []bytes=File2byte(photoFile);
+         vcard.setAvatar(bytes);
+        try {
+            vcard.save(xmpptcpConnection);
+        } catch (SmackException.NoResponseException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+
     }
+    //文件转byte[]
+    public static byte[] File2byte(File tradeFile){
+        byte[] buffer = null;
+        try
+        {
+            FileInputStream fis = new FileInputStream(tradeFile);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] b = new byte[1024];
+            int n;
+            while ((n = fis.read(b)) != -1)
+            {
+                bos.write(b, 0, n);
+            }
+            fis.close();
+            bos.close();
+            buffer = bos.toByteArray();
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return buffer;
+    }
+
     public static int getPositionByUserName(String userName){
         int i;
         for(i=0;i<friendInfoList.size();i++){

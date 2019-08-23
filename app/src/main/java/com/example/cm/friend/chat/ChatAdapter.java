@@ -71,7 +71,9 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
         if(messageList.get(position).getMessageType().equals("text"))
             viewHolder.mesTV.setText(messageList.get(position).getBody());
         else {
-            viewHolder.photoIV.setImageResource(R.drawable.cm);
+            //viewHolder.photoIV.setImageResource(R.drawable.cm);
+            //viewHolder.photoIV.setImageDrawable(Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]));
+            viewHolder.photoIV.setImageBitmap(messageList.get(position).getPhoto());
         }
           //viewHolder.photoIV.setImageBitmap(messageList.get(position).getPhoto());
         return convertView;

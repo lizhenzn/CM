@@ -2,13 +2,16 @@ package com.example.cm;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.view.GravityCompat;
@@ -22,10 +25,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
+import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
+
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.IOException;
 
 //import main.CallBackMethods;
 //import main.ImgUploader;
@@ -67,6 +76,15 @@ private final int LOGIN=1;
                     case R.id.navi_sign_out:{
                         Connect.signOut();   //退出登录
                     }break;
+                    case R.id.navi_set_head:{   //设置头像
+                        if(AlbumUtil.checkStorage(MainActivity.this)){
+                            Intent intent=new Intent("android.intent.action.GET_CONTENT");
+                            intent.setType("image/*");
+                            startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
+                        }else{
+                            Toast.makeText(MainActivity.this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                        }
+                    }break;
                     default:
                         break;
 
@@ -97,6 +115,10 @@ private final int LOGIN=1;
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+        Log.d("获取头像并设置", "onCreate: 设置侧滑栏头像之前");
+
+        //head_home.setImageDrawable(Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]));
+        Log.d("获取头像并设置", "onCreate: 设置侧滑栏头像之后");
 
     }
 
@@ -190,6 +212,7 @@ private final int LOGIN=1;
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -200,7 +223,36 @@ private final int LOGIN=1;
                 }
 
             }break;
+            case AlbumUtil.OPEN_ALBUM:{
+                String photoRoad=AlbumUtil.getImageAbsolutePath(data,MainActivity.this);
+                try {
+                    Connect.changeImage(Connect.xmpptcpConnection,photoRoad);
+                    Toast.makeText(MainActivity.this,"更改头像成功",Toast.LENGTH_SHORT).show();
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this,"更改头像异常",Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this,"更改头像异常",Toast.LENGTH_SHORT).show();
+                }
+            }break;
             default:break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case AlbumUtil.REQUEST_STORAGE:{
+                if(grantResults.length>0&&grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                    Intent intent=new Intent("android.intent.action.GET_CONTENT");
+                    intent.setType("image/*");
+                    startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
+                }else{
+                    Toast.makeText(this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                }
+            }break;
         }
     }
 

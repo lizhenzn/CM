@@ -119,7 +119,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                             boolean isLogined = Connect.login(user, passwd);
                             //登陆成功
                             if (isLogined) {
-                                Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]);
+                                //Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]);
+                               // Log.d("", "run: 登陆成功获取头像");
                                 LoginActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {

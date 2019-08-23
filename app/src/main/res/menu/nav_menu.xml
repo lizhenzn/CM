@@ -15,9 +15,6 @@
             android:title="我的关注"
             />
 
-
-
-
     </group>
     <group
         android:id="@+id/navi_group2"
@@ -30,7 +27,7 @@
         <item
             android:id="@+id/settin"
             android:icon="@mipmap/ic_launcher"
-            android:title="设置"
+            android:title="设置未登录"
 
             />
 
@@ -38,6 +35,12 @@
     <group
         android:id="@+id/navi_group3"
         android:checkableBehavior="single">
+        <item
+            android:id="@+id/navi_set_head"
+            android:icon="@drawable/cm"
+            android:title="设置头像">
+
+        </item>
         <item
             android:id="@+id/navi_sign_out"
             android:icon="@drawable/cm"
