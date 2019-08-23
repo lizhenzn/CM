@@ -60,7 +60,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     private NumberPicker numberPicker;
     private PopupWindow popupWindow;
     private String xingBie[]=new String[]{"男","女","保密"};
-    private static String path="/sdcard/Clothes/MyInfo/head";
+    public static String path="/sdcard/Clothes/MyInfo/head";
     public static final int OPEN_ALBUM=1;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -198,7 +198,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults) {
         switch (requestCode){
-            case 1:
+            case AlbumUtil.REQUEST_STORAGE:
                 if(grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
                     openAlbum();
                 }else{
@@ -218,7 +218,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                     if(imagePath!=null){
                         Bitmap bitmap= BitmapFactory.decodeFile(imagePath);
                         head_left_iv.setImageBitmap(bitmap);   //设置头像
-                        //setPicToView(bitmap);
+                        AlbumUtil.saveBitmap(bitmap);
                     }else
                         Toast.makeText(MyInfoActivity.this,"Failed to get image",Toast.LENGTH_SHORT).show();
 

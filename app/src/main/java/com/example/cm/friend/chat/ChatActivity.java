@@ -1,8 +1,14 @@
 package com.example.cm.friend.chat;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,9 +26,12 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.cm.MainActivity;
 import com.example.cm.R;
 import com.example.cm.friend.FriendFragment;
+import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.EmoticonsEditText;
 
@@ -50,6 +59,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public  static boolean isSend;
     private int friendPosition;
     private boolean work;
+    private Chat chat;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,6 +118,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         chatActivitymessageList=Connect.messageMap.get(userName);
         if(chatActivitymessageList.size()>=1)
             chatItemLV.smoothScrollToPosition(chatActivitymessageList.size()-1);
+        ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+        while(chatManager==null)
+            chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+        chat=chatManager.createChat(userName);
+        if(chat==null)
+            Log.d("222333", "onClick: chat为空");
     }
     //设置数据
     public  void initData(){
@@ -162,14 +178,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.send:{
                 String mesBody= String.valueOf(inputET.getText());
                 if(mesBody.length()>0){
-                    ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+                   /* ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
                     while(chatManager==null)
                         chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
                     Chat chat=chatManager.createChat(userName);
                     if(chat==null)
-                        Log.d("222333", "onClick: chat为空");
+                        Log.d("222333", "onClick: chat为空");*/
                     try {
-                        chat.sendMessage(toJson(mesBody,"text"));
+                        chat.sendMessage(toJson(mesBody,"text",new Date()));
                         Message message=new Message();
                         message.setType(1);
                         message.setMessageType("text"); //文本消息
@@ -192,19 +208,107 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             }break;
+            case R.id.addIB:{
+                if(AlbumUtil.checkStorage(ChatActivity.this)){
+                    Intent intent=new Intent("android.intent.action.GET_CONTENT");
+                    intent.setType("image/*");
+                    startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
+                }else{
+                    AlbumUtil.requestStorage(ChatActivity.this);
+                    //Toast.makeText(ChatActivity.this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                }
+                /*ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+                while(chatManager==null)
+                    chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+                Chat chat=chatManager.createChat(userName);
+                if(chat==null)
+                    Log.d("222333", "onClick: chat为空");
+                try {
+                    chat.sendMessage(toJson("测试图片发送","photo",new Date()));
+                    Message message=new Message();
+                    message.setType(1);
+                    message.setMessageType("photo"); //图片信息
+                    message.setBody("图片");
+                    message.setFrom(Connect.xmpptcpConnection.getUser().split("/")[0]);
+                    message.setTo(userName.split("/")[0]);
+                    message.setDate(new Date());
+                    Connect.messageMap.get(userName).add(message);     //添加信息
+                    chatActivitymessageList.add(message);
+                    inputET.setText("");              //设置输入框为空
+                    isSend=true;
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                    isSend=false;
+                }*/
+
+            }break;
+            default:break;
         }
 
 
     }
-    public String toJson(String string,String string0) {
+    public String toJson(String string,String string0,Date date) {
         JSONObject jsonObject=new JSONObject();
         try {
             jsonObject.put("data",string);
             jsonObject.put("type",string0);
+            jsonObject.put("date",date);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return jsonObject.toString();
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case AlbumUtil.OPEN_ALBUM:{
+                String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,ChatActivity.this);
+                String imageStr=AlbumUtil.getImageStr(absoluteRoad);
+                try {
+                    chat.sendMessage(toJson(imageStr,"photo",new Date()));
+                    Message message=new Message();
+                    message.setType(1);
+                    message.setMessageType("photo"); //图片信息
+                    Bitmap bitmap= BitmapFactory.decodeFile(absoluteRoad);
+                    message.setPhoto(bitmap);
+                    message.setBody("[图片]");
+                    message.setFrom(Connect.xmpptcpConnection.getUser().split("/")[0]);
+                    message.setTo(userName.split("/")[0]);
+                    message.setDate(new Date());
+                    Connect.messageMap.get(userName).add(message);     //添加信息
+                    chatActivitymessageList.add(message);
+                    inputET.setText("");              //设置输入框为空
+                    isSend=true;
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                    isSend=false;
+                }
+
+            }break;
+            default:break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case AlbumUtil.REQUEST_STORAGE:{
+                if(grantResults.length>0&&grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                    Intent intent=new Intent("android.intent.action.GET_CONTENT");
+                    intent.setType("image/*");
+                    startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
+                }else{
+                    Toast.makeText(this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                }
+
+            }break;
+            default:break;
+        }
     }
 
     @Override

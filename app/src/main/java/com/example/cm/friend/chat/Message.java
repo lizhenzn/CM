@@ -1,5 +1,7 @@
 package com.example.cm.friend.chat;
 
+import android.graphics.Bitmap;
+
 import java.util.Date;
 
 public class Message {
@@ -7,6 +9,7 @@ public class Message {
     public static final int FRIENDS_MSG = 2;//对方的消息
     private String from;
     private String body;
+    private Bitmap photo;              //图片消息
     private String to;
     private int type;//区分自己还是好友的消息
     private String messageType;        //text  photo
@@ -67,5 +70,13 @@ public class Message {
 
     public void setMessageType(String messageType) {
         this.messageType = messageType;
+    }
+
+    public Bitmap getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Bitmap photo) {
+        this.photo = photo;
     }
 }
