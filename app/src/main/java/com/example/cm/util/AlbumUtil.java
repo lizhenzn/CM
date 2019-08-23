@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
@@ -19,6 +20,11 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.example.cm.myInfo.MyInfoActivity;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 //相册工具类
 public class AlbumUtil {
@@ -30,9 +36,10 @@ public class AlbumUtil {
             return false;
         return  true;
     }
+    //申请访问存储权限 传入参数当前活动
     public static void requestStorage(Context context){
 
-            //需要自己在活动里面写onRequset接收结果 requestCode为AlbumUtil.REQUEST_STORAGE
+            //需要自己在活动里面重写 onRequestPermissionsResult()接收结果 requestCode为AlbumUtil.REQUEST_STORAGE
             ActivityCompat.requestPermissions((Activity) context,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_STORAGE);
 
     }
@@ -80,6 +87,30 @@ public class AlbumUtil {
             //setPicToView(bitmap);
         }else
             Toast.makeText(context,"Failed to get image",Toast.LENGTH_SHORT).show();
+    }
+    //把图像保存进文件
+    public static void saveBitmap(Bitmap bitmap){
+        String sdStatus= Environment.getExternalStorageState();
+        if(!sdStatus.equals(Environment.MEDIA_MOUNTED))//检测SD是否可用
+            return;
+        FileOutputStream b=null;
+        File file=new File(MyInfoActivity.path);
+        file.mkdirs();//创建文件夹
+        String fileName=MyInfoActivity.path+"head.jpg";
+        try{
+            b=new FileOutputStream(fileName);
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,b);//把数据写入文件
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }finally {
+            try{
+                b.flush();
+                b.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }

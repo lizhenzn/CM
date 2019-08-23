@@ -3,6 +3,7 @@ package com.example.cm.util;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.text.TextUtils;
@@ -51,6 +52,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Connect {
+    public static final String SERVERNAME="iz92swk4q6t1a7z";       //服务器名	iz92swk4q6t1a7z
+    public static final String IP="114.55.255.210";                //服务器IP地址
     private final Context context;
     public static List<GroupInfo> groupInfoList;
     public  static SmackUserInfo  smackUserInfo;
@@ -62,46 +65,70 @@ public class Connect {
         init();
     }
     public static XMPPTCPConnection xmpptcpConnection=null;
-    public boolean login(String user,String passwd){
+    public static boolean getXMPPTCPConnection(){
                 if(xmpptcpConnection==null) {
+                    Log.d("XMPPTCP new 之前", ""+xmpptcpConnection);
+
                     XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
                             //.setUsernameAndPassword("lizhen", "zn521128")
-                            .setServiceName("10.0.2.2")
-                            .setHost("10.0.2.2")
+                            .setServiceName(SERVERNAME)
+                            .setHost(IP)
                             .setPort(5222)
                             .setSendPresence(true)
                             .setDebuggerEnabled(true)
+                            //.setConnectTimeout(10000)
                             .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
                             .build();
                     xmpptcpConnection = new XMPPTCPConnection(config);
+                    Log.d("XMPPTCP new 之后", ""+xmpptcpConnection);
+
                     try {
                         xmpptcpConnection.connect();
-                        if(xmpptcpConnection.isConnected()) {
-                            Presence presence = new Presence(Presence.Type.available);
-                            presence.setStatus("ONLINE");
-                            xmpptcpConnection.login(user, passwd);
-                            xmpptcpConnection.sendStanza(presence);           //设置在线状态
-                            //Toast.makeText(context,"登陆成功",Toast.LENGTH_SHORT).show();
-                            initListener(); //初始化信息监听
-                            initFriend();   //获取好友列表
-                            Chat chat=ChatManager.getInstanceFor(xmpptcpConnection).createChat("lizhen@127.0.0.1");
-                            chat.sendMessage("Hello!!!");
-
-                            }
-                        else{
-                            xmpptcpConnection=null;
-                            //Toast.makeText(context,"登陆异常",Toast.LENGTH_SHORT).show();
-                            return  false;
-                        }
-
-                    } catch (SmackException | IOException | XMPPException e) {
+                        if(xmpptcpConnection.isConnected())
+                           Log.d("*********getXMPPTCP", "getXMPPTCPConnection: connect成功");
+                        else
+                            Log.d("*********getXMPPTCP", "getXMPPTCPConnection: connect失败");
+                    } catch (SmackException e) {
                         e.printStackTrace();
-                        xmpptcpConnection=null;
-                        //Toast.makeText(context,"登陆异常",Toast.LENGTH_SHORT).show();
+                        return false;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return false;
+                    } catch (XMPPException e) {
+                        e.printStackTrace();
                         return false;
                     }
                 }
         return  true;
+    }
+    public static boolean login(String userName,String passwd){
+        try {
+            //xmpptcpConnection.connect();
+            if(xmpptcpConnection.isConnected()) {
+                Presence presence = new Presence(Presence.Type.available);
+                presence.setStatus("ONLINE");
+                xmpptcpConnection.login(userName, passwd);
+                xmpptcpConnection.sendStanza(presence);           //设置在线状态
+                //Toast.makeText(context,"登陆成功",Toast.LENGTH_SHORT).show();
+                Connect.initListener(); //初始化信息监听
+                Connect.initFriend();   //获取好友列表
+                //Chat chat=ChatManager.getInstanceFor(xmpptcpConnection).createChat("lizhen@127.0.0.1");
+                //chat.sendMessage("Hello!!!");
+
+            }
+            else{
+                xmpptcpConnection=null;
+                //Toast.makeText(context,"登陆异常",Toast.LENGTH_SHORT).show();
+                return  false;
+            }
+
+        } catch (SmackException | IOException | XMPPException e) {
+            e.printStackTrace();
+            xmpptcpConnection=null;
+            //Toast.makeText(context,"登陆异常",Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
     //退出登录
     public static void signOut()  {
@@ -165,7 +192,7 @@ public class Connect {
             return null;
         return PhotoFormatTools.byteArrayToDrawable(bytes);
     }*/
-    public void initListener() {
+    public static void initListener() {
         ChatManager manager = ChatManager.getInstanceFor(Connect.xmpptcpConnection);
         //设置信息的监听
         final ChatMessageListener messageListener = new ChatMessageListener() {
@@ -179,13 +206,22 @@ public class Connect {
                         //String data = object.getString("data");
                         Log.d("TAG接收************", message.getBody());
                         com.example.cm.friend.chat.Message message1=new com.example.cm.friend.chat.Message();
+
                         JSONObject jsonObject=new JSONObject(message.getBody());
-                        message1.setBody(jsonObject.getString("data"));
-                        message1.setFrom(message.getFrom().split("/")[0]);
-                        message1.setTo(message.getTo());
+                        message1.setMessageType(jsonObject.getString("type"));
+                        if(jsonObject.getString("type").equals("text")) {
+                            message1.setBody(jsonObject.getString("data"));
+                        }else{
+                            message1.setBody("图片");
+                            //将接收到的字符串解析成bitmap
+                            //message1.setPhoto(jsonObject.getString("photo"));
+                           //message1.setPhoto(new BitmapFactory(R.drawable.unlogin));
+                        }
+                             message1.setFrom(message.getFrom().split("/")[0]);
+                             message1.setTo(message.getTo());
+                             //message1.setDate((Date) jsonObject.get("date"));
                         message1.setDate(new Date());
-                        message1.setType(2);
-                         message1.setMessageType(jsonObject.getString("type"));
+                             message1.setType(2);
                         haveNewMessage=true;
                         //ChatActivity.chatAdapter.notifyDataSetInvalidated();
                         //添加进对应的聊天信息列表
@@ -227,7 +263,7 @@ public class Connect {
         };
         manager.addChatListener(chatManagerListener);
     }
-    public void initFriend(){
+    public static void initFriend(){
         groupInfoList=new ArrayList<>();
         smackUserInfo=new SmackUserInfo();
         Log.d("登录用户",xmpptcpConnection.getUser().toString());
@@ -278,6 +314,20 @@ public class Connect {
         haveNewMessage=false;
         messageMap=new HashMap<>();
         friendInfoList=new ArrayList<>();
+    }
+    public static void getUserImage(String user){
+        VCard vCard=new VCard();
+        try {
+            vCard.load(xmpptcpConnection,user);
+            vCard.getAvatar();
+            Log.d("获取头像测试", "getUserImage: "+vCard.toString());
+        } catch (SmackException.NoResponseException e) {
+            e.printStackTrace();
+        } catch (XMPPException.XMPPErrorException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
     }
     public static int getPositionByUserName(String userName){
         int i;

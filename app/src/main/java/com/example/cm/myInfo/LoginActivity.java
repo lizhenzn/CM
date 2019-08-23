@@ -106,35 +106,46 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.login:{
+                Log.d("点击LOGIN", "");
+
                 new Thread(new Runnable() {
 
                     @Override
                     public void run() {
-                        Connect connect=new Connect(LoginActivity.this);
-                        String user= String.valueOf(userET.getText());
-                        String passwd= String.valueOf(pswET.getText());
-                        boolean isLogined=connect.login(user,passwd);
+                        Connect connect = new Connect(LoginActivity.this);
+                        String user = String.valueOf(userET.getText());
+                        String passwd = String.valueOf(pswET.getText());
+                        if (Connect.getXMPPTCPConnection()) {
+                            boolean isLogined = Connect.login(user, passwd);
+                            //登陆成功
+                            if (isLogined) {
+                                Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]);
+                                LoginActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT).show();
 
-                        //登陆成功
-                        if(isLogined){
-                            LoginActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LoginActivity.this,"登陆成功",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                Intent intent = new Intent();
+                                intent.putExtra("zhanghao", String.valueOf(userET.getText()));
+                                setResult(RESULT_OK, intent);
+                                //页面切换动画
+                                overridePendingTransition(R.anim.out_from_left, R.anim.in_from_right);
 
-                                }
-                            });
-                            Intent intent=new Intent();
-                            intent.putExtra("zhanghao",String.valueOf(userET.getText()));
-                            setResult(RESULT_OK,intent);
-                            //页面切换动画
-                            overridePendingTransition(R.anim.out_from_left,R.anim.in_from_right);
+                                LoginActivity.this.finish();
+                            } else {//登陆失败
+                                LoginActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(LoginActivity.this, "登陆异常", Toast.LENGTH_SHORT).show();
 
-                            LoginActivity.this.finish();
-                        }else{//登陆失败
+                                    }
+                                });
 
-                           // Intent intent=new Intent();
-                           // setResult(RESULT_CANCELED,intent);
+                                // Intent intent=new Intent();
+                                // setResult(RESULT_CANCELED,intent);
+                            }
                         }
                     }
 

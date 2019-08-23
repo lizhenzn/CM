@@ -169,7 +169,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if(chat==null)
                         Log.d("222333", "onClick: chat为空");
                     try {
-                        chat.sendMessage(toJson(mesBody,"text"));
+                        chat.sendMessage(toJson(mesBody,"text",new Date()));
                         Message message=new Message();
                         message.setType(1);
                         message.setMessageType("text"); //文本消息
@@ -192,15 +192,43 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             }break;
+            case R.id.addIB:{
+                ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+                while(chatManager==null)
+                    chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+                Chat chat=chatManager.createChat(userName);
+                if(chat==null)
+                    Log.d("222333", "onClick: chat为空");
+                try {
+                    chat.sendMessage(toJson("测试图片发送","photo",new Date()));
+                    Message message=new Message();
+                    message.setType(1);
+                    message.setMessageType("photo"); //图片信息
+                    message.setBody("图片");
+                    message.setFrom(Connect.xmpptcpConnection.getUser().split("/")[0]);
+                    message.setTo(userName.split("/")[0]);
+                    message.setDate(new Date());
+                    Connect.messageMap.get(userName).add(message);     //添加信息
+                    chatActivitymessageList.add(message);
+                    inputET.setText("");              //设置输入框为空
+                    isSend=true;
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                    isSend=false;
+                }
+
+            }break;
+            default:break;
         }
 
 
     }
-    public String toJson(String string,String string0) {
+    public String toJson(String string,String string0,Date date) {
         JSONObject jsonObject=new JSONObject();
         try {
             jsonObject.put("data",string);
             jsonObject.put("type",string0);
+            jsonObject.put("date",date);
         } catch (JSONException e) {
             e.printStackTrace();
         }
