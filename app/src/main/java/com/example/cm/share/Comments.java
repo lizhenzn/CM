@@ -1,6 +1,7 @@
 package com.example.cm.share;
 
 import android.graphics.Rect;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,10 +24,14 @@ public class Comments extends AppCompatActivity {
     private PostInfo postInfo;
     private ArrayList<RemarkInfo> remarks;
     private CommentAdapter commentAdapter;
+    private RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new CommentItemDecoration());
         postInfo=(PostInfo) getIntent().getSerializableExtra("post");
         initComments();
         EditText editText=findViewById(R.id.input);
@@ -50,12 +55,21 @@ public class Comments extends AppCompatActivity {
                 editText.setText("");
             }
         });
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                initComments();
+                commentAdapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     private void initComments() {
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new CommentItemDecoration());
+
+
+
         CommentList=new ArrayList<>();
         new Thread(new Runnable() {
             @Override
