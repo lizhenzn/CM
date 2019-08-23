@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import main.PostInfo;
+import main.RemarkInfo;
 import main.ShareManager;
 
 public class ServerFunction {
@@ -31,6 +32,10 @@ public class ServerFunction {
     }
     public static ShareManager getShareManagerForPresent(){
         return shareManagerForPresent;
+    }
+
+    public static ArrayList<RemarkInfo> getRemark(PostInfo postInfo) {
+        return shareManager.getRemarks4Post(postInfo);
     }
     public static void sendRemark(PostInfo postInfo,String userName,String content,String time){
         shareManager.sendRemark(postInfo.createRemark(content, userName, time));

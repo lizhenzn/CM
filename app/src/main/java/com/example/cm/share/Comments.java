@@ -16,20 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.PostInfo;
+import main.RemarkInfo;
 
 public class Comments extends AppCompatActivity {
-    private List<CommentItem> CommentList=new ArrayList<>();
+    private List<CommentItem> CommentList;
     private PostInfo postInfo;
+    private ArrayList<RemarkInfo> remarks;
+    private CommentAdapter commentAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
         postInfo=(PostInfo) getIntent().getSerializableExtra("post");
         initComments();
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new CommentAdapter(CommentList));
-        recyclerView.addItemDecoration(new CommentItemDecoration());
         EditText editText=findViewById(R.id.input);
         Button button = findViewById(R.id.sendText);
         button.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +39,12 @@ public class Comments extends AppCompatActivity {
                     @Override
                     public void run() {
                         ServerFunction.sendRemark(postInfo,"TSaber8",content,"2019-08-23 14:55:50");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                initComments();
+                            }
+                        });
                     }
                 }).start();
                 editText.setText("");
@@ -48,9 +53,28 @@ public class Comments extends AppCompatActivity {
     }
 
     private void initComments() {
-//        for (int i = 0; i <= 9; i++) {
-//            CommentList.add(new CommentItem(R.drawable.friend1, i+1+"F","TSaber7", "testtesttestesttest!!!!!!!!!!!!!!!!!!!!!!!!!!"));
-//        }
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new CommentItemDecoration());
+        CommentList=new ArrayList<>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                remarks=ServerFunction.getRemark(postInfo);
+                for(int i=1;i<=remarks.size();i++){
+                    CommentList.add(new CommentItem(R.drawable.friend1,i+"F",remarks.get(i-1).getUsername(),remarks.get(i-1).getContent()));
+                }
+                commentAdapter=new CommentAdapter(CommentList);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerView.setAdapter(commentAdapter);
+                    }
+                });
+
+            }
+        }).start();
+
     }
 
 }
