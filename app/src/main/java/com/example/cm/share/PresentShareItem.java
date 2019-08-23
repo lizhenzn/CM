@@ -41,10 +41,12 @@ public class PresentShareItem extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         userName.setText(shareItem.getUserName());
                         clothesUp.setImageURI(Uri.fromFile(ServerFunction.getUpImg(shareItem.getPostInfo())));
                         clothesDown.setImageURI(Uri.fromFile(ServerFunction.getDownImg(shareItem.getPostInfo())));
                         description.setText(shareItem.getDescription());
+
                     }
                 });
             }

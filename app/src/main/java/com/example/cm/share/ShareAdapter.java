@@ -121,10 +121,18 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 recyclerViewHolder.ClothesUp.setImageResource(R.drawable.friend1);
                 recyclerViewHolder.ClothesDown.setImageResource(R.drawable.friend1);
             }
-            if(!shareItem.isBlankItemFlag()){
+            else{
                 recyclerViewHolder.ClothesUp.setImageURI(Uri.fromFile(shareItem.getClothesUp()));
                 recyclerViewHolder.ClothesDown.setImageURI(Uri.fromFile(shareItem.getClothesDown()));
             }
+            recyclerViewHolder.Comment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), Comments.class);
+                    intent.putExtra("post",ShareItemList.get(position).getPostInfo());
+                    v.getContext().startActivity(intent);
+                }
+            });
             recyclerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

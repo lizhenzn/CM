@@ -32,6 +32,9 @@ public class ServerFunction {
     public static ShareManager getShareManagerForPresent(){
         return shareManagerForPresent;
     }
+    public static void sendRemark(PostInfo postInfo,String userName,String content,String time){
+        shareManager.sendRemark(postInfo.createRemark(content, userName, time));
+    }
     public  boolean sendPost( String title, String content, int img_num, String clothes_up,String clothes_down,  String username, int like_num) {
         PostInfo postInfo = new PostInfo();
         postInfo.setTitle(title);

@@ -48,5 +48,4 @@ dependencies {
     implementation files('libs/jxmpp-core-0.4.0-alpha1.jar')
     implementation files('libs/smack-android-4.1.9.jar')
     implementation files('libs/jxmpp-util-cache-0.4.0-alpha1.jar')
-
 }
