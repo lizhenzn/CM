@@ -1,8 +1,12 @@
 package com.example.cm.share;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class ShareItem {
+import main.PostInfo;
+
+public class ShareItem implements Serializable {
+    private PostInfo postInfo;
     private int idHeadImage;
     private String UserName;
     private File ClothesUp;
@@ -14,7 +18,8 @@ public class ShareItem {
     private int idComment;
     private boolean blankItemFlag;
 
-    public ShareItem(int idHeadImage,String UserName,File ClothesUp, File ClothesDown, String description, int idGiveLike, int idComment) {
+    public ShareItem(PostInfo postInfo,int idHeadImage,String UserName,File ClothesUp, File ClothesDown, String description, int idGiveLike, int idComment) {
+        this.postInfo=postInfo;
         this.idHeadImage = idHeadImage;
         this.UserName = UserName;
         this.ClothesUp = ClothesUp;
@@ -26,6 +31,7 @@ public class ShareItem {
     }
 
     public ShareItem(int idHeadImage,String UserName,int idClothesUp, int  idClothesDown, String description, int idGiveLike, int idComment) {
+        this.postInfo=null;
         this.idHeadImage = idHeadImage;
         this.UserName = UserName;
         this.idClothesUp = idClothesUp;
@@ -63,6 +69,7 @@ public class ShareItem {
         return idComment;
     }
 
+    PostInfo getPostInfo(){return postInfo;}
     boolean isBlankItemFlag() {
         return blankItemFlag;
     }

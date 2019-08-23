@@ -93,8 +93,7 @@ public class ShareFragment extends Fragment {
         shareItemList=new ArrayList<>();
         Log.d(TAG, "init:create new ShareItemList");
         // 模拟获取数据
-        serverFunction.refresh();
-        getData();
+        getData(true);
         shareAdapter = new ShareAdapter(shareItemList);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(shareAdapter);
@@ -107,7 +106,7 @@ public class ShareFragment extends Fragment {
                 Log.d(TAG, "onLoadMore: loadState="+shareAdapter.getLoadState());
                if (shareItemList.size() < 52) {
                     // 模拟获取网络数据，延时1s
-                                   getData();
+                                   getData(false);
                                    shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
 
                 } else {
@@ -117,7 +116,7 @@ public class ShareFragment extends Fragment {
             }
         });
     }
-    private void getData()  {
+    private void getData(boolean refresh)  {
         for (int i = 0; i <= 9; i++) {
             shareItemList.add(new ShareItem(R.drawable.friend1,"TSaber7",R.drawable.friend1,
                     R.drawable.friend1,"",R.drawable.givelike,R.drawable.comment));
@@ -128,6 +127,8 @@ public class ShareFragment extends Fragment {
             @Override
             public void run() {
                 synchronized (ThreadManager){
+                    if(refresh)
+                        serverFunction.refresh();
                     //Log.d(TAG, "run: enter thread");
                     serverFunction.loadPostList();
                     for (int i = 0; i <= 9; i++) {
@@ -135,8 +136,9 @@ public class ShareFragment extends Fragment {
                         Log.d(TAG, "run: "+i);
                         while(!serverFunction.getShareManager().transfer_flags[i]){}
                         Log.d(TAG, "run: quite while");
-                        shareItemList.set(shareItemList.size()-10+i,new ShareItem(R.drawable.friend1,"TSaber7",serverFunction.getSmallUpImg(),
+                        shareItemList.set(shareItemList.size()-10+i,new ShareItem(serverFunction.getPost(),R.drawable.friend1,"TSaber7",serverFunction.getSmallUpImg(),
                                 serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

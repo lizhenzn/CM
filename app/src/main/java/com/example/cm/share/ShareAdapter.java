@@ -1,6 +1,7 @@
 package com.example.cm.share;
 
 import android.content.Intent;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -92,12 +93,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (viewType == TYPE_ITEM) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.share_item, parent, false);
             RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    v.getContext().startActivity(new Intent(v.getContext(), PresentShareItem.class));
-                }
-            });
+
             viewHolder.Comment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -129,6 +125,16 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 recyclerViewHolder.ClothesUp.setImageURI(Uri.fromFile(shareItem.getClothesUp()));
                 recyclerViewHolder.ClothesDown.setImageURI(Uri.fromFile(shareItem.getClothesDown()));
             }
+            recyclerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(ShareItemList.get(position).isBlankItemFlag())
+                        return;
+                    Intent toPresentShareItem=new Intent(v.getContext(),PresentShareItem.class);
+                    toPresentShareItem.putExtra("shareItem",ShareItemList.get(position));
+                    v.getContext().startActivity(toPresentShareItem);
+                }
+            });
             recyclerViewHolder.HeadImage.setImageResource(shareItem.getIdHeadImage());
             recyclerViewHolder.UserName.setText(shareItem.getUserName());
             recyclerViewHolder.Description.setText(shareItem.getDescription());
