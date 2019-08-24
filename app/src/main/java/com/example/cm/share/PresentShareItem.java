@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cm.R;
 import com.example.cm.util.ServerFunction;
@@ -31,17 +32,19 @@ public class PresentShareItem extends AppCompatActivity {
         userName.setTextSize(30);
         TextView description = findViewById(R.id.description);
         description.setText("");
+        TextView likeNum = findViewById(R.id.like_num);
         ShareItem shareItem=(ShareItem) getIntent().getSerializableExtra("shareItem");
         ServerFunction.getShareManagerForPresent().resetTransferFlags();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 ServerFunction.loadImg(shareItem.getPostInfo());
+
                 while(!ServerFunction.getShareManagerForPresent().transfer_flags[0]){}
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
+                        likeNum.setText(shareItem.getPostInfo().getLike_num()+"");
                         userName.setText(shareItem.getUserName());
                         clothesUp.setImageURI(Uri.fromFile(ServerFunction.getUpImg(shareItem.getPostInfo())));
                         clothesDown.setImageURI(Uri.fromFile(ServerFunction.getDownImg(shareItem.getPostInfo())));
@@ -59,6 +62,34 @@ public class PresentShareItem extends AppCompatActivity {
                 Intent intent=new Intent(PresentShareItem.this,Comments.class);
                 intent.putExtra("post",shareItem.getPostInfo());
                 startActivity(intent);
+            }
+        });
+        ImageButton giveLike = findViewById(R.id.giveLike);
+        giveLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(ServerFunction.getShareManager().like(shareItem.getPostInfo(),"TSaber9"))
+                        {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(PresentShareItem.this,"点赞成功",Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                        else{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(PresentShareItem.this,"您已经点过赞了",Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
             }
         });
     }

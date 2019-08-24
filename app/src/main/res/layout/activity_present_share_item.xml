@@ -76,5 +76,15 @@
 
             />
 
+    <TextView
+
+        android:id="@+id/like_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/giveLike"
+        app:layout_constraintBottom_toBottomOf="@id/giveLike"
+        app:layout_constraintRight_toLeftOf="@id/giveLike"
+        />
+
 
     </android.support.constraint.ConstraintLayout>

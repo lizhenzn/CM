@@ -94,7 +94,7 @@ public class ShareFragment extends Fragment {
         Log.d(TAG, "init:create new ShareItemList");
         // 模拟获取数据
         getData(true);
-        shareAdapter = new ShareAdapter(shareItemList);
+        shareAdapter = new ShareAdapter(shareItemList,getActivity());
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(shareAdapter);
 

@@ -16,6 +16,7 @@ public class ShareItem implements Serializable {
     private String description;
     private int idGiveLike;
     private int idComment;
+    private int idLikeNum;
     private boolean blankItemFlag;
 
     public ShareItem(PostInfo postInfo,int idHeadImage,String UserName,File ClothesUp, File ClothesDown, String description, int idGiveLike, int idComment) {

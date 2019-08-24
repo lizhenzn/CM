@@ -54,10 +54,10 @@ public class MatchFragment extends Fragment {
         context=getActivity();
         view=View.inflate(context, R.layout.match,null);
 
-        Button button = view.findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+//        Button button = view.findViewById(R.id.button);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
 //                new Thread(new Runnable() {
 //                    @Override
 //                    public void run() {
@@ -68,8 +68,8 @@ public class MatchFragment extends Fragment {
 //                        }
 //                    }
 //                }).start();
-            }
-        });
+//            }
+//        });
         return  view;
     }
 }

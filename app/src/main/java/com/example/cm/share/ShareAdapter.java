@@ -1,5 +1,7 @@
 package com.example.cm.share;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.net.Uri;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.util.ServerFunction;
 
 import java.util.List;
 
@@ -24,6 +27,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ShareItem> ShareItemList;
+    private Context context;
     // 普通布局
     private final int TYPE_ITEM = 1;
     // 脚布局
@@ -57,6 +61,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         TextView Description;
         ImageButton GiveLike;
         ImageButton Comment;
+        TextView LikeNum;
 
         public RecyclerViewHolder(View view) {
             super(view);
@@ -67,6 +72,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Description = view.findViewById(R.id.description);
             GiveLike = view.findViewById(R.id.giveLike);
             Comment = view.findViewById(R.id.comment);
+            LikeNum = view.findViewById(R.id.like_num);
         }
 
 
@@ -82,9 +88,9 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    public ShareAdapter(List<ShareItem> ShareItemList) {
+    public ShareAdapter(List<ShareItem> ShareItemList,Context context) {
         this.ShareItemList = ShareItemList;
-
+        this.context=context;
     }
 
     @NonNull
@@ -122,6 +128,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 recyclerViewHolder.ClothesDown.setImageResource(R.drawable.friend1);
             }
             else{
+                recyclerViewHolder.LikeNum.setText(ShareItemList.get(position).getPostInfo().getLike_num()+"");
                 recyclerViewHolder.ClothesUp.setImageURI(Uri.fromFile(shareItem.getClothesUp()));
                 recyclerViewHolder.ClothesDown.setImageURI(Uri.fromFile(shareItem.getClothesDown()));
             }
@@ -131,6 +138,36 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     Intent intent = new Intent(v.getContext(), Comments.class);
                     intent.putExtra("post",ShareItemList.get(position).getPostInfo());
                     v.getContext().startActivity(intent);
+                }
+            });
+            recyclerViewHolder.GiveLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(ServerFunction.getShareManager().like(ShareItemList.get(position).getPostInfo(),"TSaber9")){
+                                ((Activity)context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context,"点赞成功",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            }
+                            else{
+                                ((Activity)context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context,"您已经点过赞了",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            }
+
+                        }
+                    }).start();
+
                 }
             });
             recyclerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -148,6 +185,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             recyclerViewHolder.Description.setText(shareItem.getDescription());
             recyclerViewHolder.GiveLike.setImageResource(shareItem.getIdGiveLike());
             recyclerViewHolder.Comment.setImageResource(shareItem.getIdComment());
+
         } else if (viewHolder instanceof FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) viewHolder;
             switch (loadState) {
