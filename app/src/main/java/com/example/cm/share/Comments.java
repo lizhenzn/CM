@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.cm.R;
+import com.example.cm.util.Connect;
 import com.example.cm.util.ServerFunction;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class Comments extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        ServerFunction.sendRemark(postInfo,"TSaber8",content,"2019-08-23 14:55:50");
+                        ServerFunction.sendRemark(postInfo, Connect.smackUserInfo.getUserName(),content,"2019-08-23 14:55:50");
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

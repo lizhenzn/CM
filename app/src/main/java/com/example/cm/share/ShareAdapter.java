@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.util.Connect;
 import com.example.cm.util.ServerFunction;
 
 import java.util.List;
@@ -146,7 +147,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if(ServerFunction.getShareManager().like(ShareItemList.get(position).getPostInfo(),"TSaber9")){
+                            if(ServerFunction.getShareManager().like(ShareItemList.get(position).getPostInfo(), Connect.smackUserInfo.getUserName())){
                                 ((Activity)context).runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {

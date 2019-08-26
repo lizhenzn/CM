@@ -24,6 +24,7 @@ import com.example.cm.ConnectService;
 import com.example.cm.R;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
+import com.example.cm.util.Connect;
 import com.example.cm.util.ServerFunction;
 
 
@@ -118,7 +119,7 @@ public class ShareFragment extends Fragment {
     }
     private void getData(boolean refresh)  {
         for (int i = 0; i <= 9; i++) {
-            shareItemList.add(new ShareItem(R.drawable.friend1,"TSaber7",R.drawable.friend1,
+            shareItemList.add(new ShareItem(R.drawable.friend1, Connect.smackUserInfo.getUserName(),R.drawable.friend1,
                     R.drawable.friend1,"",R.drawable.givelike,R.drawable.comment));
         }
         serverFunction.getShareManager().resetTransferFlags();
@@ -136,7 +137,7 @@ public class ShareFragment extends Fragment {
                         Log.d(TAG, "run: "+i);
                         while(!serverFunction.getShareManager().transfer_flags[i]){}
                         Log.d(TAG, "run: quite while");
-                        shareItemList.set(shareItemList.size()-10+i,new ShareItem(serverFunction.getPost(),R.drawable.friend1,"TSaber7",serverFunction.getSmallUpImg(),
+                        shareItemList.set(shareItemList.size()-10+i,new ShareItem(serverFunction.getPost(),R.drawable.friend1,Connect.smackUserInfo.getUserName(),serverFunction.getSmallUpImg(),
                                 serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
 
                         getActivity().runOnUiThread(new Runnable() {

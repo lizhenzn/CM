@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.util.Connect;
 import com.example.cm.util.ServerFunction;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -71,7 +72,7 @@ public class PresentShareItem extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if(ServerFunction.getShareManager().like(shareItem.getPostInfo(),"TSaber9"))
+                        if(ServerFunction.getShareManager().like(shareItem.getPostInfo(), Connect.smackUserInfo.getUserName()))
                         {
                             runOnUiThread(new Runnable() {
                                 @Override
