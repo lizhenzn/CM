@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.friend.AddFriendItem;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.GroupInfo;
 import com.example.cm.myInfo.FriendInfo;
@@ -67,6 +68,7 @@ public class Connect {
     public static boolean haveNewMessage;
     public static HashMap<String,List<com.example.cm.friend.chat.Message>>messageMap;                            //会话列表String对应好友，List<Message>为对应此String好友聊天信息列表
     public  static List<FriendInfo>   friendInfoList;                                                 //会话列表好友名列表
+    public static List<AddFriendItem> addFriendItemList;                         //添加好友详情列表
     public Connect(Context context){
         this.context=context;
         init();
@@ -305,7 +307,7 @@ public class Connect {
                 FriendInfo friendInfo=new FriendInfo();
                 friendInfo.setUserName(rosterEntry.getUser());
                 friendInfo.setNicName(rosterEntry.getUser());
-                //friendInfo.setHeadBt(R.drawable.chat_add);  //设置头像
+                friendInfo.setHeadBt(getUserImage(rosterEntry.getUser().split("/")[0]));  //设置头像
                 //friendInfo.setSex();
                 friendInfo.setGroupName(group.getName());
                 friendInfoList.add(friendInfo);   //添加
@@ -325,12 +327,14 @@ public class Connect {
         haveNewMessage=false;
         messageMap=new HashMap<>();
         friendInfoList=new ArrayList<>();
+        addFriendItemList=new ArrayList<>();
     }
     /*获取用户头像
     *param userName
     */
-    public static Drawable getUserImage(String user){
+    public static Bitmap getUserImage(String user){
         Drawable drawable=null;
+        Bitmap bitmap=null;
         VCard vCard=new VCard();
         try {
             vCard.load(xmpptcpConnection,user);
@@ -338,7 +342,7 @@ public class Connect {
             Log.d("获取头像测试", "getUserImage: "+vCard.toString());
             byte []bytes=vCard.getAvatar();
             ByteArrayInputStream bais=new ByteArrayInputStream(vCard.getAvatar());
-            Bitmap bitmap=BitmapFactory.decodeStream(bais);
+            bitmap=BitmapFactory.decodeStream(bais);
             BitmapDrawable bitmapDrawable=new BitmapDrawable(bitmap);
             drawable=bitmapDrawable;
 
@@ -352,7 +356,7 @@ public class Connect {
             e.printStackTrace();
             Log.d("**/***//**获取头像", "getUserImage: 获取头像异常");
         }
-        return drawable;
+        return bitmap;
     }
     /*修改头像
     *param XMPPConnection

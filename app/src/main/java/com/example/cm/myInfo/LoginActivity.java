@@ -2,8 +2,12 @@ package com.example.cm.myInfo;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
@@ -19,7 +23,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.support.v7.app.ActionBar;
 import com.example.cm.R;
 import com.example.cm.util.Connect;
 
@@ -42,11 +46,19 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     private  boolean VISIABLE;
     private ArrayAdapter<CharSequence> adapterXML;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         init();
+        /*Toolbar toolbar=(Toolbar)findViewById(R.id.login_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar=getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }*/
+
 
     }
     //初始化控件
@@ -119,6 +131,9 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                             boolean isLogined = Connect.login(user, passwd);
                             //登陆成功
                             if (isLogined) {
+                                Connect.smackUserInfo.setUserName(user);
+                                Connect.smackUserInfo.setHeadBt(Connect.getUserImage(user+"@"+Connect.SERVERNAME));
+
                                 //Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]);
                                // Log.d("", "run: 登陆成功获取头像");
                                 LoginActivity.this.runOnUiThread(new Runnable() {

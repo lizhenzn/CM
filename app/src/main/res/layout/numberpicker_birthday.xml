@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <NumberPicker
+        android:id="@+id/number_picker_birthdayYear"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+
+    </NumberPicker>
+    <NumberPicker
+        android:id="@+id/number_picker_birthdayMonth"
+        app:layout_constraintLeft_toRightOf="@id/number_picker_birthdayYear"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+
+    </NumberPicker>
+    <NumberPicker
+        android:id="@+id/number_picker_birthdayDay"
+        app:layout_constraintLeft_toRightOf="@id/number_picker_birthdayMonth"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+
+    </NumberPicker>
+
+</android.support.constraint.ConstraintLayout>
