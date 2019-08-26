@@ -6,6 +6,7 @@
         android:id="@+id/expand_groupTV"
         android:layoutDirection="ltr"
         android:gravity="center_vertical"
+        android:layout_marginLeft="6dp"
         android:layout_width="match_parent"
         android:layout_height="48dp" />
 

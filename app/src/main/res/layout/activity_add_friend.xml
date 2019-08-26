@@ -5,15 +5,97 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".friend.AddFriendActivity">
-    <LinearLayout
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/add_friend_toolabr"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colornew"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        tools:layout_editor_absoluteX="295dp">
 
-        <SearchView
-            android:id="@+id/add_friend_sv"
+        <TextView
+            android:id="@+id/title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:text="添加好友"
+            android:textSize="20sp"
+            />
+        <Button
+            android:id="@+id/add_friend_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="查找"
+            android:background="@drawable/button_search"
+            android:textSize="20sp"
+            android:layout_gravity="end"
+             />
+    </android.support.v7.widget.Toolbar>
 
+
+
+    <EditText
+        android:id="@+id/add_friend_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="请输入好友用户名"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_friend_toolabr"
+        android:background="@drawable/et_shape"
+        android:padding="10dp" />
+
+        <LinearLayout
+            android:id="@+id/add_friend_detail_LL"
             android:layout_width="match_parent"
-            android:layout_height="18dp" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@+id/add_friend_et"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/add_friend_headImage"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="10dp"
+                android:src="@drawable/cm" />
+
+            <TextView
+                android:id="@+id/add_friend_userTV"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:hint="用户名" />
+
+            <Button
+                android:id="@+id/add_friend_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="33dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/button"
+                android:text="添加" />
+
+
+        </LinearLayout>
+    <ListView
+        android:id="@+id/add_friend_lv"
+        android:layout_marginTop="6dp"
+        app:layout_constraintTop_toBottomOf="@+id/add_friend_detail_LL"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintVertical_weight="1">
+
+    </ListView>
+
 
 </android.support.constraint.ConstraintLayout>

@@ -63,10 +63,11 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
         }else{
             viewHolder= (ViewHolder) convertView.getTag();
         }
-        viewHolder.imageView.setImageResource(R.drawable.cm);
+
         viewHolder.imageView.setOnClickListener(this);
         if(messageList.get(position).getType()==1) {
             viewHolder.nameTV.setText(messageList.get(position).getFrom());
+           // viewHolder.imageView.setImageBitmap();
         }
         if(messageList.get(position).getMessageType().equals("text"))
             viewHolder.mesTV.setText(messageList.get(position).getBody());
