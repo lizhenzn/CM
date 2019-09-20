@@ -218,7 +218,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                     if(imagePath!=null){
                         Bitmap bitmap= BitmapFactory.decodeFile(imagePath);
                         head_left_iv.setImageBitmap(bitmap);   //设置头像
-                        AlbumUtil.saveBitmap(bitmap);
+                        //AlbumUtil.saveBitmap(bitmap);
                     }else
                         Toast.makeText(MyInfoActivity.this,"Failed to get image",Toast.LENGTH_SHORT).show();
 

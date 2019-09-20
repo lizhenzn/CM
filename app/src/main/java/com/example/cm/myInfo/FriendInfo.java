@@ -7,8 +7,13 @@ public class FriendInfo{
     String nicName;    //昵称
     Bitmap headBt;     //头像
     String groupName;  //所属群组
+    String headBtRoad; //头像保存路径
+    int chated;      //是否在会话列表 0不在 1在
     String sex;
     String email;
+    public FriendInfo(){
+        this.chated=0; //默认为0
+    }
 
     public String getUserName() {
         return userName;
@@ -56,5 +61,21 @@ public class FriendInfo{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getHeadBtRoad() {
+        return headBtRoad;
+    }
+
+    public void setHeadBtRoad(String headBtRoad) {
+        this.headBtRoad = headBtRoad;
+    }
+
+    public int getChated() {
+        return chated;
+    }
+
+    public void setChated(int chated) {
+        this.chated = chated;
     }
 }

@@ -36,7 +36,6 @@ public class ChatListAdapter extends BaseAdapter  {
    // private  ArrayList<ChatListMessage> listMessageArrayList;          //会话列表的类列表 image、name、message、time、type
     //private DisplayMetrics displayMetrics;    //屏幕大小
     private Context context;
-    private View beforeView;
     private List<ViewHolder> viewHolders;
     public ChatListAdapter(){}
     public ChatListAdapter(Context context){
@@ -95,12 +94,15 @@ public class ChatListAdapter extends BaseAdapter  {
         List<Message> messageList=Connect.messageMap.get(userName);            //对应friendName的聊天信息列表
         //viewHolder.headImage.setImageDrawable(context.getResources().getDrawable(Integer.parseInt(map.get(Connect.friendInfoList.get(position).get("friendName").getHeadBt())));
         //viewHolder.headImage.setImageBitmap(map.get(Connect.friendInfoList.get(position).get("friendInfo").getHeadBt()));
-        viewHolder.headImage.setImageResource(cm);
+        //viewHolder.headImage.setImageResource(cm);
+        viewHolder.headImage.setImageBitmap(Connect.friendInfoList.get(position).getHeadBt());
         viewHolder.nameTV.setText(userName);
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("HH:MM:SS");
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("HH:MM");
         if(messageList.size()>=1) {
             viewHolder.mesTV.setText(messageList.get(messageList.size() - 1).getBody());  //设置为最后一条信息
-            String time = simpleDateFormat.format(messageList.get(messageList.size() - 1).getDate());  //最后一条信息的时间
+            Log.d("时间", "getView: "+messageList.get(messageList.size() - 1).getDate());
+            String time = simpleDateFormat.format(new Date(messageList.get(messageList.size() - 1).getDate()));  //最后一条信息的时间
+            //String time=simpleDateFormat.format(new Date());
             viewHolder.timeTV.setText(time);
         }
         else

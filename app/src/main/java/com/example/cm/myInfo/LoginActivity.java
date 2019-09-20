@@ -1,7 +1,9 @@
 package com.example.cm.myInfo;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
@@ -20,12 +22,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.app.ActionBar;
 import com.example.cm.R;
+import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
+import com.example.cm.util.DataBase;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
@@ -33,6 +38,7 @@ import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +50,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     private Spinner spinner;
     private final int REGISTER=1;
     private  boolean VISIABLE;
+    private ProgressDialog progressDialog;
     private ArrayAdapter<CharSequence> adapterXML;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -52,13 +59,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         init();
-        /*Toolbar toolbar=(Toolbar)findViewById(R.id.login_toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar=getSupportActionBar();
-        if(actionBar!=null){
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }*/
-
 
     }
     //初始化控件
@@ -72,6 +72,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         headIM_login=(ImageView)findViewById(R.id.head_login);
         pswEnBtn=(Button)findViewById(R.id.visible);
 
+        progressDialog=new ProgressDialog(LoginActivity.this);
         //注册事件
         loginBtn.setOnClickListener(this);
         pswEnBtn.setOnClickListener(this);
@@ -118,27 +119,42 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.login:{
-                Log.d("点击LOGIN", "");
-
+                Log.d("点击LOGIN", "点击点击点击点击登录");
+                String user = String.valueOf(userET.getText());
+                Log.d("输入的登录名", "onClick: userName"+user);
+                File file=new File(AlbumUtil.FRIENDHEADFILEROAD+"/"+user);
+                if(!file.exists()){
+                    file.mkdirs();
+                }
+                //TODO 判断是不是和上次登录用户一样 从而决定是否更换从数据库得到的联系人列表和聊天信息列表
                 new Thread(new Runnable() {
-
                     @Override
                     public void run() {
-                        Connect connect = new Connect(LoginActivity.this);
-                        String user = String.valueOf(userET.getText());
+                    LoginActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressDialog.setTitle("");
+                            progressDialog.setMessage("登陆中...");
+                            progressDialog.setCancelable(false);
+                            progressDialog.show();
+                        }
+                    });
+                        //Connect.init();   //在程序打开之时同时初始化适配器列表，不然会有bug
+                        //Connect connect = new Connect(LoginActivity.this);
+
                         String passwd = String.valueOf(pswET.getText());
                         if (Connect.getXMPPTCPConnection()) {
-                            boolean isLogined = Connect.login(user, passwd);
+                            boolean isLogined = Connect.login(user, passwd,getApplicationContext());
                             //登陆成功
                             if (isLogined) {
-                                Connect.smackUserInfo.setUserName(user);
-                                Connect.smackUserInfo.setHeadBt(Connect.getUserImage(user+"@"+Connect.SERVERNAME));
-
+                                Connect.isLogined=true;
+                                //TODO    其他的用户信息
                                 //Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]);
                                // Log.d("", "run: 登陆成功获取头像");
                                 LoginActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        progressDialog.dismiss();
                                         Toast.makeText(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT).show();
 
                                     }
@@ -151,6 +167,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
                                 LoginActivity.this.finish();
                             } else {//登陆失败
+                                progressDialog.dismiss();
                                 LoginActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {

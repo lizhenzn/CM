@@ -18,9 +18,11 @@
         android:roundIcon="@drawable/cm"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".share.PresentShareItem"></activity>
+        <activity android:name=".friend.FriendSettingActivity"></activity>
+        <activity android:name=".friend.FriendInfoActivity" />
+        <activity android:name=".share.PresentShareItem" />
         <activity android:name=".friend.chat.ChatActivity" />
-        <activity android:name=".friend.AddFriendActivity"></activity>
+        <activity android:name=".friend.AddFriendActivity" />
         <activity android:name=".friend.chat.ChatActivity" />
         <activity android:name=".friend.ContantActivity" />
         <activity android:name=".myInfo.RegisterActivity" />

@@ -20,7 +20,6 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.cm.myInfo.MyInfoActivity;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -31,14 +30,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import android.util.Base64;
 
-import java.util.Base64.Encoder;
+import java.util.Date;
 
-import static java.lang.System.in;
 
 //相册工具类
 public class AlbumUtil {
     public static final int REQUEST_STORAGE=6;
     public static final int OPEN_ALBUM=7;
+    public static String FRIENDHEADFILEROAD="/data/data/com.example.cm/cache/friendHead";          //好友头像存储文件 本应用的cache中
+    private static String MESSAGEBITMAP="/sdcard/CM/messageBitmap";            //聊天信息图片存储文件
     //申请访问存储权限 传入参数当前活动
     //检测是否有存储权限
     public static boolean checkStorage(Context context){
@@ -58,6 +58,10 @@ public class AlbumUtil {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static String getImageAbsolutePath(Intent data,Context context){
         String imagePath=null;
+        if(data==null){
+            Log.d("", "getImageAbsolutePath: 没有选择图片");
+            return null;
+        }
         Uri uri=data.getData();
         if(DocumentsContract.isDocumentUri(context,uri)){
             //如果是Document类型文件，则通过Document id处理
@@ -98,29 +102,59 @@ public class AlbumUtil {
         }else
             Toast.makeText(context,"Failed to get image",Toast.LENGTH_SHORT).show();
     }
-    //把图像保存进文件
-    public static void saveBitmap(Bitmap bitmap){
+    /*把头像、或者聊天记录图像保存进文件
+    * param user
+    * param bitmap
+    * param return bitmapRoad
+    */
+    public static String saveHeadBitmap(String user,Bitmap bitmap){
+        String fileRoad=null;
+        String filename=null;
+        if(user==null){                //判断是头像图片还是聊天图片
+            Date date=new Date();
+            String dateStr=String.valueOf(date.getTime());
+            filename=dateStr+".jpg";
+            fileRoad=MESSAGEBITMAP;   //文件名加入时间戳，以确定文件不重复
+        }else{
+            fileRoad=FRIENDHEADFILEROAD+"/"+Connect.smackUserInfo.getUserName();
+            filename=user+"head.jpg";
+        }
         String sdStatus= Environment.getExternalStorageState();
-        if(!sdStatus.equals(Environment.MEDIA_MOUNTED))//检测SD是否可用
-            return;
+        if(!sdStatus.equals(Environment.MEDIA_MOUNTED)) {//检测SD是否可用
+            Log.d("", "saveHeadBitmap: SD卡不可用");
+            return null;
+        }
         FileOutputStream b=null;
-        File file=new File(MyInfoActivity.path);
-        file.mkdirs();//创建文件夹
-        String fileName=MyInfoActivity.path+"head.jpg";
+        File file=new File(fileRoad,filename);          //创建保存头像的文件
+        if(!file.exists()){                      //文件不存在就创建
+           // file.mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{                                    //存在就已经保存过，直接返回
+            return file.getAbsolutePath();
+        }
         try{
-            b=new FileOutputStream(fileName);
+            b=new FileOutputStream(file,false);
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,b);//把数据写入文件
+            b.flush();
+            b.close();
+            return file.getAbsolutePath();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }finally {
+        }/*finally {
             try{
                 b.flush();
                 b.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }*/ catch (IOException e) {
+            e.printStackTrace();
         }
-
+        return null;
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static String getImageStr(String absoluteRoad){
@@ -138,12 +172,14 @@ public class AlbumUtil {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Log.d("", "getImageStr: 图片转换成字符串异常");
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("", "getImageStr: 图片转换成字符串异常");
+            return null;
         }
 
-        return imageStr;
+
     }
     //Base64 decode后的字符串转byte[]
     @RequiresApi(api = Build.VERSION_CODES.O)

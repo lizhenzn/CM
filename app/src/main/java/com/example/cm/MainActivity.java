@@ -3,6 +3,7 @@ package com.example.cm;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -29,8 +30,10 @@ import android.widget.Toast;
 
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
+import com.example.cm.myInfo.SmackUserInfo;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
+import com.example.cm.util.DataBase;
 
 import org.jivesoftware.smack.XMPPException;
 
@@ -149,8 +152,18 @@ private final int LOGIN=1;
 
     //初始化各控件
     public void init(){
-        sharedPreferences=getSharedPreferences("myInfo",MODE_PRIVATE);
-        editor=sharedPreferences.edit();
+        Connect.init();             //初始化适配器列表
+        if(!AlbumUtil.checkStorage(this)){
+            AlbumUtil.requestStorage(this);        //申请存储读取权限
+        }
+        //sharedPreferences=getSharedPreferences("myInfo",MODE_PRIVATE);
+        //editor=sharedPreferences.edit();
+        Connect.sharedPreferences=getSharedPreferences("LoginedInfo",MODE_PRIVATE);
+        Connect.editor=Connect.sharedPreferences.edit();
+        // Connect.editor.clear();            //TODO
+        //Connect.editor.commit();
+        Connect.smackUserInfo=new SmackUserInfo();          //用LoginedInfo里保存上次登陆人的信息初始化登陆人信息
+
         toolbar=(Toolbar)findViewById(R.id.toolabr);
         setSupportActionBar(toolbar);
         navigationView=(NavigationView)findViewById(R.id.navi);
@@ -162,30 +175,38 @@ private final int LOGIN=1;
         zhangHaoTV=(TextView)headerView.findViewById(R.id.zhanghao);
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
+        //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
+        if(Connect.sharedPreferences.contains("userName")){  //有此userName键值，说明登陆过
+
+            Connect.smackUserInfo.setUserName(Connect.sharedPreferences.getString("userName",""));
+            String headBtRoad=Connect.sharedPreferences.getString("userHeadBtRoad","");
+            Connect.smackUserInfo.setHeadBt(BitmapFactory.decodeFile(headBtRoad));
+            Log.d(TAG, "init: 设置自己头像之后");
+            Connect.dataBaseHelp=new DataBase(this,"DataBaseOf"+Connect.smackUserInfo.getUserName()+".db",null,1,Connect.smackUserInfo.getUserName());
+            //Connect.smackUserInfo.setSex(Connect.sharedPreferences.getString("userSex",""));
+            //Connect.smackUserInfo.setHeight(Connect.sharedPreferences.getString("userHeight","180"));
+            //Connect.smackUserInfo.setEmail(Connect.sharedPreferences.getString("userEmail",""));
+            Connect.db=Connect.dataBaseHelp.getWritableDatabase();
+            //TODO        初始化聊天信息和好友信息
+            Connect.groupInfoList=Connect.dataBaseHelp.getGroupInfoList();
+        }else{//此前没有登陆过
+            Connect.smackUserInfo.setUserName("点击登录");
+            Bitmap bitmap=BitmapFactory.decodeResource(this.getResources(),R.drawable.unlogin);
+            Connect.smackUserInfo.setHeadBt(bitmap);           //设置为未登陆的照片
+        }
         setInfo();        //调用设置头像、昵称函数
+
     }
     //设置昵称、头像...
     public void setInfo(){
-        Bitmap bitmap= BitmapFactory.decodeFile(path+"head.jpg");
-        if(bitmap!=null){
-            @SuppressWarnings("deprecation")    
-            Drawable drawable=new BitmapDrawable(bitmap);
-            navi_head.setImageDrawable(drawable);
-            head_home.setImageDrawable(drawable);
-            //navi_head.setImageDrawable(Connect.getHeadImage("lizhen"));
-            //head_home.setImageDrawable(Connect.getHeadImage("lizhen"));
-            //toolbar.setNavigationIcon(drawable);
-            //ImageView homeIM=(ImageView)findViewById(android.R.id.home);
-           // homeIM.setImageDrawable(drawable);
-        }
-        else{
-            //如果SD卡没有，从服务器获取，然后保存到SD
-            Log.d("MyInfo","No head image");
-
-        }
+        navi_head.setImageBitmap(Connect.smackUserInfo.getHeadBt());
+        head_home.setImageBitmap(Connect.smackUserInfo.getHeadBt());
+        nichengTV.setText(Connect.smackUserInfo.getUserName());
+            //navi_head.setImageDrawable(drawable);
+            //head_home.setImageDrawable(drawable);
         //从文件读昵称
-        String nc=sharedPreferences.getString("user","");
-        nichengTV.setHint("昵称："+nc);
+        //String nc=sharedPreferences.getString("user","");
+        //nichengTV.setHint("昵称："+nc);
     }
     //初始化FragmentTabHost
     public void initTabhost(){
@@ -246,9 +267,9 @@ private final int LOGIN=1;
         switch (requestCode){
             case AlbumUtil.REQUEST_STORAGE:{
                 if(grantResults.length>0&&grantResults[0]== PackageManager.PERMISSION_GRANTED){
-                    Intent intent=new Intent("android.intent.action.GET_CONTENT");
-                    intent.setType("image/*");
-                    startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
+                    //Intent intent=new Intent("android.intent.action.GET_CONTENT");
+                    //intent.setType("image/*");
+                    //startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
                 }else{
                     Toast.makeText(this,"You denied the permission",Toast.LENGTH_SHORT).show();
                 }
@@ -257,12 +278,20 @@ private final int LOGIN=1;
     }
 
     @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        setInfo();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         //退出登录
         if(Connect.xmpptcpConnection!=null){
             Connect.signOut();
+            Connect.isLogined=false;
             Connect.xmpptcpConnection=null;
+
         }
     }
 }

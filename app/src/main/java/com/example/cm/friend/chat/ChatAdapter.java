@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cm.R;
+import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.Connect;
 import com.example.cm.util.EmoticonsTextView;
 
@@ -17,9 +18,12 @@ import java.util.List;
 public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
     private List<Message> messageList;
     private Context context;
-    public ChatAdapter(Context context,List<Message> messageList){
+    private FriendInfo friendInfo;
+
+    public ChatAdapter(Context context, List<Message> messageList, FriendInfo friendInfo){
         this.context=context;
         this.messageList=messageList;
+        this.friendInfo=friendInfo;
     }
     @Override
     public int getCount() {
@@ -67,7 +71,10 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
         viewHolder.imageView.setOnClickListener(this);
         if(messageList.get(position).getType()==1) {
             viewHolder.nameTV.setText(messageList.get(position).getFrom());
-           // viewHolder.imageView.setImageBitmap();
+            viewHolder.imageView.setImageBitmap(Connect.smackUserInfo.getHeadBt());
+        }else{
+            viewHolder.nameTV.setText(messageList.get(position).getFrom());
+            viewHolder.imageView.setImageBitmap(friendInfo.getHeadBt());
         }
         if(messageList.get(position).getMessageType().equals("text"))
             viewHolder.mesTV.setText(messageList.get(position).getBody());

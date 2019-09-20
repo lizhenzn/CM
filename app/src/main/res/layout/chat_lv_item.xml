@@ -7,7 +7,7 @@
     >
 
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/chat_iv"
                 android:layout_width="36dp"
                 android:layout_height="36dp"

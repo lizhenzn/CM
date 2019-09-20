@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 
@@ -28,6 +29,7 @@ public class ContantActivity extends AppCompatActivity {
     public static String friendName;
     private ImageButton addFriendIB;
     private ExpandableListView expandableListView;
+    private boolean work;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,10 @@ public class ContantActivity extends AppCompatActivity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 //判断会话列表有没有此好友
-                boolean contain=false;
+                /*boolean contain=false;
+                FriendInfo friendInfo;
+                Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).setChated(1); //设置为在聊天列表
+                friendInfo=Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition);
                 String userName=Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getUserName();
                 for(int i=0;i<Connect.friendInfoList.size();i++){
                     if(Connect.friendInfoList.get(i).getUserName().equals(userName)){     //会话列表包含此好友
@@ -56,22 +61,31 @@ public class ContantActivity extends AppCompatActivity {
                     }
                 }
                 if(!contain){  //会话列表不包含此好友
-                    FriendInfo friendInfo=new FriendInfo();
-                    friendInfo.setUserName(userName);
+                    Connect.dataBaseHelp.changeChatState(userName,1);            //改变数据库中聊天状态
                     //friendInfo.setHeadBt(message.getBody());
-                    Connect.friendInfoList.add(Connect.friendInfoList.size(),friendInfo);
+                    Connect.friendInfoList.add(Connect.friendInfoList.size(),friendInfo);//
                     List<com.example.cm.friend.chat.Message> messageList=new ArrayList<>();
                     ////messageList.add(message1);
                     Connect.messageMap.put(userName,messageList);
                     Log.d("ContantClick点击的好友条目名", "onChildClick: "+userName);
-                }
-                friendName=userName;
-                Intent intent=new Intent(ContantActivity.this, ChatActivity.class);
+                }*/
+                String userName=Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getUserName();
+                Intent intent=new Intent(ContantActivity.this, FriendInfoActivity.class);
                 intent.putExtra("userName",userName);
+                intent.putExtra("groupPosition",groupPosition);
+                intent.putExtra("childPosition",childPosition);
                 startActivity(intent);
                 return true;
             }
         });
+        //TODO 长按出现添加分组选项
+        expandableListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                return true;
+            }
+        });
+
         addFriendIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,13 +93,29 @@ public class ContantActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        new Thread(new Runnable() {
+            @Override
+            public void run(){
+                while (work) {
+                    if(Connect.groupInfoListChanged) {
+                        ContantActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                contantAdapter.notifyDataSetChanged();
+                                Connect.groupInfoListChanged = false;
+                            }
+                        });
+                    }
+                }
+            }
+        }).start();
 
     }
     public void init(){
         expandableListView=(ExpandableListView)findViewById(R.id.expendLV);
         contantAdapter=new ContantAdapter(this);
         addFriendIB=(ImageButton)findViewById(R.id.addFriendIB);
-
+        work=true;
     }
 
     @Override
@@ -95,5 +125,32 @@ public class ContantActivity extends AppCompatActivity {
             default:break;
         }
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new Thread(new Runnable() {
+            @Override
+            public void run(){
+                while (work) {
+                    if(Connect.groupInfoListChanged) {
+                        ContantActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                contantAdapter.notifyDataSetChanged();
+                                Connect.groupInfoListChanged = false;
+                            }
+                        });
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        work=false;
     }
 }

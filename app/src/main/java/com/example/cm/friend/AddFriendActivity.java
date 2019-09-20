@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +20,8 @@ import com.example.cm.R;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.Connect;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.iqregister.AccountManager;
 
 public class AddFriendActivity extends AppCompatActivity implements View.OnClickListener{
@@ -45,13 +48,16 @@ private boolean work;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(work){
-                    AddFriendActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            addFriendAdapter.notifyDataSetChanged();
-                        }
-                    });
+                while(work) {
+                    if (Connect.addFriendItemListChanged) {
+                        AddFriendActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                addFriendAdapter.notifyDataSetChanged();
+                                Connect.addFriendItemListChanged = false;
+                            }
+                        });
+                    }
                 }
 
             }
@@ -83,14 +89,26 @@ private boolean work;
                 AddFriendItem addFriendItem=new AddFriendItem();
                 FriendInfo friendInfo=new FriendInfo();
                 friendInfo.setUserName(String.valueOf(userName_tv.getText()));
-                friendInfo.setHeadBt(Connect.getUserImage(userName_tv.getText()+"@"+Connect.SERVERNAME));
+                friendInfo.setHeadBt(Connect.getUserImage(String.valueOf(userName_tv.getText())));
                 addFriendItem.setFriendInfo(friendInfo);
                 addFriendItem.setReason("Hello,World!");
+                addFriendItem.setResult("已发送验证");
                 Connect.addFriendItemList.add(addFriendItem);
+                Connect.addFriendItemListChanged=true;
+                Presence presence=new Presence(Presence.Type.subscribe);
+                presence.setTo(String.valueOf(userName_tv.getText())+"@"+Connect.SERVERNAME);
+                presence.setStatus("测试验证消息");
+                try {
+                    Connect.xmpptcpConnection.sendStanza(presence);
+                    Log.d("ADD", "onClick: 申请发送成功");
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                    Toast.makeText(AddFriendActivity.this,"申请发送异常",Toast.LENGTH_SHORT).show();
+                }
             }break;
             case R.id.add_friend_search:{//查找此用户
                 String userName= String.valueOf(userName_et.getText());
-                Bitmap bitmap=Connect.getUserImage(userName+"@"+Connect.SERVERNAME);
+                Bitmap bitmap=Connect.getUserImage(userName);
                 if(bitmap!=null){//有此用户
                     linearLayout.setVisibility(View.VISIBLE);
                     headImage.setImageBitmap(bitmap);
@@ -117,6 +135,30 @@ private boolean work;
         }
             return true;
 
+    }
+    //同意添加好友
+    public static boolean agreeAddFriend(String userName)  {
+        Presence presence=new Presence(Presence.Type.subscribed);
+        presence.setTo(userName+"@"+Connect.SERVERNAME);
+        try {
+            Connect.xmpptcpConnection.sendStanza(presence);
+        }catch(SmackException.NotConnectedException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    //拒绝添加好友
+    public static boolean rejectAddFriend(String userName)  {
+        Presence presence=new Presence(Presence.Type.unsubscribed);
+        presence.setTo(userName+"@"+Connect.SERVERNAME);
+        try {
+            Connect.xmpptcpConnection.sendStanza(presence);
+        }catch(SmackException.NotConnectedException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     @Override

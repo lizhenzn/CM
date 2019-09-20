@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.example.cm.MainActivity;
 import com.example.cm.R;
 import com.example.cm.friend.FriendFragment;
+import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.EmoticonsEditText;
@@ -56,6 +57,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton emoIB,addIB;
     private String userName;
     public static List<Message> chatActivitymessageList;
+    private FriendInfo friendInfo;
     public  static boolean isSend;
     private int friendPosition;
     private boolean work;
@@ -73,12 +75,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 public void run() {
                     Log.d("test", "run: ");
                     while(work) {
+                        //isSend=false;
+                        //Connect.haveNewMessage=false;
                         ChatActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                chatActivitymessageList=Connect.messageMap.get(userName);
+                                //chatActivitymessageList=Connect.messageMap.get(userName);
                                 chatAdapter.notifyDataSetChanged();
-                                chatItemLV.smoothScrollToPosition(chatActivitymessageList.size()-1);   //聊天界面接收到信息直接自动滑动到末尾
+                                chatItemLV.smoothScrollToPosition(Connect.messageMap.get(userName).size()-1);   //聊天界面接收到信息直接自动滑动到末尾
                             }
                         });
 
@@ -109,25 +113,33 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
         Log.d("聊天界面friendName", "init: "+userName);
-       /* for(friendPosition=0;friendPosition<Connect.friendInfoList.size();friendPosition++){
-            if(Connect.friendInfoList.get(friendPosition).getUserName().equals(userName)){
-                break;
+        for(int i=0;i<Connect.groupInfoList.size();i++){//赋值给正在聊天的人
+            for(int j=0;j<Connect.groupInfoList.get(i).getFriendInfoList().size();j++){
+                if(Connect.groupInfoList.get(i).getFriendInfoList().get(j).getUserName().equals(userName)){
+                    friendInfo=Connect.groupInfoList.get(i).getFriendInfoList().get(j);
+                    break;
+                }
             }
-        }*/
-        //friendPosition=friendPosition-1;
-        chatActivitymessageList=Connect.messageMap.get(userName);
-        if(chatActivitymessageList.size()>=1)
-            chatItemLV.smoothScrollToPosition(chatActivitymessageList.size()-1);
-        ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
-        while(chatManager==null)
-            chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
-        chat=chatManager.createChat(userName);
-        if(chat==null)
-            Log.d("222333", "onClick: chat为空");
+
+        }
+        //chatActivitymessageList=Connect.messageMap.get(userName);
+        if(Connect.messageMap.get(userName).size()>=1)
+            chatItemLV.smoothScrollToPosition(Connect.messageMap.get(userName).size()-1);
+
+        if(Connect.isLogined) {
+            ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+            while (chatManager == null)
+                chatManager = ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+            chat = chatManager.createChat(userName + "@" + Connect.SERVERNAME);
+            if (chat == null)
+                Log.d("222333", "onClick: chat为空");
+        }else{
+            Toast.makeText(this,"未登录，无法发送消息",Toast.LENGTH_SHORT).show();
+        }
     }
     //设置数据
     public  void initData(){
-        chatAdapter=new ChatAdapter(this,chatActivitymessageList);
+        chatAdapter=new ChatAdapter(this,Connect.messageMap.get(userName),friendInfo);
         chatItemLV.setAdapter(chatAdapter);
         initEmo();
 
@@ -178,28 +190,30 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.send:{
                 String mesBody= String.valueOf(inputET.getText());
                 if(mesBody.length()>0){
-                   /* ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
-                    while(chatManager==null)
-                        chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
-                    Chat chat=chatManager.createChat(userName);
-                    if(chat==null)
-                        Log.d("222333", "onClick: chat为空");*/
-                    try {
-                        chat.sendMessage(toJson(mesBody,"text",new Date()));
-                        Message message=new Message();
-                        message.setType(1);
-                        message.setMessageType("text"); //文本消息
-                        message.setBody(mesBody);
-                        message.setFrom(Connect.xmpptcpConnection.getUser().split("/")[0]);
-                        message.setTo(userName.split("/")[0]);
-                        message.setDate(new Date());
-                        Connect.messageMap.get(userName).add(message);     //添加信息
-                        chatActivitymessageList.add(message);
-                        inputET.setText("");              //设置输入框为空
-                        isSend=true;
-                    } catch (SmackException.NotConnectedException e) {
-                        e.printStackTrace();
-                        isSend=false;
+                    if(Connect.isLogined) {
+                        try {
+                            Date date = new Date();
+                            chat.sendMessage(toJson(mesBody, "text", date.getTime()));
+                            Message message = new Message();
+                            message.setType(1);
+                            message.setMessageType("text"); //文本消息
+                            message.setBody(mesBody);
+                            message.setPhotoRoad("");
+                            message.setPhoto(null);
+                            message.setFrom(Connect.xmpptcpConnection.getUser().split("@")[0]);
+                            message.setTo(userName.split("@")[0]);
+                            message.setDate(date.getTime());
+                            Connect.dataBaseHelp.addMessage(message);        //数据库添加聊天信息
+                            Connect.messageMap.get(userName).add(message);     //添加信息
+                            //chatActivitymessageList.add(message);
+                            inputET.setText("");              //设置输入框为空
+                            isSend = true;
+                        } catch (SmackException.NotConnectedException e) {
+                            e.printStackTrace();
+                            isSend = false;
+                        }
+                    }else{
+                        Toast.makeText(this,"未登录...",Toast.LENGTH_SHORT).show();
                     }
 
 
@@ -209,37 +223,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             }break;
             case R.id.addIB:{
-                if(AlbumUtil.checkStorage(ChatActivity.this)){
-                    Intent intent=new Intent("android.intent.action.GET_CONTENT");
-                    intent.setType("image/*");
-                    startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
+                if(Connect.isLogined) {         //未登录
+                    if (AlbumUtil.checkStorage(ChatActivity.this)) {
+                        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+                        intent.setType("image/*");
+                        startActivityForResult(intent, AlbumUtil.OPEN_ALBUM);
+                    } else {
+                        AlbumUtil.requestStorage(ChatActivity.this);
+                        //Toast.makeText(ChatActivity.this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                    }
                 }else{
-                    AlbumUtil.requestStorage(ChatActivity.this);
-                    //Toast.makeText(ChatActivity.this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,"未登录...",Toast.LENGTH_SHORT).show();
                 }
-                /*ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
-                while(chatManager==null)
-                    chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
-                Chat chat=chatManager.createChat(userName);
-                if(chat==null)
-                    Log.d("222333", "onClick: chat为空");
-                try {
-                    chat.sendMessage(toJson("测试图片发送","photo",new Date()));
-                    Message message=new Message();
-                    message.setType(1);
-                    message.setMessageType("photo"); //图片信息
-                    message.setBody("图片");
-                    message.setFrom(Connect.xmpptcpConnection.getUser().split("/")[0]);
-                    message.setTo(userName.split("/")[0]);
-                    message.setDate(new Date());
-                    Connect.messageMap.get(userName).add(message);     //添加信息
-                    chatActivitymessageList.add(message);
-                    inputET.setText("");              //设置输入框为空
-                    isSend=true;
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                    isSend=false;
-                }*/
+
 
             }break;
             default:break;
@@ -247,12 +243,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-    public String toJson(String string,String string0,Date date) {
+    public String toJson(String string,String string0,Long dateTime) {
         JSONObject jsonObject=new JSONObject();
         try {
             jsonObject.put("data",string);
             jsonObject.put("type",string0);
-            jsonObject.put("date",date);
+            jsonObject.put("date",dateTime);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -267,25 +263,34 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         switch (requestCode){
             case AlbumUtil.OPEN_ALBUM:{
                 String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,ChatActivity.this);
-                String imageStr=AlbumUtil.getImageStr(absoluteRoad);
-                try {
-                    chat.sendMessage(toJson(imageStr,"photo",new Date()));
-                    Message message=new Message();
-                    message.setType(1);
-                    message.setMessageType("photo"); //图片信息
-                    Bitmap bitmap= BitmapFactory.decodeFile(absoluteRoad);
-                    message.setPhoto(bitmap);
-                    message.setBody("[图片]");
-                    message.setFrom(Connect.xmpptcpConnection.getUser().split("/")[0]);
-                    message.setTo(userName.split("/")[0]);
-                    message.setDate(new Date());
-                    Connect.messageMap.get(userName).add(message);     //添加信息
-                    chatActivitymessageList.add(message);
-                    inputET.setText("");              //设置输入框为空
-                    isSend=true;
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                    isSend=false;
+                if(absoluteRoad!=null) {            //选择图片
+                    Log.d("选择的图片路径", "onActivityResult: " + absoluteRoad);
+                    String imageStr = AlbumUtil.getImageStr(absoluteRoad);
+                    Log.d("图片字符串", "onActivityResult: " + imageStr);
+                    if (imageStr == null)
+                        imageStr = "";
+                    try {
+                        Date date = new Date();
+                        chat.sendMessage(toJson(imageStr, "photo", date.getTime()));
+                        Message message = new Message();
+                        message.setType(1);
+                        message.setMessageType("photo"); //图片信息
+                        message.setPhotoRoad(absoluteRoad);
+                        Bitmap bitmap = BitmapFactory.decodeFile(absoluteRoad);
+                        message.setPhoto(bitmap);
+                        message.setBody("[图片]");
+                        message.setFrom(Connect.xmpptcpConnection.getUser().split("@")[0]);
+                        message.setTo(userName.split("@")[0]);
+                        message.setDate(date.getTime());
+                        Connect.dataBaseHelp.addMessage(message);  //数据库添加聊天信息
+                        Connect.messageMap.get(userName).add(message);     //添加信息
+                        //chatActivitymessageList.add(message);
+                        inputET.setText("");              //设置输入框为空
+                        isSend = true;
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                        isSend = false;
+                    }
                 }
 
             }break;

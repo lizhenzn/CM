@@ -14,7 +14,8 @@ public class Message {
     private int type;//区分自己还是好友的消息
     private String messageType;        //text  photo
     private String stanzaId;
-    private Date date;           //消息时间
+    private String photoRoad;        //图片路径
+    private Long date;           //消息时间
 
     public String getFrom() {
         return from;
@@ -56,11 +57,11 @@ public class Message {
         this.type = type;
     }
 
-    public Date getDate() {
+    public Long getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Long date) {
         this.date = date;
     }
 
@@ -78,5 +79,13 @@ public class Message {
 
     public void setPhoto(Bitmap photo) {
         this.photo = photo;
+    }
+
+    public String getPhotoRoad() {
+        return photoRoad;
+    }
+
+    public void setPhotoRoad(String photoRoad) {
+        this.photoRoad = photoRoad;
     }
 }

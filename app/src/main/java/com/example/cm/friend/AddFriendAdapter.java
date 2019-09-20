@@ -7,12 +7,17 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.cm.R;
+import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.Connect;
 
-public class AddFriendAdapter extends BaseAdapter {
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.packet.Presence;
+
+public class AddFriendAdapter extends BaseAdapter  {
     private  Context context;
     public AddFriendAdapter(Context context){
         this.context=context;
@@ -52,11 +57,64 @@ public class AddFriendAdapter extends BaseAdapter {
         viewHolder.userName.setText(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
         viewHolder.reason.setText(Connect.addFriendItemList.get(position).getReason());
         viewHolder.result.setText(Connect.addFriendItemList.get(position).getResult());
+        //有结果的时候隐藏按钮
+        if(Connect.addFriendItemList.get(position).getResult().length()>0){
+            viewHolder.accept.setVisibility(View.GONE);
+            viewHolder.reject.setVisibility(View.GONE);
+            viewHolder.result.setVisibility(View.VISIBLE);
+        }
+        viewHolder.accept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Connect.addFriendItemList.get(position).setResult("已同意");
+               AddFriendActivity.agreeAddFriend(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
+               Connect.addFriendItemListChanged=true;            //信息改变
+                if(Connect.addFriend(Connect.addFriendItemList.get(position).getFriendInfo().getUserName(),Connect.addFriendItemList.get(position).getFriendInfo().getUserName(),new String[]{"Friends"})){
+                    for(int j=0;j<Connect.groupInfoList.size();j++){
+                        if(Connect.groupInfoList.get(j).getGroupName().equals("Friends")){
+                            FriendInfo friendInfo=new FriendInfo();
+                            friendInfo.setUserName(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
+                            friendInfo.setHeadBt(Connect.addFriendItemList.get(position).getFriendInfo().getHeadBt());
+                            Connect.groupInfoList.get(j).getFriendInfoList().add(friendInfo);           //添加好友信息
+                            Connect.groupInfoListChanged=true;
+                            //给对方发送同意添加信息
+                            Presence presence=new Presence(Presence.Type.subscribed);
+                            presence.setTo(Connect.addFriendItemList.get(position).getFriendInfo().getUserName()+"@"+Connect.SERVERNAME);
+                            try {
+                                Connect.xmpptcpConnection.sendStanza(presence);
+                            } catch (SmackException.NotConnectedException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        }
+                    }
+                }
+                //viewHolder.btnLinearLayout.setVisibility(View.GONE);
+            }
+        });
+        viewHolder.reject.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Connect.addFriendItemList.get(position).setResult("已拒绝");
+                AddFriendActivity.rejectAddFriend(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
+                Connect.addFriendItemListChanged=true;            //信息改变
+                //给对方发送同意添加信息
+                Presence presence=new Presence(Presence.Type.unsubscribed);
+                presence.setTo(Connect.addFriendItemList.get(position).getFriendInfo().getUserName()+"@"+Connect.SERVERNAME);
+                try {
+                    Connect.xmpptcpConnection.sendStanza(presence);
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
        // viewHolder.accept.setOnClickListener();
         //viewHolder.reject.setOnClickListener();
 
         return convertView;
     }
+
+
     class ViewHolder{
         ImageView headImage;
         TextView userName;
@@ -64,5 +122,6 @@ public class AddFriendAdapter extends BaseAdapter {
         TextView result;
         Button reject;
         Button accept;
+
     }
 }
