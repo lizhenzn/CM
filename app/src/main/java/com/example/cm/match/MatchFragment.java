@@ -1,5 +1,7 @@
 package com.example.cm.match;
 
+import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.os.Bundle;
@@ -11,10 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.cm.R;
 import com.example.cm.MainActivity;
 import com.example.cm.util.ServerFunction;
+import com.example.cm.wardrobe.WardrobeFragment;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,9 +55,18 @@ public class MatchFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        context=getActivity();
-        view=View.inflate(context, R.layout.match,null);
-
+        context = getActivity();
+        view = View.inflate(context, R.layout.match, null);
+        ImageView clothes_up = view.findViewById(R.id.clothes_up);
+        clothes_up.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm=getActivity().getSupportFragmentManager();
+                fm.beginTransaction().replace(R.id.tab_main_content,new WardrobeFragment()).addToBackStack(null).commit();
+            }
+        });
+        return view;
+    }}
 //        Button button = view.findViewById(R.id.button);
 //        button.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -63,13 +76,4 @@ public class MatchFragment extends Fragment {
 //                    public void run() {
 //                        for(int i=1;i<=12;i++){
 //
-//                            ServerFunction.sendPost("test","第"+i+"条分享",2,"/sdcard/test/"+"saber"+i+"_up.jpg",
-//                                    "/sdcard/test/"+"saber"+i+"_down.jpg","TSaber7",0);
-//                        }
-//                    }
-//                }).start();
-//            }
-//        });
-        return  view;
-    }
-}
+//                            ServerFunction
