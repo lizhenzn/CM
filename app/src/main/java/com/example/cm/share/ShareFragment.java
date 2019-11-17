@@ -93,7 +93,7 @@ public class ShareFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         shareItemList=new ArrayList<>();
         Log.d(TAG, "init:create new ShareItemList");
-        // 模拟获取数据
+        // 获取数据
         getData(true);
         shareAdapter = new ShareAdapter(shareItemList,getActivity());
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -105,7 +105,7 @@ public class ShareFragment extends Fragment {
             public void onLoadMore() {
                 shareAdapter.setLoadState(shareAdapter.LOADING);
                 Log.d(TAG, "onLoadMore: loadState="+shareAdapter.getLoadState());
-               if (shareItemList.size() < 52) {
+               if (shareItemList.size() < 20) {
                     // 模拟获取网络数据，延时1s
                                    getData(false);
                                    shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
@@ -153,10 +153,8 @@ public class ShareFragment extends Fragment {
                     }
                 }
 
-
             }
         }).start();
-
     }
 }
 

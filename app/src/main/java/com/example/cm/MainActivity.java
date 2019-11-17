@@ -56,6 +56,10 @@ private SharedPreferences sharedPreferences;
 private SharedPreferences.Editor editor;
 private final int LOGIN=1;
     private static final String TAG = "MainActivity";
+
+    private int clothes_up=-1;
+    private int clothes_down=-1;
+    private boolean choose_flag=false;
 //每一个页面写一次setToolbarText()函数   ******************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {
