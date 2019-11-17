@@ -134,7 +134,9 @@ public class AlbumUtil {
                 e.printStackTrace();
             }
         }else{                                    //存在就已经保存过，直接返回
+            Log.d("", "saveHeadBitmap: 存在"+file.getAbsolutePath());
             return file.getAbsolutePath();
+
         }
         try{
             b=new FileOutputStream(file,false);

@@ -1,47 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".friend.ContantActivity">
     <android.support.v7.widget.Toolbar
-        android:id="@+id/contant_toolbar"
+        android:id="@+id/contant_toolabr"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/colornew"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:textSize="20sp"
-                android:text="好友"
-                />
-            <ImageButton
-                android:id="@+id/addFriendIB"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                 android:layout_gravity="end"
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/cm"
-                android:layout_marginRight="10dp" />
-
-
-
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="0dp"
+            android:text="好友"
+            android:textSize="14sp"
+            />
+        <ImageButton
+            android:id="@+id/contant_addIB"
+            android:layout_marginRight="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_gravity="end"
+            android:background="@drawable/chat_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </android.support.v7.widget.Toolbar>
-    <ExpandableListView
-        android:id="@+id/expendLV"
-        android:layoutDirection="rtl"
+
+
+    <ListView
+        android:id="@+id/contant_lv"
+        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" />
 
-    </ExpandableListView>
+    <com.example.cm.friend.SideBar
+        android:id="@+id/contant_sidebar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="0dp"
+        android:paddingRight="10dp"
+        android:textColor="@color/colorGray"
+        android:textSize="15sp" />
 
-</LinearLayout>
+</RelativeLayout>

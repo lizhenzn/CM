@@ -4,124 +4,119 @@ import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.friend.SideBar.ISideBarSelectCallBack;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.GroupInfo;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.Connect;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import main.UserInfo;
 
 public class ContantActivity extends AppCompatActivity {
-    private ContantAdapter contantAdapter;
-    public static String friendName;
-    private ImageButton addFriendIB;
-    private ExpandableListView expandableListView;
+
+    private ListView listView;
+    private SideBar sideBar;
+    //private ArrayList<FriendInfo> list;
     private boolean work;
+    private SortAdapter sortAdapter;
+    private ImageButton addIB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contant);
-        init();
-        Toolbar toolbar=(Toolbar)findViewById(R.id.contant_toolbar);
+        Toolbar toolbar=(Toolbar)findViewById(R.id.contant_toolabr);
         setSupportActionBar(toolbar);
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        expandableListView.setAdapter(contantAdapter);
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                //判断会话列表有没有此好友
-                /*boolean contain=false;
-                FriendInfo friendInfo;
-                Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).setChated(1); //设置为在聊天列表
-                friendInfo=Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition);
-                String userName=Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getUserName();
-                for(int i=0;i<Connect.friendInfoList.size();i++){
-                    if(Connect.friendInfoList.get(i).getUserName().equals(userName)){     //会话列表包含此好友
-                        //list.get(i).get(message.getFrom()).add(message1);
-                        contain=true;
-                        Log.d("ContantClick点击的好友条目名", "onChildClick: "+userName);
-                        break;
-                    }
-                }
-                if(!contain){  //会话列表不包含此好友
-                    Connect.dataBaseHelp.changeChatState(userName,1);            //改变数据库中聊天状态
-                    //friendInfo.setHeadBt(message.getBody());
-                    Connect.friendInfoList.add(Connect.friendInfoList.size(),friendInfo);//
-                    List<com.example.cm.friend.chat.Message> messageList=new ArrayList<>();
-                    ////messageList.add(message1);
-                    Connect.messageMap.put(userName,messageList);
-                    Log.d("ContantClick点击的好友条目名", "onChildClick: "+userName);
-                }*/
-                String userName=Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getUserName();
-                Intent intent=new Intent(ContantActivity.this, FriendInfoActivity.class);
-                intent.putExtra("userName",userName);
-                intent.putExtra("groupPosition",groupPosition);
-                intent.putExtra("childPosition",childPosition);
-                startActivity(intent);
-                return true;
-            }
-        });
-        //TODO 长按出现添加分组选项
-        expandableListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                return true;
-            }
-        });
+        initView();
+        initData();
+    }
 
-        addFriendIB.setOnClickListener(new View.OnClickListener() {
+    private void initView() {
+        listView = (ListView) findViewById(R.id.contant_lv);
+        sideBar = (SideBar) findViewById(R.id.contant_sidebar);
+        addIB=(ImageButton)findViewById(R.id.contant_addIB);
+        addIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(ContantActivity.this,AddFriendActivity.class);
                 startActivity(intent);
             }
         });
-        new Thread(new Runnable() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void run(){
-                while (work) {
-                    if(Connect.groupInfoListChanged) {
-                        ContantActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                contantAdapter.notifyDataSetChanged();
-                                Connect.groupInfoListChanged = false;
-                            }
-                        });
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent=new Intent(ContantActivity.this,FriendInfoActivity.class);
+                String userName=Connect.contantFriendInfoList.get(position).getUserName();
+                intent.putExtra("userName",userName);
+                intent.putExtra("position",position);
+                startActivity(intent);
+            }
+        });
+        if(sideBar==null){
+            Log.d("", "initView:sideBar为空222233333 ");
+        }else {
+            Log.d("", "initView:contantFriendlist长度为： "+Connect.contantFriendInfoList.size());
+
+            sideBar.setOnStrSelectCallBack((index, selectStr) -> {
+                for (int i = 0; i < Connect.contantFriendInfoList.size(); i++) {
+                    if (selectStr.equalsIgnoreCase(Connect.contantFriendInfoList.get(i).getFirstLetter())) {
+                        listView.setSelection(i); // 选择到首字母出现的位置
+                        return;
                     }
                 }
-            }
-        }).start();
+            });
+        }
 
     }
-    public void init(){
-        expandableListView=(ExpandableListView)findViewById(R.id.expendLV);
-        contantAdapter=new ContantAdapter(this);
-        addFriendIB=(ImageButton)findViewById(R.id.addFriendIB);
-        work=true;
+
+    private void initData() {
+        //list = new ArrayList<>();
+       //list= (ArrayList<FriendInfo>) Connect.friendInfoList;
+        Collections.sort(Connect.contantFriendInfoList); // 对list进行排序，需要让User实现Comparable接口重写compareTo方法
+        sortAdapter = new SortAdapter(this, Connect.contantFriendInfoList);
+        listView.setAdapter(sortAdapter);
     }
+
+
+  /*  @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.add_menu,menu);
+        return true;
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:this.finish();break;
+
+
             default:break;
         }
         return true;
@@ -138,7 +133,7 @@ public class ContantActivity extends AppCompatActivity {
                         ContantActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                contantAdapter.notifyDataSetChanged();
+                                sortAdapter.notifyDataSetChanged();
                                 Connect.groupInfoListChanged = false;
                             }
                         });

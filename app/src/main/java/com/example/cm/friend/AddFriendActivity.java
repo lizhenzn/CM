@@ -22,6 +22,7 @@ import com.example.cm.util.Connect;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smackx.iqregister.AccountManager;
 
 public class AddFriendActivity extends AppCompatActivity implements View.OnClickListener{
@@ -86,35 +87,56 @@ private boolean work;
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.add_friend_btn:{//发送添加请求
-                AddFriendItem addFriendItem=new AddFriendItem();
-                FriendInfo friendInfo=new FriendInfo();
-                friendInfo.setUserName(String.valueOf(userName_tv.getText()));
-                friendInfo.setHeadBt(Connect.getUserImage(String.valueOf(userName_tv.getText())));
-                addFriendItem.setFriendInfo(friendInfo);
-                addFriendItem.setReason("Hello,World!");
-                addFriendItem.setResult("已发送验证");
-                Connect.addFriendItemList.add(addFriendItem);
-                Connect.addFriendItemListChanged=true;
-                Presence presence=new Presence(Presence.Type.subscribe);
-                presence.setTo(String.valueOf(userName_tv.getText())+"@"+Connect.SERVERNAME);
-                presence.setStatus("测试验证消息");
-                try {
-                    Connect.xmpptcpConnection.sendStanza(presence);
-                    Log.d("ADD", "onClick: 申请发送成功");
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                    Toast.makeText(AddFriendActivity.this,"申请发送异常",Toast.LENGTH_SHORT).show();
+                boolean contain=false;
+                for(int i=0;i<Connect.groupInfoList.size();i++){
+                    for(int j=0;j<Connect.groupInfoList.get(i).getFriendInfoList().size();j++){
+                        if(Connect.groupInfoList.get(i).getFriendInfoList().get(j).getUserName().equals(userName_tv.getText())){
+                            contain=true;
+                            break;
+                        }
+                    }
+                }
+                if(!contain) {
+                    AddFriendItem addFriendItem = new AddFriendItem();
+                    FriendInfo friendInfo = new FriendInfo();
+                    friendInfo.setUserName(String.valueOf(userName_tv.getText()));
+                    friendInfo.setHeadBt(Connect.getUserImage(String.valueOf(userName_tv.getText())));
+                    addFriendItem.setFriendInfo(friendInfo);
+                    addFriendItem.setReason("Hello,World!");
+                    addFriendItem.setResult("已发送验证");
+
+                    Connect.addFriendItemListChanged = true;
+                    Presence presence = new Presence(Presence.Type.subscribe);
+                    presence.setTo(String.valueOf(userName_tv.getText()) + "@" + Connect.SERVERNAME);
+                    presence.setStatus("测试验证消息");
+                    try {
+                        Connect.xmpptcpConnection.sendStanza(presence);
+                        Log.d("ADD", "onClick: 申请发送成功");
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                        addFriendItem.setResult("申请发送异常，请重试");
+                        Toast.makeText(AddFriendActivity.this, "申请发送异常", Toast.LENGTH_SHORT).show();
+                    }
+                    Connect.addFriendItemList.add(addFriendItem);
+                }else{
+                    Toast.makeText(AddFriendActivity.this,"已有此好友",Toast.LENGTH_SHORT).show();
                 }
             }break;
             case R.id.add_friend_search:{//查找此用户
-                String userName= String.valueOf(userName_et.getText());
-                Bitmap bitmap=Connect.getUserImage(userName);
-                if(bitmap!=null){//有此用户
-                    linearLayout.setVisibility(View.VISIBLE);
-                    headImage.setImageBitmap(bitmap);
-                    userName_tv.setText(userName);
-                }else{//没有这个用户
-                    Toast.makeText(AddFriendActivity.this,"抱歉，没有这个用户",Toast.LENGTH_SHORT).show();
+                if(Connect.isLogined) {
+                    String userName = String.valueOf(userName_et.getText());
+                    //RosterEntry entry = Connect.roster.getEntry(userName);
+                    Bitmap bitmap = Connect.getUserImage(userName);
+                    if (bitmap != null) {//有此用户
+
+                        linearLayout.setVisibility(View.VISIBLE);
+                        headImage.setImageBitmap(bitmap);
+                        userName_tv.setText(userName);
+                    } else {//没有这个用户
+                        Toast.makeText(AddFriendActivity.this, "抱歉，没有这个用户", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(AddFriendActivity.this,"未登录",Toast.LENGTH_SHORT).show();
                 }
             }break;
             case R.id.add_friend_headImage:{//查看详情
@@ -138,6 +160,7 @@ private boolean work;
     }
     //同意添加好友
     public static boolean agreeAddFriend(String userName)  {
+        Connect.addFriend(userName,userName,new String[]{"Friends"});
         Presence presence=new Presence(Presence.Type.subscribed);
         presence.setTo(userName+"@"+Connect.SERVERNAME);
         try {

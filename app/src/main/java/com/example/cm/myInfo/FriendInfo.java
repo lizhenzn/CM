@@ -2,15 +2,16 @@ package com.example.cm.myInfo;
 
 import android.graphics.Bitmap;
 
-public class FriendInfo{
+public class FriendInfo implements Comparable<FriendInfo>{
     String userName;   //用户名Jid
     String nicName;    //昵称
     Bitmap headBt;     //头像
-    String groupName;  //所属群组
     String headBtRoad; //头像保存路径
     int chated;      //是否在会话列表 0不在 1在
     String sex;
     String email;
+    String pinyin;
+    String firstLetter;     //字母排序索引
     public FriendInfo(){
         this.chated=0; //默认为0
     }
@@ -47,14 +48,6 @@ public class FriendInfo{
         this.sex = sex;
     }
 
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -77,5 +70,32 @@ public class FriendInfo{
 
     public void setChated(int chated) {
         this.chated = chated;
+    }
+
+    public String getFirstLetter() {
+        return firstLetter;
+    }
+
+    public void setFirstLetter(String sortLetters) {
+        this.firstLetter = sortLetters;
+    }
+
+    public String getPinyin() {
+        return pinyin;
+    }
+
+    public void setPinyin(String pinyin) {
+        this.pinyin = pinyin;
+    }
+
+    @Override
+    public int compareTo(FriendInfo another) {
+        if (firstLetter.equals("#") && !another.getFirstLetter().equals("#")) {
+            return 1;
+        } else if (!firstLetter.equals("#") && another.getFirstLetter().equals("#")){
+            return -1;
+        } else {
+            return pinyin.compareToIgnoreCase(another.getPinyin());
+        }
     }
 }

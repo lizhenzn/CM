@@ -69,27 +69,6 @@ public class AddFriendAdapter extends BaseAdapter  {
                 Connect.addFriendItemList.get(position).setResult("已同意");
                AddFriendActivity.agreeAddFriend(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
                Connect.addFriendItemListChanged=true;            //信息改变
-                if(Connect.addFriend(Connect.addFriendItemList.get(position).getFriendInfo().getUserName(),Connect.addFriendItemList.get(position).getFriendInfo().getUserName(),new String[]{"Friends"})){
-                    for(int j=0;j<Connect.groupInfoList.size();j++){
-                        if(Connect.groupInfoList.get(j).getGroupName().equals("Friends")){
-                            FriendInfo friendInfo=new FriendInfo();
-                            friendInfo.setUserName(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
-                            friendInfo.setHeadBt(Connect.addFriendItemList.get(position).getFriendInfo().getHeadBt());
-                            Connect.groupInfoList.get(j).getFriendInfoList().add(friendInfo);           //添加好友信息
-                            Connect.groupInfoListChanged=true;
-                            //给对方发送同意添加信息
-                            Presence presence=new Presence(Presence.Type.subscribed);
-                            presence.setTo(Connect.addFriendItemList.get(position).getFriendInfo().getUserName()+"@"+Connect.SERVERNAME);
-                            try {
-                                Connect.xmpptcpConnection.sendStanza(presence);
-                            } catch (SmackException.NotConnectedException e) {
-                                e.printStackTrace();
-                            }
-                            break;
-                        }
-                    }
-                }
-                //viewHolder.btnLinearLayout.setVisibility(View.GONE);
             }
         });
         viewHolder.reject.setOnClickListener(new View.OnClickListener() {
@@ -98,14 +77,6 @@ public class AddFriendAdapter extends BaseAdapter  {
                 Connect.addFriendItemList.get(position).setResult("已拒绝");
                 AddFriendActivity.rejectAddFriend(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
                 Connect.addFriendItemListChanged=true;            //信息改变
-                //给对方发送同意添加信息
-                Presence presence=new Presence(Presence.Type.unsubscribed);
-                presence.setTo(Connect.addFriendItemList.get(position).getFriendInfo().getUserName()+"@"+Connect.SERVERNAME);
-                try {
-                    Connect.xmpptcpConnection.sendStanza(presence);
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
             }
         });
        // viewHolder.accept.setOnClickListener();

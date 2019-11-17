@@ -182,11 +182,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         if(Connect.getXMPPTCPConnection()){
                             Log.d("22233", "run: 连接服务器成功");
                             if(Connect.register(user,passwd,map)){//注册成功然后设置选择的头像，若设置失败，则注销此用户
+                                //TODO 注册后不能登录，要先设置头像，空指针错误
                                 Log.d("22233", "run: 注册成功");
-                                if(Connect.login(user,passwd,getBaseContext())){
+                                if(Connect.xmpptcpConnection!=null){
                                     try {
+                                        Connect.xmpptcpConnection.login(user,passwd);
                                         Log.d("22233", "run: 登录成功，尝试修改头像");
                                         if(Connect.changeImage(Connect.xmpptcpConnection,absoluteRoad))
+                                            Connect.signOut(); //退出
                                             RegisterActivity.this.runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
@@ -230,9 +233,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                             }
                                         });
                                         e.printStackTrace();
+                                    } catch (SmackException e) {
+                                        e.printStackTrace();
+                                        Log.d("", "run: 改头像前登陆失败");
+                                        Toast.makeText(RegisterActivity.this,"注册异常",Toast.LENGTH_SHORT).show();
+                                        progressDialog.dismiss();
                                     }
 
                                 }else{
+                                    Log.d("空空空空空空空空", "run: xmppconnectiion为空");
                                     //已注册登录未成功
 
 
@@ -242,6 +251,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                     @Override
                                     public void run() {
                                         Toast.makeText(RegisterActivity.this,"注册异常",Toast.LENGTH_SHORT).show();
+                                        progressDialog.dismiss();
                                     }
                                 });
                             }
@@ -251,6 +261,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 @Override
                                 public void run() {
                                     Toast.makeText(RegisterActivity.this,"链接服务器异常",Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
                                 }
                             });
                         }

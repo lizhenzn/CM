@@ -113,12 +113,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
         Log.d("聊天界面friendName", "init: "+userName);
-        for(int i=0;i<Connect.groupInfoList.size();i++){//赋值给正在聊天的人
-            for(int j=0;j<Connect.groupInfoList.get(i).getFriendInfoList().size();j++){
-                if(Connect.groupInfoList.get(i).getFriendInfoList().get(j).getUserName().equals(userName)){
-                    friendInfo=Connect.groupInfoList.get(i).getFriendInfoList().get(j);
-                    break;
-                }
+        for(int i=0;i<Connect.contantFriendInfoList.size();i++){//赋值给正在聊天的人
+            if(Connect.contantFriendInfoList.get(i).getUserName().equals(userName)){
+                friendInfo=Connect.contantFriendInfoList.get(i);
+                break;
             }
 
         }

@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.cm.R;
 import com.example.cm.friend.AddFriendItem;
+import com.example.cm.friend.Cn2Spell;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.GroupInfo;
 import com.example.cm.myInfo.FriendInfo;
@@ -81,6 +82,8 @@ public class Connect {
     public static boolean haveNewMessage;
     public static HashMap<String,List<com.example.cm.friend.chat.Message>>messageMap;                            //会话列表String对应好友，List<Message>为对应此String好友聊天信息列表
     public  static List<FriendInfo>   friendInfoList;                                                 //会话列表好友名列表
+    public  static List<FriendInfo>   contantFriendInfoList;                                                 //联系人列表好友名列表
+
     public static List<AddFriendItem> addFriendItemList;                         //添加好友详情列表
     public  static Roster roster;
     public static SharedPreferences sharedPreferences;                         //存储上次登录用户信息
@@ -99,7 +102,6 @@ public class Connect {
                     Log.d("XMPPTCP new 之前", ""+xmpptcpConnection);
 
                     XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                            //.setUsernameAndPassword("lizhen", "zn521128")
                             .setServiceName(SERVERNAME)
                             .setHost(IP)
                             .setPort(5222)
@@ -113,10 +115,14 @@ public class Connect {
 
                     try {
                         xmpptcpConnection.connect();
-                        if(xmpptcpConnection.isConnected())
+                        if(xmpptcpConnection.isConnected()){
                            Log.d("*********getXMPPTCP", "getXMPPTCPConnection: connect成功");
-                        else
+                        return true;
+                        }
+                        else{
                             Log.d("*********getXMPPTCP", "getXMPPTCPConnection: connect失败");
+                        return false;
+                        }
                     } catch (SmackException e) {
                         e.printStackTrace();
                         return false;
@@ -143,6 +149,8 @@ public class Connect {
 
                 xmpptcpConnection.sendStanza(presence);           //设置在线状态
                 //1 同一人，则不获取好友信息 2 不同，先关闭数据库，然后创建数据库，再获取好友信息,还要删除好友列表和会话列表信息 3 之前没登陆过，创建数据库，获取好友信息
+                roster=Roster.getInstanceFor(xmpptcpConnection);
+                roster.setSubscriptionMode(Roster.SubscriptionMode.manual);//设置手动处理
                 if(Connect.smackUserInfo.getUserName().equals("点击登录")){
                     Connect.dataBaseHelp=new DataBase(context,"DataBaseOf"+userName+".db",null,1,userName);
                     db=dataBaseHelp.getWritableDatabase();
@@ -169,6 +177,7 @@ public class Connect {
                         Connect.initFriend();    //获取好友列表
                     }
                 }
+
                 Connect.smackUserInfo.setUserName(userName);
                 Bitmap bitmap=Connect.getUserImage(userName);
                 Connect.smackUserInfo.setHeadBt(bitmap);
@@ -278,16 +287,6 @@ public class Connect {
                             if(addFriendItemList.get(i).getFriendInfo().getUserName().equals(user)){
                                 addFriendItemList.get(i).setResult("对方已同意");
                                 addFriend(user,user,new String[]{"Friends"});          //roster添加好友
-                                for(int j=0;j<groupInfoList.size();j++){
-                                    if(groupInfoList.get(j).getGroupName().equals("Friends")){
-                                        FriendInfo friendInfo=new FriendInfo();
-                                        friendInfo.setUserName(user);
-                                        friendInfo.setHeadBt(getUserImage(user));
-                                        groupInfoList.get(j).getFriendInfoList().add(friendInfo);           //添加好友信息
-                                        groupInfoListChanged=true;
-                                        break;
-                                    }
-                                }
                                 addFriendItemListChanged=true;
                                 break;
                             }
@@ -304,7 +303,10 @@ public class Connect {
                         }
                     }else if(presence.getType().equals(Presence.Type.unsubscribed)){//删除之后logd 对方拒绝添加你  对方删除你，对方下线
                         //取消订阅
-                        Log.d("", "processPacket: 取消订阅，对方删除你");
+                        Log.d("", "processPacket: 取消订阅，对方删除你"+user);
+                        //删除之后自己也删除此人 调用deleteFriend(userName) 里面包括删除聊天记录，数据库好友信息，好友列表条目等
+                        deleteFriend(user);
+                        Log.d("", "processPacket: 您删除成功"+user);
                     }else if(presence.getType().equals(Presence.Type.unavailable)){
                         //对方下线
                         Log.d("", "processPacket: 对方下线");
@@ -321,25 +323,7 @@ public class Connect {
         Log.d("请求监听", "addFriendListener: 好友请求监听开启...");
 
     }
-    //获取用户头像
-    /*public static Drawable getHeadImage(String user){
-        byte[] bytes=null;
-        try{
-            VCard vCard=new VCard();
-            ProviderManager.addIQProvider("vCard","vcard-temp",new VCardProvider());
 
-            vCard.load(xmpptcpConnection,user+"@"+xmpptcpConnection.getServiceName());
-            if(vCard==null||vCard.getAvatar()==null)
-                return null;
-            bytes=vCard.getAvatar();
-
-        }catch(Exception e){
-
-        }
-        if(bytes==null)
-            return null;
-        return PhotoFormatTools.byteArrayToDrawable(bytes);
-    }*/
     public static void initListener() {
         ChatManager manager = ChatManager.getInstanceFor(Connect.xmpptcpConnection);
         //设置信息的监听
@@ -435,7 +419,8 @@ public class Connect {
 
         Log.d("登录用户",xmpptcpConnection.getUser().toString());
 
-          roster=Roster.getInstanceFor(xmpptcpConnection);
+          /*roster=Roster.getInstanceFor(xmpptcpConnection);
+          roster.setSubscriptionMode(Roster.SubscriptionMode.manual);//设置手动处理*/
         while(!roster.isLoaded()){
             try {
                 roster.reload();
@@ -451,11 +436,26 @@ public class Connect {
             }
         }
         Log.d("重连成功",xmpptcpConnection.getUser().toString());
-        Collection<RosterGroup> groups = roster.getGroups();
+        /*Collection<RosterGroup> groups = roster.getGroups();
         Log.d("组数", String.valueOf(roster.getGroupCount()));
         for (RosterGroup group : groups) {
             GroupInfo groupInfo=new GroupInfo();
-            groupInfo.setGroupName(group.getName());   //设置组名
+            Log.d("", "initFriend: 组名"+group.getName());
+            if(group.getName().equals("Friends")) {
+                try {
+                    group.setName("我的好友");
+                } catch (SmackException.NotConnectedException e) {
+                    Log.d("", "initFriend: 改变好友分组异常");
+                    e.printStackTrace();
+                } catch (SmackException.NoResponseException e) {
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    e.printStackTrace();
+                }
+                groupInfo.setGroupName("我的好友");   //设置组名
+            }else {
+                groupInfo.setGroupName(group.getName());   //设置组名
+            }
             List<FriendInfo> friendInfoList=new ArrayList<>();  //此组中的好友
             for(RosterEntry rosterEntry:group.getEntries()){
                 FriendInfo friendInfo=new FriendInfo();
@@ -474,12 +474,50 @@ public class Connect {
                 //Log.d("", "initFriend: "+values.toString());
                 //db.insert("FriendInfoTable",null,values);//添加进数据库
                 friendInfoList.add(friendInfo);   //添加
+                //contantFriendInfoList.add(friendInfo);
             }
             groupInfo.setFriendInfoList(friendInfoList);
             groupInfoList.add(groupInfo);   //添加到全局组详情列表
 
-        }
+        }*/
         Log.d("总好友数", String.valueOf(roster.getEntryCount()));
+        Collection<RosterEntry> rosterEntries=roster.getEntries();
+        for(RosterEntry entry:rosterEntries){
+            FriendInfo friendInfo=new FriendInfo();
+            String user=entry.getUser().split("@")[0];
+            friendInfo.setUserName(user);
+            friendInfo.setNicName(user);
+            String pinyin = Cn2Spell.getPinYin(user); // 根据姓名获取拼音
+            String firstLetter = pinyin.substring(0, 1).toUpperCase(); // 获取拼音首字母并转成大写
+            if (!firstLetter.matches("[A-Z]")) { // 如果不在A-Z中则默认为“#”
+                firstLetter = "#";
+            }
+            friendInfo.setPinyin(pinyin);
+            friendInfo.setFirstLetter(firstLetter);
+            String sex=getUserVcard(user).getField("sex");
+            if(sex==null){
+                sex="保密";
+            }
+            friendInfo.setSex(sex);
+            String email=getUserVcard(user).getEmailHome();
+            if(email==null){
+                email="";
+            }
+            friendInfo.setEmail(email);
+            Log.d("", "initFriend: sex :"+sex+"   email:"+email);
+            Bitmap bitmap=getUserImage(user);
+            friendInfo.setHeadBt(bitmap);  //设置头像
+            String friendHeadBitmapRoad=AlbumUtil.saveHeadBitmap(user,bitmap);  //保存好友头像
+            friendInfo.setHeadBtRoad(friendHeadBitmapRoad);
+            Log.d("好友头像保存路径", "initFriend: "+friendHeadBitmapRoad);
+            //friendInfo.setSex();
+            //添加返回一个values对象，须要db添加提交
+            dataBaseHelp.addFriendInfo(friendInfo);
+            //Log.d("", "initFriend: "+values.toString());
+            //db.insert("FriendInfoTable",null,values);//添加进数据库
+            contantFriendInfoList.add(friendInfo);
+            Log.d("", "initFriend:添加进通讯录   "+contantFriendInfoList.size());
+        }
         roster.addRosterListener(new RosterListener() {                                                //TODO 花名册监听
             @Override
             public void entriesAdded(Collection<String> collection) {
@@ -508,6 +546,7 @@ public class Connect {
         haveNewMessage=false;
         messageMap=new HashMap<>();
         friendInfoList=new ArrayList<>();
+        contantFriendInfoList=new ArrayList<>();
         addFriendItemList=new ArrayList<>();
         groupInfoList=new ArrayList<>();
         smackUserInfo=new SmackUserInfo();
@@ -526,6 +565,18 @@ public class Connect {
             userName=userName+"@"+SERVERNAME;
             roster.createEntry(userName,name,groups);
             //TODO 数据库和好友列表需要更新
+            String userName1=userName.split("@")[0];
+            FriendInfo friendInfo=new FriendInfo();
+            friendInfo.setUserName(userName1);
+            friendInfo.setNicName(userName1);
+            friendInfo.setSex(getUserVcard(userName.split("@")[0]).getField("sex"));
+            friendInfo.setEmail(getUserVcard(userName.split("@")[0]).getEmailHome());
+            Bitmap bitmap=getUserImage(userName1);
+            String friendBtRoad=AlbumUtil.saveHeadBitmap(userName1,bitmap);
+            friendInfo.setHeadBt(bitmap);
+            friendInfo.setHeadBtRoad(friendBtRoad);
+            friendInfo.setChated(0);
+            dataBaseHelp.addFriendInfo(friendInfo);   //数据库添加好友信息
         } catch (SmackException.NotLoggedInException e) {
             e.printStackTrace();
             return false;
@@ -554,6 +605,11 @@ public class Connect {
             //TODO           数据库和好友列表需要更新
             dataBaseHelp.deleteFriendInfo(userName.split("@")[0]);   //数据库删除好友条目
             Log.d("", "deleteFriend: 数据库删除好友条目成功");
+            for(int i=0;i<contantFriendInfoList.size();i++){
+                if(contantFriendInfoList.get(i).getUserName().equals(userName.split("@")[0])){
+                    contantFriendInfoList.remove(i);
+                }
+            }
             for(int i=0;i<friendInfoList.size();i++){         //删除对应的会话列表条目
                 if(friendInfoList.get(i).getUserName().equals(userName.split("@")[0])){
                     friendInfoList.remove(i);
@@ -595,19 +651,14 @@ public class Connect {
     */
     public static Bitmap getUserImage(String user){
         user=user+"@"+SERVERNAME;
-        Drawable drawable=null;
         Bitmap bitmap=null;
         VCard vCard=new VCard();
         try {
             vCard.load(xmpptcpConnection,user);
-            vCard.getAvatar();
             Log.d("获取头像测试", "getUserImage: "+vCard.toString());
             byte []bytes=vCard.getAvatar();
-            ByteArrayInputStream bais=new ByteArrayInputStream(vCard.getAvatar());
+            ByteArrayInputStream bais=new ByteArrayInputStream(bytes);
             bitmap=BitmapFactory.decodeStream(bais);
-            BitmapDrawable bitmapDrawable=new BitmapDrawable(bitmap);
-            drawable=bitmapDrawable;
-
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
             Log.d("**/***//**获取头像", "getUserImage: 获取头像异常");
@@ -651,6 +702,21 @@ public class Connect {
         }
         return true;
 
+    }
+    //得到联系人基本信息
+    public static VCard getUserVcard(String user){
+        VCard vCard=null;
+        vCard=new VCard();
+        try {
+            vCard.load(xmpptcpConnection,user+"@"+SERVERNAME);
+        } catch (SmackException.NoResponseException e) {
+            e.printStackTrace();
+        } catch (XMPPException.XMPPErrorException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+        return vCard;
     }
     //文件转byte[]
     public static byte[] File2byte(File tradeFile){
