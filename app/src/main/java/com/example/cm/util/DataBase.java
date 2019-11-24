@@ -25,7 +25,7 @@ public class DataBase extends SQLiteOpenHelper {
     private  final String CREATE_TABLE_FRIENDINFO="create table FriendInfoTable"+"("//user==null//TODO
             +"userName varchar(24) Primary Key Not Null,"
             +"nicName varchar(24),"
-            +"sex varchar(12) Not Null,"
+            +"sex varchar(12) Not Null default '保密',"
             +"email varchar(20),"
             +"headBtRoad varchar(36),"
             +"chated int"
