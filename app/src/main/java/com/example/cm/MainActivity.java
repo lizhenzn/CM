@@ -25,6 +25,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -83,14 +84,12 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
         return choose_flag;
     }
     public static void setChoose_flag(boolean choose_flag){choose_flag=choose_flag;}
-
-    //每一个页面写一次setToolbarText()函数   ******************************************************************************
+//每一个页面写一次setToolbarText()函数   ******************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //getSupportActionBar().hide();
-
         init();
         initTabhost();
         setToolbarText("搭配");
