@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 
-import com.example.cm.ConnectService;
 import com.example.cm.R;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
