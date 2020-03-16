@@ -8,7 +8,7 @@ import com.example.cm.wardrobe.WardrobeFragment;
 public enum Tabs {
     Match(0,"搭配",R.drawable.match, MatchFragment.class),
     Share(1,"广场",R.drawable.share, ShareFragment.class),
-    Friend(2,"好友",R.drawable.friend, FriendFragment.class),
+    Friend(2,"会话",R.drawable.friend, FriendFragment.class),
     Wardrobe(3,"衣柜",R.drawable.wardrobe, WardrobeFragment .class);
 
     private int i;

@@ -136,7 +136,7 @@ private boolean work;
                         Toast.makeText(AddFriendActivity.this, "抱歉，没有这个用户", Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    Toast.makeText(AddFriendActivity.this,"未登录",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddFriendActivity.this,"未登录...",Toast.LENGTH_SHORT).show();
                 }
             }break;
             case R.id.add_friend_headImage:{//查看详情
@@ -147,6 +147,7 @@ private boolean work;
             }break;
             default:break;
         }
+        
     }
 
     @Override
