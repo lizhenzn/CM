@@ -19,6 +19,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -55,9 +56,20 @@ private SharedPreferences.Editor editor;
 private final int LOGIN=1;
     private static final String TAG = "MainActivity";
 
-    private int clothes_up=-1;
-    private int clothes_down=-1;
-    private boolean choose_flag=false;
+    private static int clothes_up=-1;
+    private static int clothes_down=-1;
+    private static boolean choose_flag=false;
+
+    public static int getClothesUp(){
+        return clothes_up;
+    }
+    public static void setClothes_up(int clothes_up){clothes_up=clothes_up;}
+    public static int getClothes_down(){ return clothes_down;}
+    public static void setClothes_down(int clothes_down){clothes_down=clothes_down;}
+    public static boolean isChoose_flag(){
+        return choose_flag;
+    }
+    public static void setChoose_flag(boolean choose_flag){choose_flag=choose_flag;}
 //每一个页面写一次setToolbarText()函数   ******************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {

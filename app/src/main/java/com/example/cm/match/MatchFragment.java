@@ -47,14 +47,22 @@ public class MatchFragment extends Fragment {
 
     @Override
     public void onResume() {
+        //Log.d(TAG, "onResume: resume match");
         super.onResume();
         setToolbarText("搭配");
+
+        MainActivity mainActivity=(MainActivity)getActivity();
+        if(mainActivity.getClothesUp()!=-1){
+            ImageView clothes_up = view.findViewById(R.id.clothes_up);
+            //.setImage
+        }
     }
 
     private static final String TAG = "TEST";
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //Log.d(TAG, "onCreateView: create match fragment");
         context = getActivity();
         view = View.inflate(context, R.layout.match, null);
         ImageView clothes_up = view.findViewById(R.id.clothes_up);
@@ -63,6 +71,10 @@ public class MatchFragment extends Fragment {
             public void onClick(View v) {
                 FragmentManager fm=getActivity().getSupportFragmentManager();
                 fm.beginTransaction().replace(R.id.tab_main_content,new WardrobeFragment()).addToBackStack(null).commit();
+                //Log.d(TAG, "onClick: replace!");
+                //MainActivity mainActivity=(MainActivity)getActivity();
+                //while(mainActivity.getClothesUp()==-1){}
+
             }
         });
         return view;

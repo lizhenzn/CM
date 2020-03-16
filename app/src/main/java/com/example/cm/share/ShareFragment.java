@@ -105,7 +105,7 @@ public class ShareFragment extends Fragment {
             public void onLoadMore() {
                 shareAdapter.setLoadState(shareAdapter.LOADING);
                 Log.d(TAG, "onLoadMore: loadState="+shareAdapter.getLoadState());
-               if (shareItemList.size() < 20) {
+               if (shareItemList.size() < 5) {
                     // 模拟获取网络数据，延时1s
                                    getData(false);
                                    shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);

@@ -103,5 +103,6 @@ public class ServerFunction {
        return  currentPostList.get(currentPostPosition).getContent();
     }
     public int getCurrentPostPosition(){return currentPostPosition;}
+    public static int getCount(){return 0;}
 
 }
