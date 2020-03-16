@@ -22,7 +22,7 @@ public class FriendInfoActivity extends AppCompatActivity {
    private Button send_btn;
    private TextView setting_btn;
    private String userName;
-   private int groupPosition,childPosition;
+   private int position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,8 +33,7 @@ public class FriendInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent=new Intent(FriendInfoActivity.this, FriendSettingActivity.class);
                 intent.putExtra("userName",userName);
-                intent.putExtra("groupPosition",groupPosition);
-                intent.putExtra("childPosition",childPosition);
+                intent.putExtra("position",position);
                 startActivity(intent);
             }
         });
@@ -44,9 +43,9 @@ public class FriendInfoActivity extends AppCompatActivity {
                 //判断会话列表有没有此好友
                 boolean contain=false;
                 FriendInfo friendInfo;
-                Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).setChated(1); //设置为在聊天列表
-                friendInfo=Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition);
-                String userName=Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getUserName();
+                Connect.contantFriendInfoList.get(position).setChated(1); //设置为在聊天列表
+                friendInfo=Connect.contantFriendInfoList.get(position);
+                String userName=friendInfo.getUserName();
                 for(int i=0;i<Connect.friendInfoList.size();i++){
                     if(Connect.friendInfoList.get(i).getUserName().equals(userName)){     //会话列表包含此好友
                         //list.get(i).get(message.getFrom()).add(message1);
@@ -77,7 +76,6 @@ public class FriendInfoActivity extends AppCompatActivity {
         setting_btn=(TextView)findViewById(R.id.friend_detail_setting);
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
-        groupPosition=intent.getIntExtra("groupPosition",0);
-        childPosition=intent.getIntExtra("childPosition",0);
+        position=intent.getIntExtra("position",0);
     }
 }

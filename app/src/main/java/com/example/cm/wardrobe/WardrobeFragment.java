@@ -1,6 +1,9 @@
 package com.example.cm.wardrobe;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,20 +18,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.cm.MainActivity;
 import com.example.cm.R;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static android.support.v7.util.DiffUtil.DiffResult.NO_POSITION;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class WardrobeFragment extends Fragment  {
     private Context context;
     private View view;
-    private List<Integer> photoList1,photoList2; //展示的上衣、裤子和上面展示的的详情
-    private static List<Integer> integerList;
-    private static List<List<Integer>> detailList1,detailList2;
+    //private List<Integer> photoList1,photoList2; //展示的上衣、裤子和上面展示的的详情  R.drawable.cm资源为Integer类型
+    //private static List<Integer> integerList;    //
+    //private static List<List<Integer>> detailList1,detailList2;   //每个衣服对应的前后左右各个图片
+    public static List<Bitmap> photoList1,photoList2; //展示的上衣、裤子和上面展示的的详情  R.drawable.cm资源为Integer类型
+    public static List<Bitmap> integerList;    //选中的某个衣服各个图片
+    public static List<List<Bitmap>> detailList1,detailList2;   //每个衣服对应的前后左右各个图片
     private RecyclerView wardrobeR1,wardrobeR2;
     private WardrobeAdapter wardrobeAdapter1,wardrobeAdapter2;
     private static ViewPager viewPager;
@@ -37,6 +46,8 @@ public class WardrobeFragment extends Fragment  {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //TODO 在加载这个模块就从服务器获取图片
+
         setToolbarText("衣柜");
 
     }
@@ -74,29 +85,39 @@ public class WardrobeFragment extends Fragment  {
         return  view;
     }
 
+
     public void initData(){
         photoList1=new ArrayList<>();
         photoList2=new ArrayList<>();
         integerList=new ArrayList<>();
         detailList1=new ArrayList<>();
         detailList2=new ArrayList<>();
+        @SuppressLint("ResourceType") InputStream is = getResources().openRawResource(R.drawable.cm);
+        Bitmap mBitmap = BitmapFactory.decodeStream(is);
+        @SuppressLint("ResourceType") InputStream is1 = getResources().openRawResource(R.drawable.unlogin);
+        Bitmap mBitmap1 = BitmapFactory.decodeStream(is1);
+        @SuppressLint("ResourceType") InputStream is2 = getResources().openRawResource(R.drawable.match1);
+        Bitmap mBitmap2 = BitmapFactory.decodeStream(is2);
+        @SuppressLint("ResourceType") InputStream is3 = getResources().openRawResource(R.drawable.wardrobe1);
+        Bitmap mBitmap3 = BitmapFactory.decodeStream(is3);
         for(int i=0;i<66;i++) {
-            photoList1.add(R.drawable.cm);
-            photoList2.add(R.drawable.friend);
-        }
-        for(int i=0;i<photoList1.size();i++){
 
-                detailList1.add(new ArrayList<Integer>(Arrays.asList(R.drawable.wardrobe, R.drawable.ic_launcher_background, R.drawable.wardrobe, R.drawable.cm)));
+            photoList1.add(mBitmap);
+            photoList2.add(mBitmap1);
 
         }
         for(int i=0;i<photoList1.size();i++){
 
-            detailList2.add(new ArrayList<Integer>(Arrays.asList(R.drawable.friend, R.drawable.friend1, R.drawable.match, R.drawable.cm)));
+                detailList1.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap,mBitmap1,mBitmap2,mBitmap3)));
+
+        }
+        for(int i=0;i<photoList2.size();i++){
+
+            detailList2.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap3,mBitmap2,mBitmap1,mBitmap)));
 
         }
 
     }
-
 
 
     class Transform implements ViewPager.PageTransformer{
@@ -130,13 +151,17 @@ public class WardrobeFragment extends Fragment  {
     }
 
     public static class WardrobeAdapter extends RecyclerView.Adapter<WardrobeAdapter.ViewHolder> {
-        private List<Integer> photoList;
+        private List<Bitmap> photoList;
         private  Context context;
         int type;
-        public WardrobeAdapter(Context context,List<Integer> photoList,int type){
+        public WardrobeAdapter(Context context,List<Bitmap> photoList,int type){
             this.context=context;
             this.photoList=photoList;
             this.type=type;
+        }
+        public static interface OnItemClickListener {
+            void onItemClick(View view);
+            void onItemLongClick(View view);
         }
 
         @NonNull
@@ -145,12 +170,26 @@ public class WardrobeFragment extends Fragment  {
             ViewHolder viewHolder=null;
             View view= LayoutInflater.from(context).inflate(R.layout.wardrobe_recycler,viewGroup,false);
             viewHolder=new ViewHolder(view);
+            ViewHolder finalViewHolder = viewHolder;
+            viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position= finalViewHolder.getAdapterPosition();
+                    if(MainActivity.isChoose_flag()){
+                        if(type==1){  //上衣
+                            MainActivity.setClothes_up(position);
+                        }else{    //下衣
+                            MainActivity.setClothes_down(position);
+                        }
+                    }
+                }
+            });
             return viewHolder;
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-            viewHolder.imageView.setImageResource(photoList.get(position));
+            viewHolder.imageView.setImageBitmap(photoList.get(position));
             if(type==1){
                 integerList=detailList1.get(position);
             }else if(type==2){
@@ -162,11 +201,21 @@ public class WardrobeFragment extends Fragment  {
 
         }
 
+
         @Override
         public int getItemCount() {
             return photoList.size();
         }
 
+        @Override
+        public int getItemViewType(int position) {
+            return position;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             ImageView imageView;
@@ -180,9 +229,9 @@ public class WardrobeFragment extends Fragment  {
 
     public static class WardrobeVPAdapter extends PagerAdapter {
         private List<View> viewList;
-        private List<Integer> integerList;        //选中图片的各个方向照
+        private List<Bitmap> integerList;        //选中图片的各个方向照
         private Context context;
-        public WardrobeVPAdapter(Context context,List<Integer> integerList){
+        public WardrobeVPAdapter(Context context,List<Bitmap> integerList){
             this.context=context;
             this.integerList=integerList;
         }
@@ -201,7 +250,7 @@ public class WardrobeFragment extends Fragment  {
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
              View view= LayoutInflater.from(context).inflate(R.layout.wardrobe_vp,container,false);
             ImageView imageView=(ImageView)view.findViewById(R.id.wardrobeVP_IV);
-            imageView.setImageResource(integerList.get(position));
+            imageView.setImageBitmap(integerList.get(position));
             container.addView(view);
             return view;
         }

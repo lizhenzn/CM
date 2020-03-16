@@ -8,6 +8,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.util.Log;
 
+import org.tensorflow.lite.Interpreter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,17 +21,16 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tensorflow.lite.Interpreter;
-
 public class ClothesEstimater {
     private Context applicationContext;
     ClothesEstimater(Context applicationContext){
         this.applicationContext=applicationContext;
     }
 
-    public int estimateClothes(Bitmap up,Bitmap down){
-        Bitmap nup=zoomImg(up,224,112);
-        Bitmap ndown=zoomImg(down,224,112);
+    public int estimateClothes(String up,String down){
+        Bitmap nup=getScaleBitmap(up);
+        Bitmap ndown=getScaleBitmap(down);
+        if(nup==null||ndown==null)return -1;
         Bitmap bitmap=getJointBitmap(nup,ndown);
         if(bitmap!=null)return estimateGood(bitmap);
         else return -1;

@@ -1,11 +1,13 @@
 package com.example.cm;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -204,7 +206,9 @@ private final int LOGIN=1;
             //Connect.smackUserInfo.setEmail(Connect.sharedPreferences.getString("userEmail",""));
             Connect.db=Connect.dataBaseHelp.getWritableDatabase();
             //TODO        初始化聊天信息和好友信息
-            Connect.groupInfoList=Connect.dataBaseHelp.getGroupInfoList();
+            //Connect.groupInfoList=Connect.dataBaseHelp.getGroupInfoList();
+
+            Connect.contantFriendInfoList=Connect.dataBaseHelp.getContantFriendInfoList();
         }else{//此前没有登陆过
             Connect.smackUserInfo.setUserName("点击登录");
             Bitmap bitmap=BitmapFactory.decodeResource(this.getResources(),R.drawable.unlogin);

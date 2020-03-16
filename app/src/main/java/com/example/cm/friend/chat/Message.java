@@ -16,6 +16,9 @@ public class Message {
     private String stanzaId;
     private String photoRoad;        //图片路径
     private Long date;           //消息时间
+    public Message(){
+        photoRoad="";
+    }
 
     public String getFrom() {
         return from;

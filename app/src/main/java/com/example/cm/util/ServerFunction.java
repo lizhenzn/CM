@@ -1,9 +1,6 @@
 package com.example.cm.util;
 
-import android.os.Environment;
 import android.util.Log;
-
-import com.example.cm.share.ShareItem;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -66,6 +63,7 @@ public class ServerFunction {
         currentPostPosition=0;
         shareManager.resetTransferFlags();
         currentPostList=shareManager.nextPostBatch(cacheDir);
+        Log.d("ShareFragment", "loadPostList: "+currentPostList);
     }
     public boolean nextPost(){
         currentPostPosition++;

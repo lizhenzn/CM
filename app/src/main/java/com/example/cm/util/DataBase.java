@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ListView;
 
+import com.example.cm.friend.Cn2Spell;
 import com.example.cm.friend.chat.GroupInfo;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
@@ -24,7 +25,7 @@ public class DataBase extends SQLiteOpenHelper {
     private  final String CREATE_TABLE_FRIENDINFO="create table FriendInfoTable"+"("//user==null//TODO
             +"userName varchar(24) Primary Key Not Null,"
             +"nicName varchar(24),"
-            +"groupName varchar(24) Not Null,"
+            +"sex varchar(12) Not Null default '保密',"
             +"email varchar(20),"
             +"headBtRoad varchar(36),"
             +"chated int"
@@ -67,7 +68,8 @@ public class DataBase extends SQLiteOpenHelper {
         ContentValues values=new ContentValues();
         values.put("userName",friendInfo.getUserName());
         values.put("nicName",friendInfo.getNicName());
-        values.put("groupName",friendInfo.getGroupName());
+        values.put("sex",friendInfo.getSex());
+        values.put("email",friendInfo.getEmail());
         values.put("headBtRoad",friendInfo.getHeadBtRoad());
         values.put("chated",friendInfo.getChated());
         Connect.db.insert("FriendInfoTable",null,values);
@@ -143,19 +145,26 @@ public class DataBase extends SQLiteOpenHelper {
         }
         return map;
     }
-    public List<GroupInfo> getGroupInfoList(){
+    public List<FriendInfo> getContantFriendInfoList(){
         Cursor cursor =Connect.db.query("FriendInfoTable",null,null,null,null,null,null);
-        List<GroupInfo> list=new ArrayList<>();
         List<FriendInfo> friendInfoList=new ArrayList<>();       //所有的好友信息列表
         if (cursor.moveToFirst()) {
             do{
                 FriendInfo friendInfo=new FriendInfo();
+                String userName=cursor.getString(cursor.getColumnIndex("userName"));
+                String pinyin = Cn2Spell.getPinYin(userName); // 根据姓名获取拼音
+                String firstLetter = pinyin.substring(0, 1).toUpperCase(); // 获取拼音首字母并转成大写
+                if (!firstLetter.matches("[A-Z]")) { // 如果不在A-Z中则默认为“#”
+                    firstLetter = "#";
+                }
                 friendInfo.setUserName(cursor.getString(cursor.getColumnIndex("userName")));
                 friendInfo.setNicName(cursor.getString(cursor.getColumnIndex("nicName")));
+                friendInfo.setPinyin(pinyin);
+                friendInfo.setFirstLetter(firstLetter);
                 String headBtRoad=cursor.getString(cursor.getColumnIndex("headBtRoad"));
                 friendInfo.setHeadBt(BitmapFactory.decodeFile(headBtRoad));
                 Log.d("", "getGroupInfoList: 设置好友头像成功"+headBtRoad);
-                friendInfo.setGroupName(cursor.getString(cursor.getColumnIndex("groupName")));
+                friendInfo.setSex(cursor.getString(cursor.getColumnIndex("sex")));
                 friendInfo.setChated(cursor.getInt(cursor.getColumnIndex("chated")));
                 if(cursor.getInt(cursor.getColumnIndex("chated"))==1){
                     Connect.friendInfoList.add(friendInfo);           //加入会话列表
@@ -164,37 +173,8 @@ public class DataBase extends SQLiteOpenHelper {
                 friendInfoList.add(friendInfo);
             }while(cursor.moveToNext());
         }
-        //对好友信息列表处理 分为各组 每次循环设第一个好友的组为新组名，每加一个然后删除这个
-        while(friendInfoList.size()>0){
-            GroupInfo groupInfo=new GroupInfo();
-            List<FriendInfo> list1=new ArrayList<>();  //每个组的好友列表
-            int size=friendInfoList.size();
-            int remove[]=new int[size];
 
-            int j=0;
-            Log.d("", "最外部组添加循环:   "+"  ");
-            Log.d("", "getGroupInfoList:第 "+j+"次组添加循环时friendlist剩余"+friendInfoList.size());
-            groupInfo.setGroupName(friendInfoList.get(0).getGroupName());
-            for(int i=0;i<size;i++){                                          //TODO 起初写的是i<friendinfolist.size() 内部每一次都会改变friend info list大小，所以每一次都检测不完
-                int x=i;
-                Log.d("从数据库得到好友消息", "getGroupInfoList:  "+i+" "+groupInfo.getGroupName());
-                Log.d("", "getGroupInfoList:   "+i+"  "+friendInfoList.get(i).toString());
-                if(friendInfoList.get(i).getGroupName().equals(groupInfo.getGroupName())){
-                    remove[i]=1;         //标记要移除
-                    Log.d("进入判断内部", "getGroupInfoList:   "+i+"  "+friendInfoList.get(i).toString());
-                    list1.add(friendInfoList.get(i));
-                    //friendInfoList.remove(i);//删除
-                }
-            }
-            for(int k=size-1;k>=0;k--){            //从大到小移除，否则出错
-                if(remove[k]==1)
-                    friendInfoList.remove(k);
-            }
-            groupInfo.setFriendInfoList(list1);
-            list.add(groupInfo);
-            j=j+1;
-        }
-        return list;
+        return friendInfoList;
     }
     /*
     * 通过userName得到聊天信息列表
@@ -214,6 +194,7 @@ public class DataBase extends SQLiteOpenHelper {
                 String photoRoad=cursor.getString(cursor.getColumnIndex("photoRoad"));
                 message.setPhoto(BitmapFactory.decodeFile(photoRoad));
                 message.setDate(cursor.getLong(cursor.getColumnIndex("date")));
+
                 if(photoRoad.length()>0){
                     message.setPhotoRoad(photoRoad);
                     message.setPhoto(BitmapFactory.decodeFile(photoRoad));

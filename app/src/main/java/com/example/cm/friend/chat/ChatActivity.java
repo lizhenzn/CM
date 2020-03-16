@@ -10,16 +10,19 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -62,10 +65,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private int friendPosition;
     private boolean work;
     private Chat chat;
+    private TextView user_tv;  //正在聊天的人 顶部显示
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        Toolbar toolbar=(Toolbar)findViewById(R.id.chat_toolbar);
+        setSupportActionBar(toolbar);
+        user_tv=(TextView)toolbar.findViewById(R.id.chat_friendNM);
+        ActionBar actionBar=getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         init();
         initData();
         work=true;
@@ -113,15 +124,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
         Log.d("聊天界面friendName", "init: "+userName);
-        for(int i=0;i<Connect.groupInfoList.size();i++){//赋值给正在聊天的人
-            for(int j=0;j<Connect.groupInfoList.get(i).getFriendInfoList().size();j++){
-                if(Connect.groupInfoList.get(i).getFriendInfoList().get(j).getUserName().equals(userName)){
-                    friendInfo=Connect.groupInfoList.get(i).getFriendInfoList().get(j);
-                    break;
-                }
+        for(int i=0;i<Connect.contantFriendInfoList.size();i++){//赋值给正在聊天的人
+            if(Connect.contantFriendInfoList.get(i).getUserName().equals(userName)){
+                friendInfo=Connect.contantFriendInfoList.get(i);
+                break;
             }
 
         }
+        user_tv.setText(userName);
         //chatActivitymessageList=Connect.messageMap.get(userName);
         if(Connect.messageMap.get(userName).size()>=1)
             chatItemLV.smoothScrollToPosition(Connect.messageMap.get(userName).size()-1);
@@ -314,6 +324,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }break;
             default:break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:this.finish();break;
+
+            default:break;
+        }
+        return true;
     }
 
     @Override

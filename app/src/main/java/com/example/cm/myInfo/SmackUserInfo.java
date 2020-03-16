@@ -11,6 +11,7 @@ public class SmackUserInfo {
     String sex;         //性别
     String height;     //身高
     String email;
+    String sortLetter;  //排序用的首字母
     public static List<FriendInfo> friendInfoList;
 
     public String getUserName() {
@@ -69,6 +70,12 @@ public class SmackUserInfo {
         SmackUserInfo.friendInfoList = friendInfoList;
     }
 
+    public String getSortLetters() {
+        return sortLetter;
+    }
 
+    public void setSortLetters(String sortLetter) {
+        this.sortLetter = sortLetter;
+    }
 }
 
