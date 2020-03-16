@@ -223,6 +223,7 @@ public class Connect {
                 String headBitmapRoad=AlbumUtil.saveHeadBitmap(userName,bitmap);
                 Log.d("保存头像路径", "run: "+headBitmapRoad);
                 Connect.editor.putString("userName",userName);
+                Connect.editor.putString("passward",passwd);
                 Connect.editor.putString("userHeadBtRoad",headBitmapRoad);
                 Log.d("登陆后写入的登录名", "run: "+Connect.sharedPreferences.getString("userName",""));
                 Connect.editor.putString("userHeadBtRoad",headBitmapRoad);

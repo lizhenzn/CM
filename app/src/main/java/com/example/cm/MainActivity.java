@@ -220,6 +220,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
         if(Connect.sharedPreferences.contains("userName")){  //有此userName键值，说明登陆过
 
             Connect.smackUserInfo.setUserName(Connect.sharedPreferences.getString("userName",""));
+            String cachePasswd=Connect.sharedPreferences.getString("passward","");//缓存的密码
             String headBtRoad=Connect.sharedPreferences.getString("userHeadBtRoad","");
             Connect.smackUserInfo.setHeadBt(BitmapFactory.decodeFile(headBtRoad));
             Log.d(TAG, "init: 设置自己头像之后");
@@ -233,7 +234,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Connect.login(Connect.smackUserInfo.getUserName(), "222333", mainActivityContext);
+                    Connect.login(Connect.smackUserInfo.getUserName(), cachePasswd, mainActivityContext);
                 }
             }).start();
 
