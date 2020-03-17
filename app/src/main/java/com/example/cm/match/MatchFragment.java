@@ -74,7 +74,6 @@ public class MatchFragment extends Fragment {
                 //Log.d(TAG, "onClick: replace!");
                 //MainActivity mainActivity=(MainActivity)getActivity();
                 //while(mainActivity.getClothesUp()==-1){}
-
             }
         });
         return view;

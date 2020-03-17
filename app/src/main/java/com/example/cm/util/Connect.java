@@ -650,6 +650,7 @@ public class Connect {
     *param userName
     */
     public static Bitmap getUserImage(String user){
+        getXMPPTCPConnection();
         user=user+"@"+SERVERNAME;
         Bitmap bitmap=null;
         VCard vCard=new VCard();

@@ -16,11 +16,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.cm.R;
+import com.example.cm.util.ClothesEstimater;
 import com.example.cm.util.Connect;
 import com.example.cm.util.ServerFunction;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import main.PostInfo;
+import main.ShareManager;
 
 import static com.example.cm.MainActivity.setToolbarText;
 
@@ -35,7 +39,8 @@ public class ShareFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private ServerFunction serverFunction;
     private Object ThreadManager=new Object();
-
+    private int countLeft=-1;
+    private int count=-1;
 
 
     @Override
@@ -62,7 +67,7 @@ public class ShareFragment extends Fragment {
         recyclerView.addItemDecoration(new ShareItemDecoration());
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
 
-
+        //刷新监听
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -89,11 +94,9 @@ public class ShareFragment extends Fragment {
             public void onLoadMore() {
                 shareAdapter.setLoadState(shareAdapter.LOADING);
                 Log.d(TAG, "onLoadMore: loadState="+shareAdapter.getLoadState());
-               if (shareItemList.size() < 5) {
-                    // 模拟获取网络数据，延时1s
-                                   getData(false);
-                                   shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
-
+               if (countLeft>0) {
+                   getData(false);
+                   shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
                 } else {
                     // 显示加载到底的提示
                     shareAdapter.setLoadState(shareAdapter.LOADING_END);
@@ -102,10 +105,31 @@ public class ShareFragment extends Fragment {
         });
     }
     private void getData(boolean refresh)  {
-        for (int i = 0; i <= 9; i++) {
+        if(refresh){
+            countLeft=-1;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    countLeft=serverFunction.getCount();
+                }
+            }).start();
+            while(countLeft==-1){
+                Log.d(TAG, "getData: is deadLoop");
+            }
+            Log.d(TAG, "init: countLeft="+countLeft);
+            count=0;
+        }
+        if(countLeft>=10){
+            count=10;
+        }
+        else{
+            count=countLeft;
+        }
+        for (int i = 0; i < count; i++) {
             shareItemList.add(new ShareItem(R.drawable.friend1, Connect.smackUserInfo.getUserName(),R.drawable.friend1,
                     R.drawable.friend1,"",R.drawable.givelike,R.drawable.comment));
         }
+        countLeft-=count;
         serverFunction.getShareManager().resetTransferFlags();
         Log.d(TAG, "getData: ready to enter thread");
         new Thread(new Runnable() {
@@ -116,16 +140,19 @@ public class ShareFragment extends Fragment {
                         serverFunction.refresh();
                     //Log.d(TAG, "run: enter thread");
                     serverFunction.loadPostList();
-                    Log.d(TAG, "postlist: "+serverFunction.nextPost());
-
-                    for (int i = 0; i <= 9; i++) {
+                    //Log.d(TAG, "postlist: "+serverFunction.nextPost());
+                    for (int i = 0; i < count; i++) {
                         //Log.d(TAG, "run: "+serverFunction.getCurrentPostPosition());
                         Log.d(TAG, "run: "+i);
                         while(!serverFunction.getShareManager().transfer_flags[i]){}
                         Log.d(TAG, "run: quite while");
-                        shareItemList.set(shareItemList.size()-10+i,new ShareItem(serverFunction.getPost(),R.drawable.friend1,Connect.smackUserInfo.getUserName(),serverFunction.getSmallUpImg(),
+                        PostInfo post=serverFunction.getPost();
+                        String userName=null;
+                        userName=serverFunction.getUserName();
+                        while(userName==null){}
+                        Log.d(TAG, "run: username="+userName);
+                        shareItemList.set(shareItemList.size()-count+i,new ShareItem(post,Connect.getUserImage(userName),userName,serverFunction.getSmallUpImg(),
                                 serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
-
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

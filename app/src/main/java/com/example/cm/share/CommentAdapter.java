@@ -32,7 +32,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         CommentItem comment = allComments.get(i);
-        viewHolder.headImage.setImageResource(comment.getIdHeadImage());
+        viewHolder.headImage.setImageBitmap(comment.getHeadImage());
         viewHolder.number.setText(comment.getNumber());
         viewHolder.userName.setText(comment.getUserName());
         viewHolder.commentText.setText(comment.getCommentText());

@@ -181,7 +181,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     v.getContext().startActivity(toPresentShareItem);
                 }
             });
-            recyclerViewHolder.HeadImage.setImageResource(shareItem.getIdHeadImage());
+            recyclerViewHolder.HeadImage.setImageBitmap(shareItem.getHeadImage());
             recyclerViewHolder.UserName.setText(shareItem.getUserName());
             recyclerViewHolder.Description.setText(shareItem.getDescription());
             recyclerViewHolder.GiveLike.setImageResource(shareItem.getIdGiveLike());

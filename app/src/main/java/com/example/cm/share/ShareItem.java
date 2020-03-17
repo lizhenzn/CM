@@ -1,5 +1,7 @@
 package com.example.cm.share;
 
+import android.graphics.Bitmap;
+
 import java.io.File;
 import java.io.Serializable;
 
@@ -8,6 +10,7 @@ import main.PostInfo;
 public class ShareItem implements Serializable {
     private PostInfo postInfo;
     private int idHeadImage;
+    private Bitmap HeadImage;
     private String UserName;
     private File ClothesUp;
     private File ClothesDown;
@@ -18,6 +21,18 @@ public class ShareItem implements Serializable {
     private int idComment;
     private int idLikeNum;
     private boolean blankItemFlag;
+
+    public ShareItem(PostInfo postInfo,Bitmap HeadImage,String UserName,File ClothesUp, File ClothesDown, String description, int idGiveLike, int idComment) {
+        this.postInfo=postInfo;
+        this.HeadImage = HeadImage;
+        this.UserName = UserName;
+        this.ClothesUp = ClothesUp;
+        this.ClothesDown = ClothesDown;
+        this.description = description;
+        this.idGiveLike = idGiveLike;
+        this.idComment = idComment;
+        blankItemFlag=false;
+    }
 
     public ShareItem(PostInfo postInfo,int idHeadImage,String UserName,File ClothesUp, File ClothesDown, String description, int idGiveLike, int idComment) {
         this.postInfo=postInfo;
@@ -30,7 +45,6 @@ public class ShareItem implements Serializable {
         this.idComment = idComment;
         blankItemFlag=false;
     }
-
     public ShareItem(int idHeadImage,String UserName,int idClothesUp, int  idClothesDown, String description, int idGiveLike, int idComment) {
         this.postInfo=null;
         this.idHeadImage = idHeadImage;
@@ -42,8 +56,8 @@ public class ShareItem implements Serializable {
         this.idComment = idComment;
         blankItemFlag=true;
     }
-    int getIdHeadImage() {
-        return idHeadImage;
+    Bitmap getHeadImage() {
+        return HeadImage;
     }
 
     String getUserName() {

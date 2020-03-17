@@ -1,22 +1,24 @@
 package com.example.cm.share;
 
+import android.graphics.Bitmap;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CommentItem {
-    int idHeadImage;
+    Bitmap HeadImage;
     String Number;
     String UserName;
     String CommentText;
 
-    public CommentItem(int idHeadImage, String Number,String UserName, String CommentText) {
-        this.idHeadImage = idHeadImage;
+    public CommentItem(Bitmap HeadImage, String Number,String UserName, String CommentText) {
+        this.HeadImage = HeadImage;
         this.Number = Number;
         this.UserName = UserName;
         this.CommentText = CommentText;
     }
 
-    int getIdHeadImage() {
-        return idHeadImage;
+    Bitmap getHeadImage() {
+        return HeadImage;
     }
 
     String getNumber() {
