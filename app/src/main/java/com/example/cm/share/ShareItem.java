@@ -88,4 +88,5 @@ public class ShareItem implements Serializable {
     boolean isBlankItemFlag() {
         return blankItemFlag;
     }
+    void removeHeadImage(){HeadImage=null;}
 }
