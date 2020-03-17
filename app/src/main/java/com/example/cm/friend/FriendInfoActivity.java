@@ -14,6 +14,8 @@ import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.Connect;
 
+import org.jivesoftware.smackx.vcardtemp.packet.VCard;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +29,22 @@ public class FriendInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_info);
+
         init();
+        VCard vCard=Connect.getUserVcard(userName);
+        Log.d("联系人信息", "onCreate: "+vCard);
+        Log.d("邮件", "onCreate: email"+vCard.getField("email"));
+        Log.d("性别", "onCreate: sex:"+vCard.getField("sex"));
+        Log.d("性别gender", "onCreate: sex:"+vCard.getField("gender"));
+
+        Log.d("性别", "onCreate: sex:"+vCard.getEmailHome());
+        Log.d("性别", "onCreate: sex:"+vCard.getEmailWork());
+        Log.d("性别", "onCreate: sex:"+vCard.getJabberId());
+        Log.d("昵称", "onCreate: Nic:"+vCard.getNickName());
+
+        //Connect.setInfo();
+
+
         setting_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -10,11 +10,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Build;
+import android.os.Debug;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ViewManager;
 import android.widget.Toast;
 
+import com.example.cm.MainActivity;
 import com.example.cm.R;
 import com.example.cm.friend.AddFriendItem;
 import com.example.cm.friend.Cn2Spell;
@@ -39,6 +42,7 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
@@ -51,8 +55,12 @@ import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
+import org.jivesoftware.smackx.offline.OfflineMessageManager;
+import org.jivesoftware.smackx.offline.packet.OfflineMessageRequest;
+import org.jivesoftware.smackx.vcardtemp.VCardManager;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 import org.jivesoftware.smackx.vcardtemp.provider.VCardProvider;
+import org.jivesoftware.smackx.xdata.packet.DataForm;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -105,7 +113,7 @@ public class Connect {
                             .setServiceName(SERVERNAME)
                             .setHost(IP)
                             .setPort(5222)
-                            .setSendPresence(true)
+                            .setSendPresence(false)         //设置false可以接受离线信息
                             .setDebuggerEnabled(true)
                             //.setConnectTimeout(10000)
                             .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
@@ -114,7 +122,9 @@ public class Connect {
                     Log.d("XMPPTCP new 之后", ""+xmpptcpConnection);
 
                     try {
+                        Log.d("", "getXMPPTCPConnection: connect之前"+xmpptcpConnection);
                         xmpptcpConnection.connect();
+                        Log.d("", "getXMPPTCPConnection: connect之后"+xmpptcpConnection);
                         if(xmpptcpConnection.isConnected()){
                            Log.d("*********getXMPPTCP", "getXMPPTCPConnection: connect成功");
                         return true;
@@ -138,16 +148,45 @@ public class Connect {
     }
     public static boolean login(String userName,String passwd,Context context){
         try {
+            if(xmpptcpConnection==null){
+                getXMPPTCPConnection();
+            }
+            if(xmpptcpConnection.isConnected()){//连接说明登陆过
+
+                if(MainActivity.isBinded) {
+                    MainActivity.unBindPacket();
+                }
+            }else{
+                if(getXMPPTCPConnection()){
+                    Log.d("", "login:连接服务器成功");
+                }else{
+                    Log.d("", "login:连接服务器失败");
+                    return false;
+                }
+            }
+            if(isLogined){
+                signOut();//注销登录的
+            }
+
             //xmpptcpConnection.connect();
             if(xmpptcpConnection.isConnected()) {
+                //MainActivity.unBindPacket();
                 boolean sameUser=false;
                 boolean beforeLogined=false;
                 String beforeUser=sharedPreferences.getString("userName","");                   //得到之前登陆的人名，与此次登陆的比较
-                Presence presence = new Presence(Presence.Type.available);
-                presence.setStatus("ONLINE");
-                xmpptcpConnection.login(userName, passwd);    //login TODO
+                Presence presence1 = new Presence(Presence.Type.unavailable);
+                presence1.setStatus("OFFLINE");
+                Presence presence2 = new Presence(Presence.Type.available);
+                presence2.setStatus("ONLINE");
+                 xmpptcpConnection.login(userName, passwd);    //login TODO
+                Log.d("", "login: 设置离线状态");
+                xmpptcpConnection.sendStanza(presence1);           //设置离线状态获取离线消息
+                MainActivity.bindPacket();//绑定
+                getOfflineMessage();
+                //addFriendListener();//接收好友请求拒绝删除等信息报
 
-                xmpptcpConnection.sendStanza(presence);           //设置在线状态
+                xmpptcpConnection.sendStanza(presence2);//设置在线状态
+
                 //1 同一人，则不获取好友信息 2 不同，先关闭数据库，然后创建数据库，再获取好友信息,还要删除好友列表和会话列表信息 3 之前没登陆过，创建数据库，获取好友信息
                 roster=Roster.getInstanceFor(xmpptcpConnection);
                 roster.setSubscriptionMode(Roster.SubscriptionMode.manual);//设置手动处理
@@ -184,15 +223,15 @@ public class Connect {
                 String headBitmapRoad=AlbumUtil.saveHeadBitmap(userName,bitmap);
                 Log.d("保存头像路径", "run: "+headBitmapRoad);
                 Connect.editor.putString("userName",userName);
+                Connect.editor.putString("passward",passwd);
                 Connect.editor.putString("userHeadBtRoad",headBitmapRoad);
                 Log.d("登陆后写入的登录名", "run: "+Connect.sharedPreferences.getString("userName",""));
                 Connect.editor.putString("userHeadBtRoad",headBitmapRoad);
                 Connect.editor.commit();
 
-                Connect.initListener(); //初始化信息监听
+                //Connect.initChatMessageListener(); //初始化信息监听
 
-                addFriendListener();   //好友申请监听
-
+                //addFriendListener();   //好友申请监听
 
 
             }
@@ -208,6 +247,7 @@ public class Connect {
             //Toast.makeText(context,"登陆异常",Toast.LENGTH_SHORT).show();
             return false;
         }
+        isLogined=true;
         return true;
     }
     //退出登录
@@ -324,7 +364,7 @@ public class Connect {
 
     }
 
-    public static void initListener() {
+    public static void initChatMessageListener() {
         ChatManager manager = ChatManager.getInstanceFor(Connect.xmpptcpConnection);
         //设置信息的监听
         final ChatMessageListener messageListener = new ChatMessageListener() {
@@ -436,50 +476,7 @@ public class Connect {
             }
         }
         Log.d("重连成功",xmpptcpConnection.getUser().toString());
-        /*Collection<RosterGroup> groups = roster.getGroups();
-        Log.d("组数", String.valueOf(roster.getGroupCount()));
-        for (RosterGroup group : groups) {
-            GroupInfo groupInfo=new GroupInfo();
-            Log.d("", "initFriend: 组名"+group.getName());
-            if(group.getName().equals("Friends")) {
-                try {
-                    group.setName("我的好友");
-                } catch (SmackException.NotConnectedException e) {
-                    Log.d("", "initFriend: 改变好友分组异常");
-                    e.printStackTrace();
-                } catch (SmackException.NoResponseException e) {
-                    e.printStackTrace();
-                } catch (XMPPException.XMPPErrorException e) {
-                    e.printStackTrace();
-                }
-                groupInfo.setGroupName("我的好友");   //设置组名
-            }else {
-                groupInfo.setGroupName(group.getName());   //设置组名
-            }
-            List<FriendInfo> friendInfoList=new ArrayList<>();  //此组中的好友
-            for(RosterEntry rosterEntry:group.getEntries()){
-                FriendInfo friendInfo=new FriendInfo();
-                String user=rosterEntry.getUser().split("@")[0];
-                friendInfo.setUserName(user);
-                friendInfo.setNicName(user);
-                Bitmap bitmap=getUserImage(user);
-                friendInfo.setHeadBt(bitmap);  //设置头像
-                String friendHeadBitmapRoad=AlbumUtil.saveHeadBitmap(user,bitmap);  //保存好友头像
-                friendInfo.setHeadBtRoad(friendHeadBitmapRoad);
-                Log.d("好友头像保存路径", "initFriend: "+friendHeadBitmapRoad);
-                //friendInfo.setSex();
-                friendInfo.setGroupName(group.getName());
-                //添加返回一个values对象，须要db添加提交
-                dataBaseHelp.addFriendInfo(friendInfo);
-                //Log.d("", "initFriend: "+values.toString());
-                //db.insert("FriendInfoTable",null,values);//添加进数据库
-                friendInfoList.add(friendInfo);   //添加
-                //contantFriendInfoList.add(friendInfo);
-            }
-            groupInfo.setFriendInfoList(friendInfoList);
-            groupInfoList.add(groupInfo);   //添加到全局组详情列表
 
-        }*/
         Log.d("总好友数", String.valueOf(roster.getEntryCount()));
         Collection<RosterEntry> rosterEntries=roster.getEntries();
         for(RosterEntry entry:rosterEntries){
@@ -495,6 +492,7 @@ public class Connect {
             friendInfo.setPinyin(pinyin);
             friendInfo.setFirstLetter(firstLetter);
             String sex=getUserVcard(user).getField("sex");
+            Log.d("得到子元素名称", "initFriend: "+getUserVcard(user).getChildElementName());
             if(sex==null){
                 sex="保密";
             }
@@ -650,26 +648,14 @@ public class Connect {
     *param userName
     */
     public static Bitmap getUserImage(String user){
-        getXMPPTCPConnection();
-        user=user+"@"+SERVERNAME;
+        //user=user+"@"+SERVERNAME;
         Bitmap bitmap=null;
-        VCard vCard=new VCard();
-        try {
-            vCard.load(xmpptcpConnection,user);
-            Log.d("获取头像测试", "getUserImage: "+vCard.toString());
-            byte []bytes=vCard.getAvatar();
+        //VCard vCard=new VCard();
+            //vCard.load(xmpptcpConnection,user);
+            Log.d("获取头像测试", "getUserImage: ");
+            byte []bytes=getUserVcard(user).getAvatar();
             ByteArrayInputStream bais=new ByteArrayInputStream(bytes);
             bitmap=BitmapFactory.decodeStream(bais);
-        } catch (SmackException.NoResponseException e) {
-            e.printStackTrace();
-            Log.d("**/***//**获取头像", "getUserImage: 获取头像异常");
-        } catch (XMPPException.XMPPErrorException e) {
-            e.printStackTrace();
-            Log.d("**/***//**获取头像", "getUserImage: 获取头像异常");
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-            Log.d("**/***//**获取头像", "getUserImage: 获取头像异常");
-        }
         return bitmap;
     }
     /*修改头像
@@ -679,9 +665,12 @@ public class Connect {
     public static boolean changeImage(XMPPConnection connection,String absoluteRoad)
             throws XMPPException, IOException {
 
-        VCard vcard = new VCard();
+        VCard vcard;
         try {
-            vcard.load(xmpptcpConnection);
+            //vcard.load(xmpptcpConnection);
+            vcard=VCardManager.getInstanceFor(xmpptcpConnection).loadVCard();
+
+
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
             return false;
@@ -693,7 +682,8 @@ public class Connect {
         byte []bytes=File2byte(photoFile);
          vcard.setAvatar(bytes);
         try {
-            vcard.save(xmpptcpConnection);
+            //vcard.save(xmpptcpConnection);
+            VCardManager.getInstanceFor(xmpptcpConnection).saveVCard(vcard);
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
             return false;
@@ -707,9 +697,10 @@ public class Connect {
     //得到联系人基本信息
     public static VCard getUserVcard(String user){
         VCard vCard=null;
-        vCard=new VCard();
+        //vCard=new VCard();
         try {
-            vCard.load(xmpptcpConnection,user+"@"+SERVERNAME);
+            vCard=VCardManager.getInstanceFor(xmpptcpConnection).loadVCard(user+"@"+SERVERNAME);
+            //vCard.load(xmpptcpConnection,user+"@"+SERVERNAME);
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         } catch (XMPPException.XMPPErrorException e) {
@@ -741,5 +732,68 @@ public class Connect {
             e.printStackTrace();
         }
         return buffer;
+    }
+    //设置自身信息函数key,value 昵称key为NickName 性别：gender 生日：birthday
+    static public  boolean setInfo(String key,String value){
+        boolean isSucceed=false;
+        if((key!=null)&&(value!=null)) {
+            try {
+                VCard vCard = VCardManager.getInstanceFor(xmpptcpConnection).loadVCard();
+                if(vCard!=null){
+                    if(key.equals("NickName")){
+                        vCard.setNickName(value);
+                    }else{
+                        vCard.setField(key,value);
+                    }
+                }
+                VCardManager.getInstanceFor(xmpptcpConnection).saveVCard(vCard);
+                isSucceed=true;
+                Log.d("设置自身信息测试", "setInfo: 设置自身信息成功" + vCard.getEmailHome());
+            } catch (SmackException.NoResponseException e) {
+                e.printStackTrace();
+                isSucceed=false;
+            } catch (XMPPException.XMPPErrorException e) {
+                e.printStackTrace();
+                isSucceed=false;
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+                isSucceed=false;
+            }
+        }else{
+            isSucceed=false;
+        }
+        return isSucceed;
+    }
+    //获取离线消息
+    //猜想 Message 继承Packet 在Message处理之前先转换成Staza看是不是添加好友删除好友的包
+    public static List<com.example.cm.friend.chat.Message> getOfflineMessage(){
+        List<com.example.cm.friend.chat.Message> messageList=new ArrayList<>();
+        OfflineMessageManager offlineMessageManager=new OfflineMessageManager(xmpptcpConnection);
+        try {
+            List<Message> messages=offlineMessageManager.getMessages();
+            Log.d("离线消息测试", "getOfflineMessage: "+messages);
+
+            if(messages.size()>0){
+                for(int i=0;i<messages.size();i++){
+                    Log.d("离线消息", "getOfflineMessage: ");
+                    Log.d("离线消息", "getOfflineMessage: ");
+                    Log.d("离线消息", "getOfflineMessage: ");
+                    Log.d("离线消息测试", "getOfflineMessage: "+messages);
+                    Log.d("离线消息", "getOfflineMessage: ");
+                    Log.d("离线消息", "getOfflineMessage: ");
+                    Log.d("离线消息", "getOfflineMessage: ");
+                }
+            }
+            offlineMessageManager.deleteMessages();//删除离线消息
+            Log.d("", "getOfflineMessage: 删除离线消息");
+        } catch (SmackException.NoResponseException e) {
+            e.printStackTrace();
+        } catch (XMPPException.XMPPErrorException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+
+        return messageList;
     }
 }

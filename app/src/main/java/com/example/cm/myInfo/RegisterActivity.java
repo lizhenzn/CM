@@ -165,7 +165,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String email= String.valueOf(email_et.getText());
                 Map <String,String> map=new HashMap<>();
                 map.put("email",email);
-                map.put("sex",sex);
+                map.put("gender",sex);
                 map.put("birthday",birthday);
                 new Thread(new Runnable() {
                     @Override

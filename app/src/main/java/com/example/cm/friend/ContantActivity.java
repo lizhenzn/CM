@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import main.UserInfo;
+import q.rorbin.badgeview.QBadgeView;
 
 public class ContantActivity extends AppCompatActivity {
 
@@ -43,6 +44,7 @@ public class ContantActivity extends AppCompatActivity {
     private boolean work;
     private SortAdapter sortAdapter;
     private ImageButton addIB;
+    private QBadgeView addFriendQBadgeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +67,14 @@ public class ContantActivity extends AppCompatActivity {
         addIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addFriendQBadgeView.hide(true);//隐藏红点
                 Intent intent=new Intent(ContantActivity.this,AddFriendActivity.class);
                 startActivity(intent);
             }
         });
+        addFriendQBadgeView=new QBadgeView(this);
+        addFriendQBadgeView.bindTarget(addIB).setBadgeText(" ");
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

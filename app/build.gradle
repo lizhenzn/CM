@@ -50,4 +50,6 @@ dependencies {
     implementation files('libs/jxmpp-util-cache-0.4.0-alpha1.jar')
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
+
+    implementation 'q.rorbin:badgeview:1.1.2'
 }

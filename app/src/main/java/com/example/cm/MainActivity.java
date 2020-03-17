@@ -1,7 +1,10 @@
 package com.example.cm;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -12,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -34,6 +38,7 @@ import android.widget.Toast;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.myInfo.SmackUserInfo;
+import com.example.cm.service.PacketListenerService;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.DataBase;
@@ -41,6 +46,8 @@ import com.example.cm.util.DataBase;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.IOException;
+
+import q.rorbin.badgeview.QBadgeView;
 
 //import main.CallBackMethods;
 //import main.ImgUploader;
@@ -56,6 +63,11 @@ private static String path="/sdcard/Clothes/MyInfo/head";
 private SharedPreferences sharedPreferences;
 private SharedPreferences.Editor editor;
 private final int LOGIN=1;
+private QBadgeView naviQBadgeView;
+private static ServiceConnection serviceConnection;   //用于连接服务通信
+private static PacketListenerService.MyBinder binder;   //服务中Binder
+    private static Context mainActivityContext;   //主活动的Context
+    public static Boolean isBinded;
     private static final String TAG = "MainActivity";
 
     private static int clothes_up=-1;
@@ -170,10 +182,21 @@ private final int LOGIN=1;
 
     //初始化各控件
     public void init(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+               if(Connect.getXMPPTCPConnection()) {//连接服务器
+                   Log.d(TAG, "run: MainActivity服务器连接成功");
+               }
+            }
+        }).start();
+        isBinded=false;
+        mainActivityContext=MainActivity.this;
         Connect.init();             //初始化适配器列表
         if(!AlbumUtil.checkStorage(this)){
             AlbumUtil.requestStorage(this);        //申请存储读取权限
         }
+        naviQBadgeView=new QBadgeView(this);
         //sharedPreferences=getSharedPreferences("myInfo",MODE_PRIVATE);
         //editor=sharedPreferences.edit();
         Connect.sharedPreferences=getSharedPreferences("LoginedInfo",MODE_PRIVATE);
@@ -197,6 +220,7 @@ private final int LOGIN=1;
         if(Connect.sharedPreferences.contains("userName")){  //有此userName键值，说明登陆过
 
             Connect.smackUserInfo.setUserName(Connect.sharedPreferences.getString("userName",""));
+            String cachePasswd=Connect.sharedPreferences.getString("passward","");//缓存的密码
             String headBtRoad=Connect.sharedPreferences.getString("userHeadBtRoad","");
             Connect.smackUserInfo.setHeadBt(BitmapFactory.decodeFile(headBtRoad));
             Log.d(TAG, "init: 设置自己头像之后");
@@ -206,14 +230,26 @@ private final int LOGIN=1;
             //Connect.smackUserInfo.setEmail(Connect.sharedPreferences.getString("userEmail",""));
             Connect.db=Connect.dataBaseHelp.getWritableDatabase();
             //TODO        初始化聊天信息和好友信息
-            //Connect.groupInfoList=Connect.dataBaseHelp.getGroupInfoList();
-
             Connect.contantFriendInfoList=Connect.dataBaseHelp.getContantFriendInfoList();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Connect.login(Connect.smackUserInfo.getUserName(), cachePasswd, mainActivityContext);
+                }
+            }).start();
+
+
+
+
+
         }else{//此前没有登陆过
             Connect.smackUserInfo.setUserName("点击登录");
             Bitmap bitmap=BitmapFactory.decodeResource(this.getResources(),R.drawable.unlogin);
             Connect.smackUserInfo.setHeadBt(bitmap);           //设置为未登陆的照片
         }
+
+
+
         setInfo();        //调用设置头像、昵称函数
 
     }
@@ -245,12 +281,42 @@ private final int LOGIN=1;
             Drawable drawable=getApplication().getResources().getDrawable(tabs1.getIcon());
             tab_iv.setImageDrawable(drawable);
             tab_tv.setText(tabs1.getName());
+            if(tabs1.getName().equals("会话")) {
+                naviQBadgeView.bindTarget(tab_tv);
+            }
+            naviQBadgeView.setBadgeText("");
             tabSpec.setIndicator(indicator);
             fragmentTabHost.addTab(tabSpec,tabs1.getaClass(),null);
 
         }
 
 
+    }
+    //绑定监听
+    public static void bindPacket(){
+        serviceConnection=new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                binder=(PacketListenerService.MyBinder)service;
+                binder.startListerer();//调用包监听中Binder的方法
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                isBinded=false;
+            }
+        };
+        Intent intent=new Intent(mainActivityContext, PacketListenerService.class);
+        mainActivityContext.bindService(intent,serviceConnection,BIND_AUTO_CREATE);    //绑定服务
+        isBinded=true;
+
+    }
+    //取绑监听
+    public static void unBindPacket(){
+        if(serviceConnection!=null) {
+            mainActivityContext.unbindService(serviceConnection);
+            isBinded=false;
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -314,4 +380,6 @@ private final int LOGIN=1;
 
         }
     }
+
+
 }
