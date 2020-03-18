@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static android.support.v7.util.DiffUtil.DiffResult.NO_POSITION;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class WardrobeFragment extends Fragment  {
@@ -40,8 +40,11 @@ public class WardrobeFragment extends Fragment  {
     public static List<List<Bitmap>> detailList1,detailList2;   //每个衣服对应的前后左右各个图片
     private RecyclerView wardrobeR1,wardrobeR2;
     private WardrobeAdapter wardrobeAdapter1,wardrobeAdapter2;
+    private LinearLayout layout_up,layout_down,layout_up_control,layout_down_control;
+    private ImageView upAdd,downAdd;
     private static ViewPager viewPager;
     private  static  WardrobeVPAdapter wardrobeVPAdapter;
+    private boolean upClothes,downClothes;
     //1:滑动上衣 2：滑动裤子
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,11 +70,18 @@ public class WardrobeFragment extends Fragment  {
         wardrobeAdapter1=new WardrobeAdapter(context,photoList1,1);
         wardrobeAdapter2=new WardrobeAdapter(context,photoList2,2);
         view=View.inflate(context, R.layout.wardrobe,null);
+        layout_up=view.findViewById(R.id.wardrobeUpLayout);
+        layout_down=view.findViewById(R.id.wardrobeDownLayout);
+        layout_down.setVisibility(View.GONE);
+        layout_up_control=view.findViewById(R.id.wardrobeUpControl);//控制上选单伸缩
+        layout_down_control=view.findViewById(R.id.wardrobeDownControl);//控制下选单伸缩
         viewPager=(ViewPager)view.findViewById(R.id.wardrobeVP);
         viewPager.setPageTransformer(true,new Transform());
         //viewPager.setAdapter(wardrobeVPAdapter);
         wardrobeR1=(RecyclerView)view.findViewById(R.id.wardrobeR1);
         wardrobeR2=(RecyclerView)view.findViewById(R.id.wardrobeR2);
+        upAdd=view.findViewById(R.id.wardrobeUpAdd);
+        downAdd=view.findViewById(R.id.wardrobeDownAdd);
         LinearLayoutManager linearLayoutManager1=new LinearLayoutManager(context);
         LinearLayoutManager linearLayoutManager2=new LinearLayoutManager(context);
         linearLayoutManager1.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -80,8 +90,38 @@ public class WardrobeFragment extends Fragment  {
         wardrobeR2.setLayoutManager(linearLayoutManager2);
         wardrobeR1.setAdapter(wardrobeAdapter1);
         wardrobeR2.setAdapter(wardrobeAdapter2);
-
-
+        upClothes=true;downClothes=false;
+        layout_down_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(downClothes)
+                {layout_down.setVisibility(View.GONE);downClothes=false;}
+                else
+                {layout_down.setVisibility(View.VISIBLE);downClothes=true;}
+            }
+        });
+        layout_up_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layout_up.setVisibility(View.GONE);
+                if(upClothes)
+                {layout_up.setVisibility(View.GONE);upClothes=false;}
+                else
+                {layout_up.setVisibility(View.VISIBLE);upClothes=true;}
+            }
+        });
+        upAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("addTest", "onClick: addUp");
+            }
+        });
+        downAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("addTest", "onClick: addDown");
+            }
+        });
         return  view;
     }
 
@@ -175,13 +215,16 @@ public class WardrobeFragment extends Fragment  {
                 @Override
                 public void onClick(View v) {
                     int position= finalViewHolder.getAdapterPosition();
-                    if(MainActivity.isChoose_flag()){
+
+                    //if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
                         }else{    //下衣
                             MainActivity.setClothes_down(position);
                         }
-                    }
+                   // }
+                    Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
+                            " "+MainActivity.getClothes_down());
                 }
             });
             return viewHolder;
@@ -197,8 +240,6 @@ public class WardrobeFragment extends Fragment  {
             }
             wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
             viewPager.setAdapter(wardrobeVPAdapter);
-
-
         }
 
 

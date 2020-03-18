@@ -1,17 +1,13 @@
 package com.example.cm;
 
-import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,7 +21,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -77,9 +72,9 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     public static int getClothesUp(){
         return clothes_up;
     }
-    public static void setClothes_up(int clothes_up){clothes_up=clothes_up;}
+    public static void setClothes_up(int up){clothes_up=up;}
     public static int getClothes_down(){ return clothes_down;}
-    public static void setClothes_down(int clothes_down){clothes_down=clothes_down;}
+    public static void setClothes_down(int down){clothes_down=down;}
     public static boolean isChoose_flag(){
         return choose_flag;
     }

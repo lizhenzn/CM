@@ -35,6 +35,14 @@ public class ClothesEstimater {
         if(bitmap!=null)return estimateGood(bitmap);
         else return -1;
     }
+    public int estimateClothes(Bitmap up,Bitmap down){
+        Bitmap nup=zoomImg(up,224,112);
+        Bitmap ndown=zoomImg(down,224,112);
+        if(nup==null||ndown==null)return -1;
+        Bitmap bitmap=getJointBitmap(nup,ndown);
+        if(bitmap!=null)return estimateGood(bitmap);
+        else return -1;
+    }
     private int get_max_result(float[] result) {
         float probability = result[0];
         int r = 0;
