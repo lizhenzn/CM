@@ -30,16 +30,13 @@ public class ClothesEstimater {
     public int estimateClothes(String up,String down){
         Bitmap nup=getScaleBitmap(up);
         Bitmap ndown=getScaleBitmap(down);
-        if(nup==null||ndown==null)return -1;
-        Bitmap bitmap=getJointBitmap(nup,ndown);
-        if(bitmap!=null)return estimateGood(bitmap);
-        else return -1;
+        return estimateClothes(nup,ndown);
     }
     public int estimateClothes(Bitmap up,Bitmap down){
         Bitmap nup=zoomImg(up,224,112);
         Bitmap ndown=zoomImg(down,224,112);
         if(nup==null||ndown==null)return -1;
-        Bitmap bitmap=getJointBitmap(nup,ndown);
+        Bitmap bitmap=getJointBitmap(nup,ndown);nup=null;ndown=null;
         if(bitmap!=null)return estimateGood(bitmap);
         else return -1;
     }
@@ -127,7 +124,7 @@ public class ClothesEstimater {
      *
      * @return 经过适当缩放的BitMap
      */
-    private Bitmap getScaleBitmap(String filename){
+    public static Bitmap getScaleBitmap(String filename){
         BitmapFactory.Options opt=new BitmapFactory.Options();
         opt.inJustDecodeBounds=true;
         //标准防爆内存操作，开始时只解析图片大小，不解析图片内容
@@ -152,7 +149,7 @@ public class ClothesEstimater {
         try {
             Bitmap bmp=BitmapFactory.decodeStream(new FileInputStream(new File(filename)),null,opt);
             //Bitmap bmp=BitmapFactory.decodeStream(getApplicationContext().getAssets().open(filename),null,opt);
-            if(bmp!=null) return  zoomImg(bmp,224,112);
+            if(bmp!=null) return  bmp;
         } catch (IOException e) {
             e.printStackTrace();
         }

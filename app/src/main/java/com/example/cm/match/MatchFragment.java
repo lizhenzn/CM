@@ -58,6 +58,7 @@ public class MatchFragment extends Fragment {
         context = getActivity();
         view = View.inflate(context, R.layout.match, null);
         ImageView clothes_up = view.findViewById(R.id.clothes_up);
+        ImageView clothes_down = view.findViewById(R.id.clothes_down);
         clothes_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +70,6 @@ public class MatchFragment extends Fragment {
                 //while(mainActivity.getClothesUp()==-1){}
             }
         });
-        ImageView clothes_down = view.findViewById(R.id.clothes_down);
         clothes_down.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

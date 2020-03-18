@@ -2,13 +2,16 @@ package com.example.cm.wardrobe;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,22 +20,25 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.RenderProcessGoneDetail;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
+import com.example.cm.util.ActionSheetDialog;
+import com.example.cm.util.AlbumUtil;
+import com.example.cm.util.ClothesEstimater;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static android.app.Activity.RESULT_OK;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class WardrobeFragment extends Fragment  {
-    private static final String TAG = "WardrobeFragment";
     private Context context;
     private View view;
     //private List<Integer> photoList1,photoList2; //展示的上衣、裤子和上面展示的的详情  R.drawable.cm资源为Integer类型
@@ -48,14 +54,19 @@ public class WardrobeFragment extends Fragment  {
     private static ViewPager viewPager;
     private  static  WardrobeVPAdapter wardrobeVPAdapter;
     private boolean upClothes,downClothes;
+    private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4;
     //1:滑动上衣 2：滑动裤子
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //TODO 在加载这个模块就从服务器获取图片
-
         setToolbarText("衣柜");
-
+        initData();//initData
+        context=getActivity();
+        upClothes=true;downClothes=false;
+        wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
+        wardrobeAdapter1=new WardrobeAdapter(context,photoList1,1);
+        wardrobeAdapter2=new WardrobeAdapter(context,photoList2,2);
     }
 
     @Override
@@ -64,31 +75,16 @@ public class WardrobeFragment extends Fragment  {
         setToolbarText("衣柜");
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        MainActivity.setChoose_flag(false);
-        MainActivity.setFragmentTabHostVisibility(true);
-        Log.d(TAG, "onDestroy: ChooseFlag is set false");
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(MainActivity.isChoose_flag()){
-            MainActivity.setFragmentTabHostVisibility(false);
-        }else{
-            MainActivity.setFragmentTabHostVisibility(true);
-        }
-        context=getActivity();
-        initData();
-        wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
-        wardrobeAdapter1=new WardrobeAdapter(context,photoList1,1);
-        wardrobeAdapter2=new WardrobeAdapter(context,photoList2,2);
+
+
         view=View.inflate(context, R.layout.wardrobe,null);
         layout_up=view.findViewById(R.id.wardrobeUpLayout);
+        if(!upClothes)layout_up.setVisibility(View.GONE);
         layout_down=view.findViewById(R.id.wardrobeDownLayout);
-        layout_down.setVisibility(View.GONE);
+        if(!downClothes)layout_down.setVisibility(View.GONE);
         layout_up_control=view.findViewById(R.id.wardrobeUpControl);//控制上选单伸缩
         layout_down_control=view.findViewById(R.id.wardrobeDownControl);//控制下选单伸缩
         viewPager=(ViewPager)view.findViewById(R.id.wardrobeVP);
@@ -106,7 +102,6 @@ public class WardrobeFragment extends Fragment  {
         wardrobeR2.setLayoutManager(linearLayoutManager2);
         wardrobeR1.setAdapter(wardrobeAdapter1);
         wardrobeR2.setAdapter(wardrobeAdapter2);
-        upClothes=true;downClothes=false;
         layout_down_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,18 +124,126 @@ public class WardrobeFragment extends Fragment  {
         upAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("addTest", "onClick: addUp");
+
+                new ActionSheetDialog(getContext())
+                        .builder()
+                        .setCancelable(false)
+                        .setCanceledOnTouchOutside(true)
+                        .setTitle("添加上衣")
+                        .addSheetItem("从相册选择", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
+                            @Override
+                            public void onClick(int which) {
+                                if (AlbumUtil.checkStorage(getContext())) {
+                                    Intent intent = new Intent("android.intent.action.GET_CONTENT");
+                                    intent.setType("image/*");
+                                    startActivityForResult(intent,WardrobeFragment.ALBUM_UP);
+                                } else {
+                                    AlbumUtil.requestStorage(getContext());
+                                    //Toast.makeText(ChatActivity.this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .addSheetItem("点击拍照", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
+                            @Override
+                            public void onClick(int which) {
+                                Log.d("addTest", "点击拍照——下");
+                                Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
+                                if(takePhotoIntent.resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
+                                    startActivityForResult(takePhotoIntent,WardrobeFragment.CAMERA_UP);//启动相机
+                                }else{
+                                    Toast.makeText(getContext(),"没有相机，无法完成操作",Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        }).show();
             }
         });
         downAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("addTest", "onClick: addDown");
+                new ActionSheetDialog(getContext())
+                        .builder()
+                        .setCancelable(false)
+                        .setCanceledOnTouchOutside(true)
+                        .setTitle("添加下衣")
+                        .addSheetItem("从相册选择", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
+                            @Override
+                            public void onClick(int which) {
+                                if (AlbumUtil.checkStorage(getContext())) {
+                                    Intent intent = new Intent("android.intent.action.GET_CONTENT");
+                                    intent.setType("image/*");
+                                    startActivityForResult(intent,WardrobeFragment.ALBUM_DOWN);
+                                } else {
+                                    AlbumUtil.requestStorage(getContext());
+                                    //Toast.makeText(ChatActivity.this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .addSheetItem("点击拍照", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
+                            @Override
+                            public void onClick(int which) {
+                                Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
+                                if(takePhotoIntent.resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
+                                    startActivityForResult(takePhotoIntent,WardrobeFragment.CAMERA_DOWN);//启动相机
+                                }else{
+                                    Toast.makeText(getContext(),"没有相机，无法完成操作",Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }).show();
             }
         });
         return  view;
     }
 
+    /**
+     *  此处负责处理相机和图库的调用返回问题
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case WardrobeFragment.ALBUM_UP:{
+                String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,getContext());
+                Log.d("addTest", "从相册选择_上:path="+absoluteRoad);
+                Bitmap bitmap=ClothesEstimater.getScaleBitmap(absoluteRoad);
+                WardrobeFragment.photoList1.set(0,bitmap);
+                wardrobeAdapter1.notifyDataSetChanged();
+           }break;
+            case WardrobeFragment.ALBUM_DOWN:{
+                String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,getContext());
+                Log.d("addTest", "从相册选择_下:path="+absoluteRoad);
+                Bitmap bitmap=ClothesEstimater.getScaleBitmap(absoluteRoad);
+                WardrobeFragment.photoList2.set(0,bitmap);
+                wardrobeAdapter2.notifyDataSetChanged();
+           }break;
+            case WardrobeFragment.CAMERA_UP:{
+                Log.d("addTest", "点击拍照——上");
+                if(resultCode==RESULT_OK){
+                    /*缩略图信息是储存在返回的intent中的Bundle中的，
+                     * 对应Bundle中的键为data，因此从Intent中取出
+                     * Bundle再根据data取出来Bitmap即可*/
+                    Bundle extras = data.getExtras();
+                    Bitmap bitmap = (Bitmap) extras.get("data");
+                    WardrobeFragment.photoList1.set(0,bitmap);
+                    wardrobeAdapter1.notifyDataSetChanged();
+                }
+
+            }break;
+            case WardrobeFragment.CAMERA_DOWN:{
+                Log.d("addTest", "点击拍照——下");
+                if(resultCode==RESULT_OK){
+                    Bundle extras = data.getExtras();
+                    Bitmap bitmap = (Bitmap) extras.get("data");
+                    WardrobeFragment.photoList2.set(0,bitmap);
+                    wardrobeAdapter2.notifyDataSetChanged();
+                }
+            }break;
+        }
+    }
 
     public void initData(){
         photoList1=new ArrayList<>();
@@ -232,17 +335,15 @@ public class WardrobeFragment extends Fragment  {
                 public void onClick(View v) {
                     int position= finalViewHolder.getAdapterPosition();
 
-                    if(MainActivity.isChoose_flag()){
-                        Log.d(TAG, "onClick: type="+type);
+                    //if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
                         }else{    //下衣
                             MainActivity.setClothes_down(position);
                         }
-                        Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
-                                " "+MainActivity.getClothes_down());
-                    }
-
+                   // }
+                    Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
+                            " "+MainActivity.getClothes_down());
                 }
             });
             return viewHolder;
