@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.RenderProcessGoneDetail;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -30,6 +32,7 @@ import java.util.List;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class WardrobeFragment extends Fragment  {
+    private static final String TAG = "WardrobeFragment";
     private Context context;
     private View view;
     //private List<Integer> photoList1,photoList2; //展示的上衣、裤子和上面展示的的详情  R.drawable.cm资源为Integer类型
@@ -61,9 +64,22 @@ public class WardrobeFragment extends Fragment  {
         setToolbarText("衣柜");
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MainActivity.setChoose_flag(false);
+        MainActivity.setFragmentTabHostVisibility(true);
+        Log.d(TAG, "onDestroy: ChooseFlag is set false");
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if(MainActivity.isChoose_flag()){
+            MainActivity.setFragmentTabHostVisibility(false);
+        }else{
+            MainActivity.setFragmentTabHostVisibility(true);
+        }
         context=getActivity();
         initData();
         wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
@@ -216,15 +232,17 @@ public class WardrobeFragment extends Fragment  {
                 public void onClick(View v) {
                     int position= finalViewHolder.getAdapterPosition();
 
-                    //if(MainActivity.isChoose_flag()){
+                    if(MainActivity.isChoose_flag()){
+                        Log.d(TAG, "onClick: type="+type);
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
                         }else{    //下衣
                             MainActivity.setClothes_down(position);
                         }
-                   // }
-                    Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
-                            " "+MainActivity.getClothes_down());
+                        Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
+                                " "+MainActivity.getClothes_down());
+                    }
+
                 }
             });
             return viewHolder;

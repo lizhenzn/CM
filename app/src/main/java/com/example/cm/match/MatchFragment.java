@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.example.cm.MainActivity;
@@ -43,9 +44,9 @@ public class MatchFragment extends Fragment {
         }
         Log.d(TAG, "onResume: "+MainActivity.getClothes_down());
         if(MainActivity.getClothes_down()!=-1){
-            ImageView clothes_up = view.findViewById(R.id.clothes_up);
+            ImageView clothes_down = view.findViewById(R.id.clothes_down);
             //.setImage
-            clothes_up.setImageBitmap(WardrobeFragment.photoList2.get(MainActivity.getClothes_down()));
+            clothes_down.setImageBitmap(WardrobeFragment.photoList2.get(MainActivity.getClothes_down()));
         }
     }
 
@@ -60,11 +61,31 @@ public class MatchFragment extends Fragment {
         clothes_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MainActivity.setChoose_flag(true);
                 FragmentManager fm=getActivity().getSupportFragmentManager();
                 fm.beginTransaction().replace(R.id.tab_main_content,new WardrobeFragment()).addToBackStack(null).commit();
                 //Log.d(TAG, "onClick: replace!");
                 //MainActivity mainActivity=(MainActivity)getActivity();
                 //while(mainActivity.getClothesUp()==-1){}
+            }
+        });
+        ImageView clothes_down = view.findViewById(R.id.clothes_down);
+        clothes_down.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.setChoose_flag(true);
+                FragmentManager fm=getActivity().getSupportFragmentManager();
+                fm.beginTransaction().replace(R.id.tab_main_content,new WardrobeFragment()).addToBackStack(null).commit();
+                //Log.d(TAG, "onClick: replace!");
+                //MainActivity mainActivity=(MainActivity)getActivity();
+                //while(mainActivity.getClothesUp()==-1){}
+            }
+        });
+        ImageButton match=view.findViewById(R.id.smart_match);
+        match.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //智能搭配功能
             }
         });
         return view;

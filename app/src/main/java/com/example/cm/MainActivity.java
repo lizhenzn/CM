@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -69,6 +70,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     private static int clothes_down=-1;
     private static boolean choose_flag=false;
 
+    private static FragmentTabHost fragmentTabHost;
     public static int getClothesUp(){
         return clothes_up;
     }
@@ -78,7 +80,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     public static boolean isChoose_flag(){
         return choose_flag;
     }
-    public static void setChoose_flag(boolean choose_flag){choose_flag=choose_flag;}
+    public static void setChoose_flag(boolean choose_flag){MainActivity.choose_flag=choose_flag;}
 //每一个页面写一次setToolbarText()函数   ******************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -261,7 +263,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     }
     //初始化FragmentTabHost
     public void initTabhost(){
-        FragmentTabHost fragmentTabHost=(FragmentTabHost)findViewById(R.id.tabhost);
+        fragmentTabHost=(FragmentTabHost)findViewById(R.id.tabhost);
         //将FragmentTabhost与FrameLayout关联
         fragmentTabHost.setup(getApplicationContext(),getSupportFragmentManager(),R.id.tab_main_content);
         //添加tab和其对应的fragment
@@ -284,7 +286,6 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
             fragmentTabHost.addTab(tabSpec,tabs1.getaClass(),null);
 
         }
-
 
     }
     //绑定监听
@@ -376,5 +377,12 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
         }
     }
 
+    public static void setFragmentTabHostVisibility(boolean visibility){
+        if(visibility){
+            fragmentTabHost.setVisibility(View.VISIBLE);
+        }else{
+            fragmentTabHost.setVisibility(View.GONE);
+        }
+    }
 
 }
