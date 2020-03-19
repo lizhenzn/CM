@@ -65,6 +65,7 @@ public class MatchFragment extends Fragment {
                 MainActivity.setChoose_flag(true);
                 FragmentManager fm=getActivity().getSupportFragmentManager();
                 fm.beginTransaction().replace(R.id.tab_main_content,new WardrobeFragment()).addToBackStack(null).commit();
+                MainActivity.setFragmentTabHostVisibility(false);
                 //Log.d(TAG, "onClick: replace!");
                 //MainActivity mainActivity=(MainActivity)getActivity();
                 //while(mainActivity.getClothesUp()==-1){}

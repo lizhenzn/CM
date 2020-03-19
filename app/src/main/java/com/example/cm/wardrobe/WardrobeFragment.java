@@ -75,6 +75,12 @@ public class WardrobeFragment extends Fragment  {
         setToolbarText("衣柜");
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MainActivity.setFragmentTabHostVisibility(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -335,13 +341,13 @@ public class WardrobeFragment extends Fragment  {
                 public void onClick(View v) {
                     int position= finalViewHolder.getAdapterPosition();
 
-                    //if(MainActivity.isChoose_flag()){
+                    if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
                         }else{    //下衣
                             MainActivity.setClothes_down(position);
                         }
-                   // }
+                     }
                     Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
                             " "+MainActivity.getClothes_down());
                 }
