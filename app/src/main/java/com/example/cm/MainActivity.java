@@ -71,7 +71,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     private static boolean choose_flag=false;
 
     private static FragmentTabHost fragmentTabHost;
-    public static int getClothesUp(){
+    public static int getClothes_up(){
         return clothes_up;
     }
     public static void setClothes_up(int up){clothes_up=up;}
@@ -374,7 +374,6 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
             Connect.signOut();
             Connect.isLogined=false;
             Connect.xmpptcpConnection=null;
-
         }
     }
 

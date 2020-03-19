@@ -1,20 +1,26 @@
 package com.example.cm.match;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
+import com.example.cm.SendShare;
+import com.example.cm.share.Comments;
+import com.example.cm.share.PresentShareItem;
 import com.example.cm.wardrobe.WardrobeFragment;
 
 import static com.example.cm.MainActivity.setToolbarText;
@@ -35,12 +41,12 @@ public class MatchFragment extends Fragment {
         //Log.d(TAG, "onResume: resume match");
         super.onResume();
         setToolbarText("搭配");
-        Log.d(TAG, "onResume: "+MainActivity.getClothesUp());
+        Log.d(TAG, "onResume: "+MainActivity.getClothes_up());
         MainActivity mainActivity=(MainActivity)getActivity();
-        if(MainActivity.getClothesUp()!=-1){
+        if(MainActivity.getClothes_up()!=-1){
             ImageView clothes_up = view.findViewById(R.id.clothes_up);
             //.setImage
-            clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(MainActivity.getClothesUp()));
+            clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(MainActivity.getClothes_up()));
         }
         Log.d(TAG, "onResume: "+MainActivity.getClothes_down());
         if(MainActivity.getClothes_down()!=-1){
@@ -59,6 +65,8 @@ public class MatchFragment extends Fragment {
         view = View.inflate(context, R.layout.match, null);
         ImageView clothes_up = view.findViewById(R.id.clothes_up);
         ImageView clothes_down = view.findViewById(R.id.clothes_down);
+
+        //上衣点击事件
         clothes_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,22 +74,18 @@ public class MatchFragment extends Fragment {
                 FragmentManager fm=getActivity().getSupportFragmentManager();
                 fm.beginTransaction().replace(R.id.tab_main_content,new WardrobeFragment()).addToBackStack(null).commit();
                 MainActivity.setFragmentTabHostVisibility(false);
-                //Log.d(TAG, "onClick: replace!");
-                //MainActivity mainActivity=(MainActivity)getActivity();
-                //while(mainActivity.getClothesUp()==-1){}
             }
         });
+        //下衣点击事件
         clothes_down.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MainActivity.setChoose_flag(true);
                 FragmentManager fm=getActivity().getSupportFragmentManager();
                 fm.beginTransaction().replace(R.id.tab_main_content,new WardrobeFragment()).addToBackStack(null).commit();
-                //Log.d(TAG, "onClick: replace!");
-                //MainActivity mainActivity=(MainActivity)getActivity();
-                //while(mainActivity.getClothesUp()==-1){}
             }
         });
+        //智能搭配入口
         ImageButton match=view.findViewById(R.id.smart_match);
         match.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -89,15 +93,14 @@ public class MatchFragment extends Fragment {
                 //智能搭配功能
             }
         });
+        //发送分享入口
+        FloatingActionButton send_share=view.findViewById(R.id.send_share);
+        send_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getActivity(), SendShare.class);
+                startActivity(intent);
+            }
+        });
         return view;
     }}
-//        Button button = view.findViewById(R.id.button);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        for(int i=1;i<=12;i++){
-//
-//                            ServerFunction

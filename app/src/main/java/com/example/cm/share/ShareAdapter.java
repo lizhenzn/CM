@@ -100,7 +100,6 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (viewType == TYPE_ITEM) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.share_item, parent, false);
             RecyclerViewHolder viewHolder = new RecyclerViewHolder(view);
-
 //            viewHolder.Comment.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {

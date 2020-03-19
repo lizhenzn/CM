@@ -348,7 +348,7 @@ public class WardrobeFragment extends Fragment  {
                             MainActivity.setClothes_down(position);
                         }
                      }
-                    Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
+                    Log.d("RecycleList:", "onClick: "+MainActivity.getClothes_up()+
                             " "+MainActivity.getClothes_down());
                 }
             });
