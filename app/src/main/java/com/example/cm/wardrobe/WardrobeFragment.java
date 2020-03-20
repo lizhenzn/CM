@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,6 +55,7 @@ public class WardrobeFragment extends Fragment  {
     public static List<Bitmap> photoList1,photoList2; //展示的上衣、裤子和上面展示的的详情  R.drawable.cm资源为Integer类型
     public static List<Bitmap> integerList;    //选中的某个衣服各个图片
     public static List<List<Bitmap>> detailList1,detailList2;   //每个衣服对应的前后左右各个图片
+    public static List<String> upFileName,downFileName;
     private RecyclerView wardrobeR1,wardrobeR2;
     private WardrobeAdapter wardrobeAdapter1,wardrobeAdapter2;
     private LinearLayout layout_up,layout_down,layout_up_control,layout_down_control;
@@ -61,6 +64,7 @@ public class WardrobeFragment extends Fragment  {
     private  static  WardrobeVPAdapter wardrobeVPAdapter;
     private boolean upClothes,downClothes;
     private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4;
+    private static File BASE_DIR=null;
     //1:滑动上衣 2：滑动裤子
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,11 +85,18 @@ public class WardrobeFragment extends Fragment  {
         setToolbarText("衣柜");
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+            case AlbumUtil.REQUEST_CAMERA:
+
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-
         view=View.inflate(context, R.layout.wardrobe,null);
         layout_up=view.findViewById(R.id.wardrobeUpLayout);
         if(!upClothes)layout_up.setVisibility(View.GONE);
@@ -152,12 +163,28 @@ public class WardrobeFragment extends Fragment  {
                         .addSheetItem("点击拍照", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
                             @Override
                             public void onClick(int which) {
-                                Log.d("addTest", "点击拍照——下");
+                                Log.d("addTest", "点击拍照——上");
+                                if(!AlbumUtil.checkCamera(getContext()))
+                                    AlbumUtil.requestCamera(getContext());
+                                if(!AlbumUtil.checkCamera(getContext())){
+                                    Toast.makeText(getContext(),
+                                            "拒绝相机权限，拍照失败",
+                                            Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
                                 if(takePhotoIntent.resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
+                                    File picFile=creatImageFile(BASE_DIR,1);
+                                    upFileName.add(picFile.getName());
+                                    Uri imageUri=FileProvider.getUriForFile(getContext(),
+                                            "com.example.cm",
+                                            picFile);
+                                    takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
                                     startActivityForResult(takePhotoIntent,WardrobeFragment.CAMERA_UP);//启动相机
                                 }else{
-                                    Toast.makeText(getContext(),"没有相机，无法完成操作",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(),
+                                            "没有相机，无法完成操作",
+                                            Toast.LENGTH_SHORT).show();
                                 }
 
                             }
@@ -188,8 +215,22 @@ public class WardrobeFragment extends Fragment  {
                         .addSheetItem("点击拍照", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
                             @Override
                             public void onClick(int which) {
+                                if(!AlbumUtil.checkCamera(getContext()))
+                                    AlbumUtil.requestCamera(getContext());
+                                if(!AlbumUtil.checkCamera(getContext())){
+                                    Toast.makeText(getContext(),
+                                            "拒绝相机权限，拍照失败",
+                                            Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
                                 if(takePhotoIntent.resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
+                                    File picFile=creatImageFile(BASE_DIR,2);
+                                    downFileName.add(picFile.getName());
+                                    Uri imageUri=FileProvider.getUriForFile(getContext(),
+                                            "com.example.cm",
+                                            picFile);
+                                    takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
                                     startActivityForResult(takePhotoIntent,WardrobeFragment.CAMERA_DOWN);//启动相机
                                 }else{
                                     Toast.makeText(getContext(),"没有相机，无法完成操作",Toast.LENGTH_SHORT).show();
@@ -237,7 +278,7 @@ public class WardrobeFragment extends Fragment  {
                     Bitmap bitmap = ClothesEstimater.getScaleBitmap(absoluteRoad);
                     WardrobeFragment.photoList1.add(bitmap);
                     wardrobeAdapter1.notifyDataSetChanged();
-                    saveBitmap(bitmap,baseDir,1);
+                    upFileName.add(saveBitmap(bitmap,baseDir,1));
                 }
            }break;
             case WardrobeFragment.ALBUM_DOWN:{
@@ -247,7 +288,7 @@ public class WardrobeFragment extends Fragment  {
                     Bitmap bitmap = ClothesEstimater.getScaleBitmap(absoluteRoad);
                     WardrobeFragment.photoList2.add(bitmap);
                     wardrobeAdapter2.notifyDataSetChanged();
-                    saveBitmap(bitmap,baseDir,2);
+                    downFileName.add(saveBitmap(bitmap,baseDir,2));
                 }
            }break;
             case WardrobeFragment.CAMERA_UP:{
@@ -256,12 +297,14 @@ public class WardrobeFragment extends Fragment  {
                     /*缩略图信息是储存在返回的intent中的Bundle中的，
                      * 对应Bundle中的键为data，因此从Intent中取出
                      * Bundle再根据data取出来Bitmap即可*/
-                    Bundle extras = data.getExtras();
-                    Bitmap bitmap = (Bitmap) extras.get("data");
+                    File pic=new File(BASE_DIR,"upClothes"+
+                            File.separatorChar+
+                            upFileName.get(upFileName.size()-1));
+                    Log.d("wardrobe", "onActivityResult: "+upFileName.get(upFileName.size()-1));
+                    Bitmap bitmap =ClothesEstimater.getScaleBitmap(pic.getAbsolutePath());
                     if(bitmap!=null) {
                         WardrobeFragment.photoList1.add(bitmap);
                         wardrobeAdapter1.notifyDataSetChanged();
-                        saveBitmap(bitmap,baseDir,1);
                     }
                 }
 
@@ -269,12 +312,14 @@ public class WardrobeFragment extends Fragment  {
             case WardrobeFragment.CAMERA_DOWN:{
                 Log.d("addTest", "点击拍照——下");
                 if(resultCode==RESULT_OK){
-                    Bundle extras = data.getExtras();
-                    Bitmap bitmap = (Bitmap) extras.get("data");
+                    File pic=new File(BASE_DIR,"downClothes"+
+                            File.separatorChar+
+                            downFileName.get(downFileName.size()-1));
+                    Log.d("wardrobe", "onActivityResult: "+downFileName.get(downFileName.size()-1));
+                    Bitmap bitmap =ClothesEstimater.getScaleBitmap(pic.getAbsolutePath());
                     if(bitmap!=null) {
                         WardrobeFragment.photoList2.add(bitmap);
                         wardrobeAdapter2.notifyDataSetChanged();
-                        saveBitmap(bitmap,baseDir,2);
                     }
                 }
             }break;
@@ -287,6 +332,8 @@ public class WardrobeFragment extends Fragment  {
         integerList=new ArrayList<>();
         detailList1=new ArrayList<>();
         detailList2=new ArrayList<>();
+        upFileName=new ArrayList<>();
+        downFileName=new ArrayList<>();
         @SuppressLint("ResourceType") InputStream is = getResources().openRawResource(R.drawable.cm);
         Bitmap mBitmap = BitmapFactory.decodeStream(is);
         @SuppressLint("ResourceType") InputStream is1 = getResources().openRawResource(R.drawable.unlogin);
@@ -304,27 +351,33 @@ public class WardrobeFragment extends Fragment  {
         if(!AlbumUtil.checkStorage(getContext())){
             Toast.makeText(getContext(),"拒绝权限，无法加载衣柜内容",Toast.LENGTH_LONG).show();
         }
-        File baseDir=null;
+
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
-            baseDir=getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            BASE_DIR=getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         } else {
-            Log.e("wardrobe", "load wardrobe failure : sdcard not mounted");
+            BASE_DIR=getActivity().getFilesDir();
+            if(BASE_DIR==null)Log.e("wardrobe",
+                    "load wardrobe failure : get storage dir failed");
         }
-        File picDir=new File(baseDir,"upClothes");
+        File picDir=new File(BASE_DIR,"upClothes");
+        if(!picDir.exists())picDir.mkdirs();
         Log.d("wardrobe", "initData: "+picDir.getAbsolutePath());
         for(String fname:picDir.list()){
             Bitmap bitmap=ClothesEstimater.getScaleBitmap(picDir.getAbsolutePath()
                     +File.separator
                     +fname);
             photoList1.add(bitmap);
+            upFileName.add(fname);
         }
-        picDir=new File(baseDir,"downClothes");
+        picDir=new File(BASE_DIR,"downClothes");
+        if(!picDir.exists())picDir.mkdirs();
         for(String fname:picDir.list()){
             Bitmap bitmap=ClothesEstimater.getScaleBitmap(picDir.getAbsolutePath()
                     +File.separator
                     +fname);
             photoList2.add(bitmap);
+            downFileName.add(fname);
         }
         for(int i=0;i<photoList1.size()+10;i++){
             detailList1.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap,mBitmap1,mBitmap2,mBitmap3)));
@@ -395,12 +448,13 @@ public class WardrobeFragment extends Fragment  {
                     //if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
+                            Log.d("RecycleList:", "onClick: "+upFileName.get(position));
                         }else{    //下衣
                             MainActivity.setClothes_down(position);
+                            Log.d("RecycleList:", "onClick: "+downFileName.get(position));
                         }
                    // }
-                    Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
-                            " "+MainActivity.getClothes_down());
+
                 }
             });
             viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -415,8 +469,28 @@ public class WardrobeFragment extends Fragment  {
                                     , new ActionSheetDialog.OnSheetItemClickListener() {
                                         @Override
                                         public void onClick(int which) {
-                                            Log.d("wardrobe", "onClick: 删除"
-                                            +finalViewHolder.getAdapterPosition());
+                                            MainActivity.setClothes_down(-1);
+                                            MainActivity.setClothes_up(-1);
+                                            int pos=finalViewHolder.getAdapterPosition();
+                                            if(type==1){
+                                                photoList1.remove(pos);
+                                                File f=new File(BASE_DIR,
+                                                        "upClothes"+
+                                                                File.separatorChar+
+                                                                upFileName.get(pos));
+                                                if (f.exists())f.delete();
+                                                upFileName.remove(pos);
+                                                notifyDataSetChanged();
+                                            }else if(type==2){
+                                                photoList2.remove(pos);
+                                                File f=new File(BASE_DIR,
+                                                        "downClothes"+
+                                                                File.separatorChar+
+                                                                downFileName.get(pos));
+                                                if (f.exists())f.delete();
+                                                downFileName.remove(pos);
+                                                notifyDataSetChanged();
+                                            }
                                         }
                                     }).show();
                     return false;
@@ -502,30 +576,38 @@ public class WardrobeFragment extends Fragment  {
      * @param bitmap Bitmap
      * @param type 为1表示上衣，为2表示下衣
      */
-    public static void saveBitmap(Bitmap bitmap,File baseDir,int type) {
-        String savePath=null;
-        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        if(type==1)savePath="upClothes/";
-        else if(type==2)savePath="downClothes/";
-        else {
-            Log.d("wardrobe", "saveBitmap: error_type");return;}
-        savePath+=format.format(new Date())+".jpg";
-        File filePic;
+    public static String saveBitmap(Bitmap bitmap,File baseDir,int type) {
+        File filePic=creatImageFile(baseDir,type);
         try {
-            filePic = new File(baseDir,savePath);
             Log.d("wardrobe", "saveBitmap: savePath"+filePic.getAbsolutePath());
-            if (!filePic.exists()) {
-                filePic.getParentFile().mkdirs();
-                filePic.createNewFile();
-            }
             FileOutputStream fos = new FileOutputStream(filePic);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             fos.close();
         } catch (IOException e) {
             Log.e("tag", "saveBitmap: " + e.getMessage());
-            return;
+            return null;
         }
-        Log.i("tag", "saveBitmap success: " + filePic.getAbsolutePath());
+        Log.i("tag", "saveBitmap success: " + filePic.getParentFile().getPath());
+        return filePic.getName();
+    }
+    public static File creatImageFile(File baseDir,int type){
+        String savePath=null;
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        if(type==1)savePath="upClothes/";
+        else if(type==2)savePath="downClothes/";
+        else {
+            Log.d("wardrobe", "saveBitmap: error_type");return null;}
+        savePath+=format.format(new Date())+".jpg";
+        File filePic= new File(baseDir,savePath);
+        if (!filePic.exists()) {
+            filePic.getParentFile().mkdirs();
+            try {
+                filePic.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return filePic;
     }
 }

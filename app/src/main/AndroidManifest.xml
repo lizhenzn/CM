@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+
 
     <application
         android:allowBackup="true"
@@ -33,10 +36,6 @@
         <activity android:name=".myInfo.RegisterActivity" />
         <activity android:name=".share.Comments" />
 
-        <service
-            android:name=".ConnectService"
-            android:enabled="true"
-            android:exported="true" />
 
         <activity android:name=".myInfo.LoginActivity" />
         <activity android:name=".myInfo.EditNiChengActivity" />
@@ -48,6 +47,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.cm"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"
+                tools:replace="android:resource"/>
+        </provider>
     </application>
 
 </manifest>

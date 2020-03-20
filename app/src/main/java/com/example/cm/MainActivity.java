@@ -357,6 +357,13 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
                     Toast.makeText(this,"You denied the permission",Toast.LENGTH_SHORT).show();
                 }
             }break;
+            case AlbumUtil.REQUEST_CAMERA:{
+                if(grantResults.length>0&&grantResults[0]== PackageManager.PERMISSION_GRANTED){
+
+                }else{
+                    Toast.makeText(this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                }
+            }break;
         }
     }
 
