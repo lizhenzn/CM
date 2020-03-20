@@ -134,6 +134,7 @@ public class ClothesEstimater {
             //直接通过文件路径读取不了，通过输入流读取
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
         int bmpWidth = opt.outWidth;
         int bmpHeight = opt.outHeight;

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,9 +31,14 @@ import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.ClothesEstimater;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -194,7 +200,13 @@ public class WardrobeFragment extends Fragment  {
         });
         return  view;
     }
-
+    /**
+     * 判断sdcard是否被挂载
+     */
+    public static boolean hasSdcard() {
+        return Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED);
+    }
     /**
      *  此处负责处理相机和图库的调用返回问题
      * @param requestCode
@@ -205,20 +217,38 @@ public class WardrobeFragment extends Fragment  {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(!AlbumUtil.checkStorage(getContext()))AlbumUtil.requestStorage(getContext());
+        if(!AlbumUtil.checkStorage(getContext())){
+            Toast.makeText(getContext(),"拒绝权限，无法加入衣柜",Toast.LENGTH_LONG).show();
+        }
+        File baseDir=null;
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            baseDir=getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        } else {
+            Log.e("wardrobe", "saveBitmap failure : sdcard not mounted");
+            return;
+        }
         switch (requestCode){
             case WardrobeFragment.ALBUM_UP:{
                 String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,getContext());
                 Log.d("addTest", "从相册选择_上:path="+absoluteRoad);
-                Bitmap bitmap=ClothesEstimater.getScaleBitmap(absoluteRoad);
-                WardrobeFragment.photoList1.set(0,bitmap);
-                wardrobeAdapter1.notifyDataSetChanged();
+                if(absoluteRoad!=null) {
+                    Bitmap bitmap = ClothesEstimater.getScaleBitmap(absoluteRoad);
+                    WardrobeFragment.photoList1.add(bitmap);
+                    wardrobeAdapter1.notifyDataSetChanged();
+                    saveBitmap(bitmap,baseDir,1);
+                }
            }break;
             case WardrobeFragment.ALBUM_DOWN:{
                 String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,getContext());
                 Log.d("addTest", "从相册选择_下:path="+absoluteRoad);
-                Bitmap bitmap=ClothesEstimater.getScaleBitmap(absoluteRoad);
-                WardrobeFragment.photoList2.set(0,bitmap);
-                wardrobeAdapter2.notifyDataSetChanged();
+                if(absoluteRoad!=null) {
+                    Bitmap bitmap = ClothesEstimater.getScaleBitmap(absoluteRoad);
+                    WardrobeFragment.photoList2.add(bitmap);
+                    wardrobeAdapter2.notifyDataSetChanged();
+                    saveBitmap(bitmap,baseDir,2);
+                }
            }break;
             case WardrobeFragment.CAMERA_UP:{
                 Log.d("addTest", "点击拍照——上");
@@ -228,8 +258,11 @@ public class WardrobeFragment extends Fragment  {
                      * Bundle再根据data取出来Bitmap即可*/
                     Bundle extras = data.getExtras();
                     Bitmap bitmap = (Bitmap) extras.get("data");
-                    WardrobeFragment.photoList1.set(0,bitmap);
-                    wardrobeAdapter1.notifyDataSetChanged();
+                    if(bitmap!=null) {
+                        WardrobeFragment.photoList1.add(bitmap);
+                        wardrobeAdapter1.notifyDataSetChanged();
+                        saveBitmap(bitmap,baseDir,1);
+                    }
                 }
 
             }break;
@@ -238,8 +271,11 @@ public class WardrobeFragment extends Fragment  {
                 if(resultCode==RESULT_OK){
                     Bundle extras = data.getExtras();
                     Bitmap bitmap = (Bitmap) extras.get("data");
-                    WardrobeFragment.photoList2.set(0,bitmap);
-                    wardrobeAdapter2.notifyDataSetChanged();
+                    if(bitmap!=null) {
+                        WardrobeFragment.photoList2.add(bitmap);
+                        wardrobeAdapter2.notifyDataSetChanged();
+                        saveBitmap(bitmap,baseDir,2);
+                    }
                 }
             }break;
         }
@@ -259,21 +295,42 @@ public class WardrobeFragment extends Fragment  {
         Bitmap mBitmap2 = BitmapFactory.decodeStream(is2);
         @SuppressLint("ResourceType") InputStream is3 = getResources().openRawResource(R.drawable.wardrobe1);
         Bitmap mBitmap3 = BitmapFactory.decodeStream(is3);
-        for(int i=0;i<66;i++) {
-
-            photoList1.add(mBitmap);
-            photoList2.add(mBitmap1);
-
+//        for(int i=0;i<66;i++) {
+//
+//            photoList1.add(mBitmap);
+//            photoList2.add(mBitmap1);
+//        }
+        if(!AlbumUtil.checkStorage(getContext()))AlbumUtil.requestStorage(getContext());
+        if(!AlbumUtil.checkStorage(getContext())){
+            Toast.makeText(getContext(),"拒绝权限，无法加载衣柜内容",Toast.LENGTH_LONG).show();
         }
-        for(int i=0;i<photoList1.size();i++){
-
-                detailList1.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap,mBitmap1,mBitmap2,mBitmap3)));
-
+        File baseDir=null;
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            baseDir=getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        } else {
+            Log.e("wardrobe", "load wardrobe failure : sdcard not mounted");
         }
-        for(int i=0;i<photoList2.size();i++){
-
+        File picDir=new File(baseDir,"upClothes");
+        Log.d("wardrobe", "initData: "+picDir.getAbsolutePath());
+        for(String fname:picDir.list()){
+            Bitmap bitmap=ClothesEstimater.getScaleBitmap(picDir.getAbsolutePath()
+                    +File.separator
+                    +fname);
+            photoList1.add(bitmap);
+        }
+        picDir=new File(baseDir,"downClothes");
+        for(String fname:picDir.list()){
+            Bitmap bitmap=ClothesEstimater.getScaleBitmap(picDir.getAbsolutePath()
+                    +File.separator
+                    +fname);
+            photoList2.add(bitmap);
+        }
+        for(int i=0;i<photoList1.size()+10;i++){
+            detailList1.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap,mBitmap1,mBitmap2,mBitmap3)));
+        }
+        for(int i=0;i<photoList2.size()+10;i++){
             detailList2.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap3,mBitmap2,mBitmap1,mBitmap)));
-
         }
 
     }
@@ -344,6 +401,25 @@ public class WardrobeFragment extends Fragment  {
                    // }
                     Log.d("RecycleList:", "onClick: "+MainActivity.getClothesUp()+
                             " "+MainActivity.getClothes_down());
+                }
+            });
+            viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    new ActionSheetDialog(context).
+                            builder()
+                            .setCancelable(true)
+                            .setCanceledOnTouchOutside(true)
+                            .addSheetItem("删除",
+                                    ActionSheetDialog.SheetItemColor.Blue
+                                    , new ActionSheetDialog.OnSheetItemClickListener() {
+                                        @Override
+                                        public void onClick(int which) {
+                                            Log.d("wardrobe", "onClick: 删除"
+                                            +finalViewHolder.getAdapterPosition());
+                                        }
+                                    }).show();
+                    return false;
                 }
             });
             return viewHolder;
@@ -419,5 +495,37 @@ public class WardrobeFragment extends Fragment  {
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             container.removeView((View)object);
         }
+    }
+    /**
+     * 保存bitmap到本地
+     *
+     * @param bitmap Bitmap
+     * @param type 为1表示上衣，为2表示下衣
+     */
+    public static void saveBitmap(Bitmap bitmap,File baseDir,int type) {
+        String savePath=null;
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        if(type==1)savePath="upClothes/";
+        else if(type==2)savePath="downClothes/";
+        else {
+            Log.d("wardrobe", "saveBitmap: error_type");return;}
+        savePath+=format.format(new Date())+".jpg";
+        File filePic;
+        try {
+            filePic = new File(baseDir,savePath);
+            Log.d("wardrobe", "saveBitmap: savePath"+filePic.getAbsolutePath());
+            if (!filePic.exists()) {
+                filePic.getParentFile().mkdirs();
+                filePic.createNewFile();
+            }
+            FileOutputStream fos = new FileOutputStream(filePic);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            Log.e("tag", "saveBitmap: " + e.getMessage());
+            return;
+        }
+        Log.i("tag", "saveBitmap success: " + filePic.getAbsolutePath());
     }
 }
