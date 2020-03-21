@@ -7,15 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.BitmapFactory;
 import android.util.Log;
-import android.widget.ListView;
 
 import com.example.cm.friend.Cn2Spell;
-import com.example.cm.friend.chat.GroupInfo;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -72,7 +69,7 @@ public class DataBase extends SQLiteOpenHelper {
         values.put("email",friendInfo.getEmail());
         values.put("headBtRoad",friendInfo.getHeadBtRoad());
         values.put("chated",friendInfo.getChated());
-        Connect.db.insert("FriendInfoTable",null,values);
+        MessageManager.getDb().insert("FriendInfoTable",null,values);
     }
     /*
     *message
@@ -87,14 +84,14 @@ public class DataBase extends SQLiteOpenHelper {
         values.put("body",message.getBody());
         values.put("date",message.getDate());
         values.put("photoRoad",message.getPhotoRoad());
-        Connect.db.insert("MessageTable",null,values);
+        MessageManager.getDb().insert("MessageTable",null,values);
 
     }
     /*得到数据库的聊天记录
     *cursor 传入得到的cursor对象，返回处理后的hashmap
      */
     public HashMap<String, List<Message>> getMessageHashMap(){
-        Cursor cursor =Connect.db.query("MessageTable",null,null,null,null,null,null);
+        Cursor cursor =MessageManager.getDb().query("MessageTable",null,null,null,null,null,null);
         HashMap<String,List<Message>> map=new HashMap<>();
         List<Message> messageList=new ArrayList<>();
         if(cursor.moveToFirst()){
@@ -146,7 +143,7 @@ public class DataBase extends SQLiteOpenHelper {
         return map;
     }
     public List<FriendInfo> getContantFriendInfoList(){
-        Cursor cursor =Connect.db.query("FriendInfoTable",null,null,null,null,null,null);
+        Cursor cursor =MessageManager.getDb().query("FriendInfoTable",null,null,null,null,null,null);
         List<FriendInfo> friendInfoList=new ArrayList<>();       //所有的好友信息列表
         if (cursor.moveToFirst()) {
             do{
@@ -167,8 +164,8 @@ public class DataBase extends SQLiteOpenHelper {
                 friendInfo.setSex(cursor.getString(cursor.getColumnIndex("sex")));
                 friendInfo.setChated(cursor.getInt(cursor.getColumnIndex("chated")));
                 if(cursor.getInt(cursor.getColumnIndex("chated"))==1){
-                    Connect.friendInfoList.add(friendInfo);           //加入会话列表
-                    Connect.messageMap.put(friendInfo.getUserName(),getMessageListByName(friendInfo.getUserName()));//同时添加进对应的聊天信息
+                    MessageManager.getFriendInfoList().add(friendInfo);           //加入会话列表
+                    MessageManager.getMessageMap().put(friendInfo.getUserName(),getMessageListByName(friendInfo.getUserName()));//同时添加进对应的聊天信息
                 }
                 friendInfoList.add(friendInfo);
             }while(cursor.moveToNext());
@@ -183,7 +180,7 @@ public class DataBase extends SQLiteOpenHelper {
     public List<Message> getMessageListByName(String user){
         List<Message> messageList=new ArrayList<>();
         //Cursor cursor =Connect.db.query("MessageTable",null,null,null,null,null,null);
-        Cursor cursor=Connect.db.query("MessageTable",null,"toUser=? and type='1' or fromUser=?  and type='2'",new String[]{user,user},null,null,null);
+        Cursor cursor=MessageManager.getDb().query("MessageTable",null,"toUser=? and type='1' or fromUser=?  and type='2'",new String[]{user,user},null,null,null);
         if(cursor.moveToFirst()){
             do{
                 Message message=new Message();
@@ -206,27 +203,6 @@ public class DataBase extends SQLiteOpenHelper {
             }while (cursor.moveToNext());
         }
         cursor.close();
-       /* Cursor cursor1=Connect.db.query("MessageTable",null,"fromUser=? and type=?",new String[]{user,"2"},null,null,null);
-        if(cursor1.moveToFirst()){
-            do{
-                Message message=new Message();
-                message.setFrom(cursor1.getString(cursor1.getColumnIndex("fromUser")));
-                message.setTo(cursor1.getString(cursor1.getColumnIndex("toUser")));
-                message.setBody(cursor1.getString(cursor1.getColumnIndex("body")));
-                message.setType(cursor1.getInt(cursor1.getColumnIndex("type")));
-                String photoRoad=cursor1.getString(cursor1.getColumnIndex("photoRoad"));
-                if(photoRoad.length()>0){
-                    message.setPhotoRoad(photoRoad);
-                    message.setPhoto(BitmapFactory.decodeFile(photoRoad));
-                }
-                message.setDate(Long.valueOf(cursor.getString(cursor.getColumnIndex("date"))));
-                message.setMessageType(cursor1.getString(cursor1.getColumnIndex("messageType")));
-                //message.setDate(cursor.getShort(cursor.getColumnIndex("date")));
-                //添加进整体聊天记录
-                messageList.add(message);
-            }while (cursor1.moveToNext()&&cursor1!=null);
-        }
-        cursor1.close();*/
         //TODO 排序
 
         return messageList;
@@ -240,21 +216,26 @@ public class DataBase extends SQLiteOpenHelper {
     public  void changeChatState(String user,int state){
         ContentValues values=new ContentValues();
         values.put("chated",state);
-        Connect.db.update("FriendInfoTable",values,"userName=?",new String[]{user});
+        MessageManager.getDb().update("FriendInfoTable",values,"userName=?",new String[]{user});
     }
     /*
     *s删除对应好友的聊天记录
     *@param userName
      */
     public void deleteMessage(String userName){
-        Connect.db.delete("MessageTable","fromUser=? and type='2' or toUser=? and type='1'",new String[]{userName,userName});
+        MessageManager.getDb().delete("MessageTable","fromUser=? and type='2' or toUser=? and type='1'",new String[]{userName,userName});
     }
     /*
     * 删除数据库对应的好友条目
     *@param userName
      */
     public void deleteFriendInfo(String userName){
-        Connect.db.delete("FriendInfoTable","userName=?",new String[]{userName});
+        MessageManager.getDb().delete("FriendInfoTable","userName=?",new String[]{userName});
         deleteMessage(userName);
+    }
+    //删除所有的好友信息
+    public void deleteAllFriendInfo(){
+        MessageManager.getDb().execSQL("delete from FriendInfoTable where chated=0 or chated=1;");
+        Log.d("", "deleteAllFriendInfo: 删除所有好友信息成功");
     }
 }

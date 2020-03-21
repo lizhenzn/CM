@@ -38,6 +38,7 @@ import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.EmoticonsEditText;
+import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
@@ -59,10 +60,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private EmoAdapter emoAdapter;
     private ImageButton emoIB,addIB;
     private String userName;
-    public static List<Message> chatActivitymessageList;
     private FriendInfo friendInfo;
     public  static boolean isSend;
-    private int friendPosition;
     private boolean work;
     private Chat chat;
     private TextView user_tv;  //正在聊天的人 顶部显示
@@ -91,9 +90,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         ChatActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                //chatActivitymessageList=Connect.messageMap.get(userName);
                                 chatAdapter.notifyDataSetChanged();
-                                chatItemLV.smoothScrollToPosition(Connect.messageMap.get(userName).size()-1);   //聊天界面接收到信息直接自动滑动到末尾
+                                if(MessageManager.isHaveNewMessage()) {
+                                    chatItemLV.smoothScrollToPosition(MessageManager.getMessageMap().get(userName).size() - 1);   //聊天界面接收到信息直接自动滑动到末尾
+                                }
                             }
                         });
 
@@ -110,7 +110,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     //初始化控件
     public void init(){
+        work=true;
         chatItemLV=(ListView)findViewById(R.id.chat_itemLV);
+        chatItemLV.setDivider(null);//分割线设置空
         emoRecy=(RecyclerView)findViewById(R.id.recycler_emo);
         inputET=(EmoticonsEditText)findViewById(R.id.inputET);
         sendBtn=(Button)findViewById(R.id.send);
@@ -124,22 +126,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
         Log.d("聊天界面friendName", "init: "+userName);
-        for(int i=0;i<Connect.contantFriendInfoList.size();i++){//赋值给正在聊天的人
-            if(Connect.contantFriendInfoList.get(i).getUserName().equals(userName)){
-                friendInfo=Connect.contantFriendInfoList.get(i);
+        for(int i=0;i<MessageManager.getContantFriendInfoList().size();i++){//赋值给正在聊天的人
+            if(MessageManager.getContantFriendInfoList().get(i).getUserName().equals(userName)){
+                friendInfo=MessageManager.getContantFriendInfoList().get(i);
                 break;
             }
 
         }
         user_tv.setText(userName);
-        //chatActivitymessageList=Connect.messageMap.get(userName);
-        if(Connect.messageMap.get(userName).size()>=1)
-            chatItemLV.smoothScrollToPosition(Connect.messageMap.get(userName).size()-1);
+        if(MessageManager.getMessageMap().get(userName).size()>=1)
+            chatItemLV.smoothScrollToPosition(MessageManager.getMessageMap().get(userName).size()-1);
 
         if(Connect.isLogined) {
-            ChatManager chatManager=ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+            ChatManager chatManager=ChatManager.getInstanceFor(Connect.getXMPPTCPConnection());
             while (chatManager == null)
-                chatManager = ChatManager.getInstanceFor(Connect.xmpptcpConnection);
+                chatManager = ChatManager.getInstanceFor(Connect.getXMPPTCPConnection());
             chat = chatManager.createChat(userName + "@" + Connect.SERVERNAME);
             if (chat == null)
                 Log.d("222333", "onClick: chat为空");
@@ -149,7 +150,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
     //设置数据
     public  void initData(){
-        chatAdapter=new ChatAdapter(this,Connect.messageMap.get(userName),friendInfo);
+        chatAdapter=new ChatAdapter(this,MessageManager.getMessageMap().get(userName),friendInfo);
         chatItemLV.setAdapter(chatAdapter);
         initEmo();
 
@@ -210,11 +211,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             message.setBody(mesBody);
                             message.setPhotoRoad("");
                             message.setPhoto(null);
-                            message.setFrom(Connect.xmpptcpConnection.getUser().split("@")[0]);
+                            message.setFrom(Connect.getXMPPTCPConnection().getUser().split("@")[0]);
                             message.setTo(userName.split("@")[0]);
                             message.setDate(date.getTime());
-                            Connect.dataBaseHelp.addMessage(message);        //数据库添加聊天信息
-                            Connect.messageMap.get(userName).add(message);     //添加信息
+                            MessageManager.getDataBaseHelp().addMessage(message);        //数据库添加聊天信息
+                            MessageManager.getMessageMap().get(userName).add(message);     //添加信息
                             //chatActivitymessageList.add(message);
                             inputET.setText("");              //设置输入框为空
                             isSend = true;
@@ -289,11 +290,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         Bitmap bitmap = BitmapFactory.decodeFile(absoluteRoad);
                         message.setPhoto(bitmap);
                         message.setBody("[图片]");
-                        message.setFrom(Connect.xmpptcpConnection.getUser().split("@")[0]);
+                        message.setFrom(Connect.getXMPPTCPConnection().getUser().split("@")[0]);
                         message.setTo(userName.split("@")[0]);
                         message.setDate(date.getTime());
-                        Connect.dataBaseHelp.addMessage(message);  //数据库添加聊天信息
-                        Connect.messageMap.get(userName).add(message);     //添加信息
+                        MessageManager.getDataBaseHelp().addMessage(message);  //数据库添加聊天信息
+                        MessageManager.getMessageMap().get(userName).add(message);     //添加信息
                         //chatActivitymessageList.add(message);
                         inputET.setText("");              //设置输入框为空
                         isSend = true;

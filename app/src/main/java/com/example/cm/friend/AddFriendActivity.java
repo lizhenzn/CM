@@ -18,10 +18,14 @@ import android.widget.Toast;
 
 import com.example.cm.R;
 import com.example.cm.myInfo.FriendInfo;
+import com.example.cm.myInfo.VCardManager;
 import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smackx.iqregister.AccountManager;
 
@@ -50,12 +54,12 @@ private boolean work;
             @Override
             public void run() {
                 while(work) {
-                    if (Connect.addFriendItemListChanged) {
+                    if (MessageManager.isAddFriendItemListChanged()) {
                         AddFriendActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 addFriendAdapter.notifyDataSetChanged();
-                                Connect.addFriendItemListChanged = false;
+                                MessageManager.setContantListChanged(false);
                             }
                         });
                     }
@@ -88,36 +92,37 @@ private boolean work;
         switch (v.getId()){
             case R.id.add_friend_btn:{//发送添加请求
                 boolean contain=false;
-                for(int i=0;i<Connect.groupInfoList.size();i++){
-                    for(int j=0;j<Connect.groupInfoList.get(i).getFriendInfoList().size();j++){
-                        if(Connect.groupInfoList.get(i).getFriendInfoList().get(j).getUserName().equals(userName_tv.getText())){
+                    for(int j=0;j<MessageManager.getContantFriendInfoList().size();j++){
+                        if(MessageManager.getContantFriendInfoList().get(j).getUserName().equals(userName_tv.getText())){
                             contain=true;
                             break;
                         }
                     }
-                }
+
                 if(!contain) {
+                    String user=String.valueOf(userName_tv.getText());
                     AddFriendItem addFriendItem = new AddFriendItem();
                     FriendInfo friendInfo = new FriendInfo();
-                    friendInfo.setUserName(String.valueOf(userName_tv.getText()));
-                    friendInfo.setHeadBt(Connect.getUserImage(String.valueOf(userName_tv.getText())));
+                    friendInfo.setUserName(user);
+                    friendInfo.setHeadBt(VCardManager.getUserImage(user));
                     addFriendItem.setFriendInfo(friendInfo);
                     addFriendItem.setReason("Hello,World!");
                     addFriendItem.setResult("已发送验证");
 
-                    Connect.addFriendItemListChanged = true;
-                    Presence presence = new Presence(Presence.Type.subscribe);
-                    presence.setTo(String.valueOf(userName_tv.getText()) + "@" + Connect.SERVERNAME);
-                    presence.setStatus("测试验证消息");
+                    MessageManager.setContantListChanged(true);
+
                     try {
-                        Connect.xmpptcpConnection.sendStanza(presence);
-                        Log.d("ADD", "onClick: 申请发送成功");
-                    } catch (SmackException.NotConnectedException e) {
+                        while(!Connect.getRoster().isLoaded()){
+                            Connect.getRoster().reload();
+                        }
+                        Connect.getRoster().createEntry(user+"@"+Connect.SERVERNAME,user,new String[]{"Friends"});
+                        Log.e("ADD", "onClick: 申请发送成功");
+                    } catch (Exception e) {//SmackException.NotConnectedException
                         e.printStackTrace();
                         addFriendItem.setResult("申请发送异常，请重试");
                         Toast.makeText(AddFriendActivity.this, "申请发送异常", Toast.LENGTH_SHORT).show();
                     }
-                    Connect.addFriendItemList.add(addFriendItem);
+                    MessageManager.getAddFriendItemList().add(addFriendItem);
                 }else{
                     Toast.makeText(AddFriendActivity.this,"已有此好友",Toast.LENGTH_SHORT).show();
                 }
@@ -125,10 +130,8 @@ private boolean work;
             case R.id.add_friend_search:{//查找此用户
                 if(Connect.isLogined) {
                     String userName = String.valueOf(userName_et.getText());
-                    //RosterEntry entry = Connect.roster.getEntry(userName);
-                    Bitmap bitmap = Connect.getUserImage(userName);
+                    Bitmap bitmap = VCardManager.getUserImage(userName);
                     if (bitmap != null) {//有此用户
-
                         linearLayout.setVisibility(View.VISIBLE);
                         headImage.setImageBitmap(bitmap);
                         userName_tv.setText(userName);
@@ -161,14 +164,27 @@ private boolean work;
     }
     //同意添加好友
     public static boolean agreeAddFriend(String userName)  {
-        Connect.addFriend(userName,userName,new String[]{"Friends"});
+
         Presence presence=new Presence(Presence.Type.subscribed);
         presence.setTo(userName+"@"+Connect.SERVERNAME);
         try {
-            Connect.xmpptcpConnection.sendStanza(presence);
+            Connect.getXMPPTCPConnection().sendStanza(presence);
+            MessageManager.addFriend(userName);//刷新好友列表
+            while(!Connect.getRoster().isLoaded()){
+                Connect.getRoster().reload();
+            }
+            Connect.getRoster().createEntry(userName+"@"+Connect.SERVERNAME,userName,new String[]{"Friends"});
+            Log.e("ADD", "onClick: 申请发送成功");
+            Log.e("", "agreeAddFriend: 同意添加好友" );
         }catch(SmackException.NotConnectedException e){
             e.printStackTrace();
             return false;
+        } catch (SmackException.NotLoggedInException e) {
+            e.printStackTrace();
+        } catch (SmackException.NoResponseException e) {
+            e.printStackTrace();
+        } catch (XMPPException.XMPPErrorException e) {
+            e.printStackTrace();
         }
         return true;
     }
@@ -177,7 +193,8 @@ private boolean work;
         Presence presence=new Presence(Presence.Type.unsubscribed);
         presence.setTo(userName+"@"+Connect.SERVERNAME);
         try {
-            Connect.xmpptcpConnection.sendStanza(presence);
+            Connect.getXMPPTCPConnection().sendStanza(presence);
+            Log.e("", "rejectAddFriend: 拒绝添加");
         }catch(SmackException.NotConnectedException e){
             e.printStackTrace();
             return false;

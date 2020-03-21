@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.cm.R;
+import com.example.cm.myInfo.VCardManager;
 import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
 import java.util.ArrayList;
@@ -46,8 +48,9 @@ public class Comments extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        ServerFunction.sendRemark(postInfo, Connect.smackUserInfo.getUserName(),content,"2019-08-23 14:55:50");
-                        Log.d(TAG, "run: execute sendRemark,posi_id="+postInfo.getPost_id()+",userName="+Connect.smackUserInfo.getUserName()+",content="+content);
+                        ServerFunction.sendRemark(postInfo, MessageManager.getSmackUserInfo().getUserName(),content,"2019-08-23 14:55:50");
+                        Log.d(TAG, "run: execute sendRemark,posi_id="+postInfo.getPost_id()+",userName="+MessageManager.getSmackUserInfo().getUserName()+",content="+content);
+                        ServerFunction.sendRemark(postInfo, MessageManager.getSmackUserInfo().getUserName(),content,"2019-08-23 14:55:50");
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -80,7 +83,7 @@ public class Comments extends AppCompatActivity {
             public void run() {
                 remarks=ServerFunction.getRemark(postInfo);
                 for(int i=1;i<=remarks.size();i++){
-                    CommentList.add(new CommentItem(Connect.getUserImage(remarks.get(i-1).getUsername()),i+"F",remarks.get(i-1).getUsername(),remarks.get(i-1).getContent()));
+                    CommentList.add(new CommentItem(VCardManager.getUserImage(remarks.get(i-1).getUsername()),i+"F",remarks.get(i-1).getUsername(),remarks.get(i-1).getContent()));
                 }
                 commentAdapter=new CommentAdapter(CommentList);
                 runOnUiThread(new Runnable() {

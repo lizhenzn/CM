@@ -24,7 +24,6 @@
         android:elevation="4dp"
         android:background="@color/colorGray">
     </LinearLayout>
-
     <LinearLayout
         android:id="@+id/wardrobeUpLayout"
         android:layout_width="match_parent"
@@ -78,5 +77,4 @@
           android:src="@drawable/chat_add" />
     </LinearLayout>
   </LinearLayout>
-
 </ScrollView>
