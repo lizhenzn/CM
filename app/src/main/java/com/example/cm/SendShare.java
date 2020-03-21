@@ -18,7 +18,7 @@ import com.example.cm.wardrobe.WardrobeFragment;
 
 import main.PostInfo;
 import main.ShareManager;
-
+//2020-3-21 11:22
 public class SendShare extends AppCompatActivity {
     private static final String TAG = "SendShare";
     private View view;
@@ -47,7 +47,7 @@ public class SendShare extends AppCompatActivity {
                 ShareManager shareManager=new ShareManager();
                 PostInfo postInfo=new PostInfo();
                 postInfo.setLike_num(0);
-                postInfo.setUsername(Connect.smackUserInfo.getUserName());
+//                postInfo.setUsername(Connect.smackUserInfo.getUserName());
 //                postInfo.setImgs();
 //                shareManager.sendPost()
             }
