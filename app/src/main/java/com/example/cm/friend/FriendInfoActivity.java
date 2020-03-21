@@ -1,8 +1,9 @@
 package com.example.cm.friend;
 
+import android.app.ActionBar;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,7 +14,6 @@ import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.VCardManager;
-import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
@@ -46,7 +46,8 @@ public class FriendInfoActivity extends AppCompatActivity {
 
         //Connect.setInfo();
 
-
+        ActionBar actionBar=getActionBar();
+        if(actionBar!=null)actionBar.setDisplayShowTitleEnabled(false);
         setting_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

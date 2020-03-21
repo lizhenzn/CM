@@ -3,44 +3,28 @@ package com.example.cm.myInfo;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.annotation.RequiresApi;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.text.method.TransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v7.app.ActionBar;
+
 import com.example.cm.R;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
-import com.example.cm.util.DataBase;
-
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.chat.Chat;
-import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.chat.ChatMessageListener;
-import org.jivesoftware.smack.packet.Message;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LoginActivity extends Activity implements View.OnClickListener{
     private Button loginBtn,pswEnBtn;
@@ -59,7 +43,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         init();
-
+        android.app.ActionBar actionBar=getActionBar();
+        if(actionBar!=null)actionBar.setDisplayShowTitleEnabled(false);
     }
     //初始化控件
     public void init(){
