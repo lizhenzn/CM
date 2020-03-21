@@ -84,6 +84,7 @@ public class MatchFragment extends Fragment {
                 MainActivity.setChoose_flag(true);
                 FragmentManager fm=getActivity().getSupportFragmentManager();
                 fm.beginTransaction().replace(R.id.tab_main_content,new WardrobeFragment()).addToBackStack(null).commit();
+                MainActivity.setFragmentTabHostVisibility(false);
             }
         });
         //智能搭配入口
