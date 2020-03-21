@@ -63,7 +63,8 @@ public class WardrobeFragment extends Fragment  {
     private static ViewPager viewPager;
     private  static  WardrobeVPAdapter wardrobeVPAdapter;
     private boolean upClothes,downClothes;
-    private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4;
+    private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4,
+            TYPE_UP=5,TYPE_DOWN=6;
     private static File BASE_DIR=null;
     //1:滑动上衣 2：滑动裤子
     @Override
@@ -625,5 +626,30 @@ public class WardrobeFragment extends Fragment  {
             }
         }
         return filePic;
+    }
+
+    /**
+     * 给定偏移量和类型取得绝对路径
+     * @param pos 偏移量
+     * @param type 对应静态常量TYPE_UP、TYPE_DOWN
+     * @return 绝对路径,出错则返回null
+     */
+    public static String getImgRealPath(int pos,int type,Context context){
+        File baseDir=null;
+        File imgDir=null;
+        if(hasSdcard())baseDir=context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        else baseDir=context.getFilesDir();
+        if(type==TYPE_UP) {
+            imgDir = new File(baseDir, "upClothes"+
+                    File.separatorChar+
+                    upFileName.get(pos));
+        }
+        else if(type==TYPE_DOWN) {
+            imgDir = new File(baseDir, "downClothes"+
+                    File.separatorChar+
+                            downFileName.get(pos));
+        }
+        if(imgDir!=null)return imgDir.getAbsolutePath();
+        else return null;
     }
 }
