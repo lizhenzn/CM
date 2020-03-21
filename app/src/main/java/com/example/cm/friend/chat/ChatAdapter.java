@@ -12,6 +12,7 @@ import com.example.cm.R;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.Connect;
 import com.example.cm.util.EmoticonsTextView;
+import com.example.cm.util.MessageManager;
 
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
         viewHolder.imageView.setOnClickListener(this);
         if(messageList.get(position).getType()==1) {
             viewHolder.nameTV.setText(messageList.get(position).getFrom());
-            viewHolder.imageView.setImageBitmap(Connect.smackUserInfo.getHeadBt());
+            viewHolder.imageView.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
         }else{
             viewHolder.nameTV.setText(messageList.get(position).getFrom());
             viewHolder.imageView.setImageBitmap(friendInfo.getHeadBt());

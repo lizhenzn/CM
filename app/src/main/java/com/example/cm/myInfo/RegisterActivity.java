@@ -136,6 +136,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             public void onClick(DialogInterface dialog, int which) {
                 sex_tv.setHint(xingBie[which]);
                 sex=String.valueOf(sex_tv.getText());
+                Log.e("", "onClick: 您选择的："+sex );
+                if(sex.equals("男")){
+                    sex="male";
+                }else if(sex.equals("女")){
+                    sex="female";
+                }else{
+                    sex="secrecy";
+                }
                 dialog.dismiss();
             }
         });
@@ -162,6 +170,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String user= String.valueOf(user_et.getText());
                 String passwd= String.valueOf(passwd_et.getText());
                 String insurePasswd= String.valueOf(insurePasswd_et.getText());
+
                 String email= String.valueOf(email_et.getText());
                 Map <String,String> map=new HashMap<>();
                 map.put("email",email);
@@ -179,73 +188,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 progressDialog.show();
                             }
                         });
-                        if(Connect.getXMPPTCPConnection()){
-                            Log.d("22233", "run: 连接服务器成功");
                             if(Connect.register(user,passwd,map)){//注册成功然后设置选择的头像，若设置失败，则注销此用户
                                 //TODO 注册后不能登录，要先设置头像，空指针错误
                                 Log.d("22233", "run: 注册成功");
-                                if(Connect.xmpptcpConnection!=null){
-                                    try {
-                                        Connect.xmpptcpConnection.login(user,passwd);
-                                        Log.d("22233", "run: 登录成功，尝试修改头像");
-                                        if(Connect.changeImage(Connect.xmpptcpConnection,absoluteRoad))
-                                            Connect.signOut(); //退出
-                                            RegisterActivity.this.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    progressDialog.dismiss();
-                                                    Toast.makeText(RegisterActivity.this,"注册成功",Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                    } catch (XMPPException e) {
-                                        try {
-                                            Log.d("22233", "run: 修改头像失败，删除账户");
-                                            AccountManager.getInstance(Connect.xmpptcpConnection).deleteAccount();
-                                        } catch (SmackException.NoResponseException e1) {
-                                            e1.printStackTrace();
-                                        } catch (XMPPException.XMPPErrorException e1) {
-                                            e1.printStackTrace();
-                                        } catch (SmackException.NotConnectedException e1) {
-                                            e1.printStackTrace();
-                                        }
-                                        RegisterActivity.this.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toast.makeText(RegisterActivity.this,"注册异常",Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                        e.printStackTrace();
-                                    } catch (IOException e) {
-                                        try {
-                                            AccountManager.getInstance(Connect.xmpptcpConnection).deleteAccount();
-                                        } catch (SmackException.NoResponseException e1) {
-                                            e1.printStackTrace();
-                                        } catch (XMPPException.XMPPErrorException e1) {
-                                            e1.printStackTrace();
-                                        } catch (SmackException.NotConnectedException e1) {
-                                            e1.printStackTrace();
-                                        }
-                                        RegisterActivity.this.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toast.makeText(RegisterActivity.this,"注册异常",Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                        e.printStackTrace();
-                                    } catch (SmackException e) {
-                                        e.printStackTrace();
-                                        Log.d("", "run: 改头像前登陆失败");
-                                        Toast.makeText(RegisterActivity.this,"注册异常",Toast.LENGTH_SHORT).show();
+                                RegisterActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(RegisterActivity.this,"注册成功",Toast.LENGTH_SHORT).show();
                                         progressDialog.dismiss();
                                     }
+                                });
 
-                                }else{
-                                    Log.d("空空空空空空空空", "run: xmppconnectiion为空");
-                                    //已注册登录未成功
-
-
-                                }
                             }else{
                                 RegisterActivity.this.runOnUiThread(new Runnable() {
                                     @Override
@@ -255,16 +208,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                     }
                                 });
                             }
-
-                        }else{
-                            RegisterActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(RegisterActivity.this,"链接服务器异常",Toast.LENGTH_SHORT).show();
-                                    progressDialog.dismiss();
-                                }
-                            });
-                        }
                     }
                 }).start();
 

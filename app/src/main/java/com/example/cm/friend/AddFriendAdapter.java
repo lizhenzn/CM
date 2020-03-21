@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.example.cm.R;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Presence;
@@ -24,12 +25,12 @@ public class AddFriendAdapter extends BaseAdapter  {
     }
     @Override
     public int getCount() {
-        return Connect.addFriendItemList.size();
+        return MessageManager.getAddFriendItemList().size();
     }
 
     @Override
     public Object getItem(int position) {
-        return Connect.addFriendItemList.get(position);
+        return MessageManager.getAddFriendItemList().get(position);
     }
 
     @Override
@@ -53,12 +54,12 @@ public class AddFriendAdapter extends BaseAdapter  {
         }else{
             viewHolder= (ViewHolder) convertView.getTag();
         }
-        viewHolder.headImage.setImageBitmap(Connect.addFriendItemList.get(position).getFriendInfo().getHeadBt());
-        viewHolder.userName.setText(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
-        viewHolder.reason.setText(Connect.addFriendItemList.get(position).getReason());
-        viewHolder.result.setText(Connect.addFriendItemList.get(position).getResult());
+        viewHolder.headImage.setImageBitmap(MessageManager.getAddFriendItemList().get(position).getFriendInfo().getHeadBt());
+        viewHolder.userName.setText(MessageManager.getAddFriendItemList().get(position).getFriendInfo().getUserName());
+        viewHolder.reason.setText(MessageManager.getAddFriendItemList().get(position).getReason());
+        viewHolder.result.setText(MessageManager.getAddFriendItemList().get(position).getResult());
         //有结果的时候隐藏按钮
-        if(Connect.addFriendItemList.get(position).getResult().length()>0){
+        if(MessageManager.getAddFriendItemList().get(position).getResult().length()>0){
             viewHolder.accept.setVisibility(View.GONE);
             viewHolder.reject.setVisibility(View.GONE);
             viewHolder.result.setVisibility(View.VISIBLE);
@@ -66,17 +67,17 @@ public class AddFriendAdapter extends BaseAdapter  {
         viewHolder.accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Connect.addFriendItemList.get(position).setResult("已同意");
-               AddFriendActivity.agreeAddFriend(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
-               Connect.addFriendItemListChanged=true;            //信息改变
+                MessageManager.getAddFriendItemList().get(position).setResult("已同意");
+               AddFriendActivity.agreeAddFriend(MessageManager.getAddFriendItemList().get(position).getFriendInfo().getUserName());
+               MessageManager.setAddFriendItemListChanged(true);        //信息改变
             }
         });
         viewHolder.reject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Connect.addFriendItemList.get(position).setResult("已拒绝");
-                AddFriendActivity.rejectAddFriend(Connect.addFriendItemList.get(position).getFriendInfo().getUserName());
-                Connect.addFriendItemListChanged=true;            //信息改变
+                MessageManager.getAddFriendItemList().get(position).setResult("已拒绝");
+                AddFriendActivity.rejectAddFriend(MessageManager.getAddFriendItemList().get(position).getFriendInfo().getUserName());
+                MessageManager.setAddFriendItemListChanged(true);           //信息改变
             }
         });
        // viewHolder.accept.setOnClickListener();

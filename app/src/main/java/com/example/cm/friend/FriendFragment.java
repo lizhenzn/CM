@@ -24,6 +24,7 @@ import com.example.cm.friend.chat.ChatListAdapter;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,9 +75,9 @@ public class FriendFragment extends Fragment  {
         chatListAdapter=new ChatListAdapter(getActivity());
         chatLV.setAdapter(chatListAdapter);
         Log.d("test", "onCreateView: ");
-        if(Connect.haveNewMessage) {
+        if(MessageManager.isHaveNewMessage()) {
             chatListAdapter.notifyDataSetChanged();
-            Connect.haveNewMessage=false;
+            MessageManager.setHaveNewMessage(false);
         }
 
 
@@ -87,7 +88,7 @@ public class FriendFragment extends Fragment  {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent intent=new Intent(getActivity(), ChatActivity.class);
-                        intent.putExtra("userName",Connect.friendInfoList.get(position).getUserName());
+                        intent.putExtra("userName",MessageManager.getFriendInfoList().get(position).getUserName());
                         startActivity(intent);
                         Toast.makeText(getContext(),"点击  "+position,Toast.LENGTH_SHORT).show();
                         Log.d("friend", "onItemClick: ");
@@ -136,9 +137,9 @@ public class FriendFragment extends Fragment  {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (Connect.haveNewMessage||ChatActivity.isSend) {
+                            if (MessageManager.isHaveNewMessage()||ChatActivity.isSend) {
                                 chatListAdapter.notifyDataSetChanged();
-                                Connect.haveNewMessage = false;
+                                MessageManager.setHaveNewMessage(false); ;
                                 ChatActivity.isSend=false;
                             }
                         }

@@ -143,8 +143,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                         //Connect connect = new Connect(LoginActivity.this);
 
                         String passwd = String.valueOf(pswET.getText());
-                        if (Connect.getXMPPTCPConnection()) {
-                            boolean isLogined = Connect.login(user, passwd,getApplicationContext());
+                        if (Connect.getXMPPTCPConnection()!=null) {
+                            boolean isLogined = Connect.login(user, passwd);
                             //登陆成功
                             if (isLogined) {
                                 Connect.isLogined=true;

@@ -8,6 +8,11 @@ import android.widget.Button;
 
 import com.example.cm.R;
 import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.roster.Roster;
 
 public class FriendSettingActivity extends AppCompatActivity {
 private Button delete_btn;
@@ -22,7 +27,28 @@ private int groupPosition,childPosition;
         delete_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Connect.deleteFriend(userName);        //TODO 删除好友
+                while (!Connect.getRoster().isLoaded()){
+                    try {
+                        Connect.getRoster().reload();
+                    } catch (SmackException.NotLoggedInException e) {
+                        e.printStackTrace();
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                userName=userName+"@"+Connect.SERVERNAME;
+                try {
+                    Connect.getRoster().removeEntry(Connect.getRoster().getEntry(userName));
+                    MessageManager.deleteFriend(userName);        //TODO 删除好友
+                } catch (SmackException.NotLoggedInException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NoResponseException e) {
+                    e.printStackTrace();
+                } catch (XMPPException.XMPPErrorException e) {
+                    e.printStackTrace();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
             }
         });
         save_nic_btn.setOnClickListener(new View.OnClickListener() {
