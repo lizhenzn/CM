@@ -63,8 +63,8 @@ public class WardrobeFragment extends Fragment  {
     private static ViewPager viewPager;
     private  static  WardrobeVPAdapter wardrobeVPAdapter;
     private boolean upClothes,downClothes;
-    private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4,
-            TYPE_UP=5,TYPE_DOWN=6;
+    private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4;
+    public static final int  TYPE_UP=5,TYPE_DOWN=6;
     private static File BASE_DIR=null;
     //1:滑动上衣 2：滑动裤子
     @Override
@@ -610,7 +610,7 @@ public class WardrobeFragment extends Fragment  {
     }
     public static File creatImageFile(File baseDir,int type){
         String savePath=null;
-        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         if(type==1)savePath="upClothes/";
         else if(type==2)savePath="downClothes/";
         else {
