@@ -20,6 +20,7 @@ import com.example.cm.MainActivity;
 import com.example.cm.R;
 import com.example.cm.SendShare;
 import com.example.cm.util.ClothesEstimater;
+import com.example.cm.util.Connect;
 import com.example.cm.wardrobe.WardrobeFragment;
 
 import static com.example.cm.MainActivity.getClothes_down;
@@ -112,6 +113,10 @@ public class MatchFragment extends Fragment {
         send_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!Connect.isLogined){
+                    Toast.makeText(context,"您未登录",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 Intent intent=new Intent(getActivity(), SendShare.class);
                 startActivity(intent);
             }

@@ -1,9 +1,9 @@
 package com.example.cm.friend;
 
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -25,9 +25,6 @@ import com.example.cm.util.MessageManager;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.smack.roster.RosterEntry;
-import org.jivesoftware.smackx.iqregister.AccountManager;
 
 public class AddFriendActivity extends AppCompatActivity implements View.OnClickListener{
 private Button add_btn,search_btn;
@@ -47,6 +44,7 @@ private boolean work;
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
         //初始化控件
         init();

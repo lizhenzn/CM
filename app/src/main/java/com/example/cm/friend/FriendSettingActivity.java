@@ -1,8 +1,9 @@
 package com.example.cm.friend;
 
+import android.app.ActionBar;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
@@ -12,7 +13,6 @@ import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.roster.Roster;
 
 public class FriendSettingActivity extends AppCompatActivity {
 private Button delete_btn;
@@ -22,6 +22,8 @@ private int groupPosition,childPosition;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar actionBar=getActionBar();
+        if(actionBar!=null)actionBar.setDisplayShowTitleEnabled(false);
         setContentView(R.layout.activity_friend_setting);
         init();
         delete_btn.setOnClickListener(new View.OnClickListener() {

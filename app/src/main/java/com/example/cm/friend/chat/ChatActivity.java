@@ -7,17 +7,16 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
@@ -31,9 +30,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.cm.MainActivity;
 import com.example.cm.R;
-import com.example.cm.friend.FriendFragment;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
@@ -46,9 +43,7 @@ import org.jivesoftware.smack.chat.ChatManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
     private ListView chatItemLV;
@@ -75,6 +70,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
         init();
         initData();
