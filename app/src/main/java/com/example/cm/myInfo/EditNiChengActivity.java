@@ -48,9 +48,10 @@ private EditText niCheng_ed;
             case R.id.saveNiCheng_btn:{
                 String niC=String.valueOf(niCheng_ed.getText());
                 if(niC.length()>0) {
-                    VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(), "NickName", niC);
+                    VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(), "NICKNAME", niC);
                     MessageManager.getSmackUserInfo().setNiC(niC);
                     Log.e("", "onOptionsItemSelected: 修改后昵称：" + niC);
+                    Toast.makeText(this,"修改成功",Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(EditNiChengActivity.this,"昵称不能为空",Toast.LENGTH_SHORT).show();
                 }

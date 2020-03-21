@@ -118,7 +118,7 @@ public class VCardManager {
             try {
                 VCard vCard = org.jivesoftware.smackx.vcardtemp.VCardManager.getInstanceFor(mXmpptcpConnection).loadVCard();
                 if(vCard!=null){
-                    if(key.equals("NickName")){
+                    if(key.equals("NICKNAME")){
                         vCard.setNickName(value);
                     }else{
                         vCard.setField(key,value);

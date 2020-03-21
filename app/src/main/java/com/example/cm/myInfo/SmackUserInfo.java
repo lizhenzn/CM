@@ -1,7 +1,13 @@
 package com.example.cm.myInfo;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import com.example.cm.MainActivity;
+import com.example.cm.R;
+
+import java.io.InputStream;
 import java.util.List;
 
 public class SmackUserInfo {
@@ -13,6 +19,17 @@ public class SmackUserInfo {
     String height;     //身高
     String email;
     String sortLetter;  //排序用的首字母
+    public SmackUserInfo(){
+        userName="点击登录";
+        niC="点击登录";
+        passwd="";
+        @SuppressLint("ResourceType") InputStream is1 = MainActivity.getInstance().getResources().openRawResource(R.drawable.unlogin);
+        headBt = BitmapFactory.decodeStream(is1);
+        sex="secrecy";
+        height="0";
+        email="";
+        sortLetter="#";
+    }
 
     public String getNiC() {
         return niC;

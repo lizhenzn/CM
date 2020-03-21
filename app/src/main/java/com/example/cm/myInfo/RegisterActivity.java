@@ -171,6 +171,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 map.put("email",email);
                 map.put("gender",sex);
                 map.put("birthday",birthday);
+                map.put("height","0");
+                map.put("NICKNAME",user);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {

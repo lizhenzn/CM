@@ -36,6 +36,8 @@ import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smack.XMPPException;
 
+import java.io.IOException;
+
 @SuppressLint("SdCardPath")
 public class MyInfoActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -50,6 +52,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     private String xingBie[]=new String[]{"男","女","保密"};
     public static String path="/sdcard/Clothes/MyInfo/head";
     public static final int OPEN_ALBUM=1;
+    private static String height="0";
     //SharedPreferences sharedPreferences;
     //SharedPreferences.Editor editor;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -68,8 +71,8 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        String nc= MessageManager.getSmackUserInfo().getUserName();
-        nicheng_tv.setHint(nc);
+        String nc= MessageManager.getSmackUserInfo().getNiC();
+        nicheng_tv.setText(nc);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -94,10 +97,17 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         //设置信息
         head_left_iv.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
 
-        String nc=MessageManager.getSmackUserInfo().getUserName();
-        nicheng_tv.setHint(nc);
-        xingBie_tv.setHint(MessageManager.getSmackUserInfo().getSex());
-        shenGao_tv.setHint(MessageManager.getSmackUserInfo().getHeight());
+        String nc=MessageManager.getSmackUserInfo().getNiC();
+        nicheng_tv.setText(nc);
+        String gender=MessageManager.getSmackUserInfo().getSex();
+        if(gender.equals("male")){
+            xingBie_tv.setText("男");
+        }else if(gender.equals("female")){
+            xingBie_tv.setText("女");
+        }else{
+            xingBie_tv.setText("保密");
+        }
+        shenGao_tv.setText(MessageManager.getSmackUserInfo().getHeight());
 
     }
 
@@ -132,7 +142,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.nichen_view:
                 if(Connect.isLogined) {
                     Intent intent = new Intent(MyInfoActivity.this, EditNiChengActivity.class);
-                    String nc = nicheng_tv.getHint().toString();
+                    String nc = nicheng_tv.getText().toString();
                     intent.putExtra("niCheng", nc);
                     startActivityForResult(intent, 2);
                 }else{
@@ -148,7 +158,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         builder.setSingleChoiceItems(xingBie, 0, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                xingBie_tv.setHint(xingBie[which]);
+                xingBie_tv.setText(xingBie[which]);
                 String gender=null;
                 if(xingBie[which].equals("男")){
                     gender="male";
@@ -158,7 +168,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                     gender="secrecy";
                 }
                 VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"gender",gender);
-                MessageManager.getSmackUserInfo().setSex(xingBie[which]);
+                MessageManager.getSmackUserInfo().setSex(gender);
                 Log.e("", "onClick: 修改性别后："+gender );
                 dialog.dismiss();
             }
@@ -179,14 +189,13 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                String data=String.valueOf(numberPicker.getValue());
-                VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"height",data);
-                Log.e("", "onValueChange: 修改身高后："+data );
-                MessageManager.getSmackUserInfo().setHeight(data);
-                shenGao_tv.setHint(data);
+                height=String.valueOf(numberPicker.getValue());
             }
         });
-
+        VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"height",height);
+        Log.e("", "onValueChange: 修改身高后："+height );
+        MessageManager.getSmackUserInfo().setHeight(height);
+        shenGao_tv.setText(height);
 
     }
 
@@ -235,7 +244,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
             case 2:
                 if(requestCode==RESULT_OK) {
                     //String nic=sharedPreferences.getString("user","");
-                    nicheng_tv.setHint(MessageManager.getSmackUserInfo().getNiC());
+                    nicheng_tv.setText(MessageManager.getSmackUserInfo().getNiC());
                 }
                 break;
         }
@@ -250,4 +259,6 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         }
         return true;
     }
+
+
 }
