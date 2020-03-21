@@ -213,7 +213,7 @@ public class ClothesEstimater {
         System.arraycopy(labelProbArray[0], 0, results, 0, labelProbArray[0].length);
         int index=get_max_result(results);
         Log.d("test", "estimateGood: "+results[0]+" "+results[1]);
-        if(results[index]>0.95)
+        if(results[index]>0.95&&index==1)
             return 1;
         else return 0;
     }
