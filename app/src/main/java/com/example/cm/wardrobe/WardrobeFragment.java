@@ -94,9 +94,17 @@ public class WardrobeFragment extends Fragment  {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MainActivity.setFragmentTabHostVisibility(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+
         view=View.inflate(context, R.layout.wardrobe,null);
         layout_up=view.findViewById(R.id.wardrobeUpLayout);
         if(!upClothes)layout_up.setVisibility(View.GONE);
@@ -384,6 +392,7 @@ public class WardrobeFragment extends Fragment  {
         }
         for(int i=0;i<photoList2.size()+10;i++){
             detailList2.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap3,mBitmap2,mBitmap1,mBitmap)));
+
         }
 
     }
@@ -445,7 +454,7 @@ public class WardrobeFragment extends Fragment  {
                 public void onClick(View v) {
                     int position= finalViewHolder.getAdapterPosition();
 
-                    //if(MainActivity.isChoose_flag()){
+                    if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
                             Log.d("RecycleList:", "onClick: "+upFileName.get(position));
@@ -453,7 +462,7 @@ public class WardrobeFragment extends Fragment  {
                             MainActivity.setClothes_down(position);
                             Log.d("RecycleList:", "onClick: "+downFileName.get(position));
                         }
-                   // }
+                    }
 
                 }
             });
@@ -494,7 +503,7 @@ public class WardrobeFragment extends Fragment  {
                                         }
                                     }).show();
                     return false;
-                }
+                     }
             });
             return viewHolder;
         }
