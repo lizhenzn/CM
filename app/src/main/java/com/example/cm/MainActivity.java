@@ -38,6 +38,7 @@ import com.example.cm.service.PacketListenerService;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.DataBase;
+import com.example.cm.util.ServerFunction;
 
 import org.jivesoftware.smack.XMPPException;
 
@@ -69,7 +70,6 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     private static int clothes_up=-1;
     private static int clothes_down=-1;
     private static boolean choose_flag=false;
-
     private static FragmentTabHost fragmentTabHost;
     public static int getClothes_up(){
         return clothes_up;

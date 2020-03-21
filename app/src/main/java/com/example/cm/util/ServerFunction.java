@@ -24,6 +24,11 @@ public class ServerFunction {
         currentPostList=null;
         currentPostPosition=0;
     }
+    public ServerFunction(){
+        shareManager=new ShareManager();
+        currentPostList=null;
+        currentPostPosition=0;
+    }
     public static ShareManager getShareManager(){
         return shareManager;
     }
