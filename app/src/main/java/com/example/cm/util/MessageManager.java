@@ -19,10 +19,15 @@ import com.example.cm.myInfo.VCardManager;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.RosterEntry;
+import org.jivesoftware.smack.roster.RosterListener;
+import org.jivesoftware.smack.roster.packet.RosterPacket;
 import org.jivesoftware.smackx.offline.OfflineMessageManager;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -196,6 +201,98 @@ public class MessageManager {
             e.printStackTrace();
         }
         return true;
+    }
+    //从服务器获取好友信息
+    public static void initFriend(){
+
+        Log.d("登录用户",Connect.getXMPPTCPConnection().getUser().toString());
+
+          /*roster=Roster.getInstanceFor(xmpptcpConnection);
+          roster.setSubscriptionMode(Roster.SubscriptionMode.manual);//设置手动处理*/
+        while(!Connect.getRoster().isLoaded()){
+            try {
+                Connect.getRoster().reload();
+                Log.d("重连Roster",Connect.getXMPPTCPConnection().getUser().toString());
+
+            } catch (SmackException.NotLoggedInException e) {
+                e.printStackTrace();
+                Log.d("重连异常抛出",Connect.getXMPPTCPConnection().getUser().toString());
+
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+                Log.d("重连异常抛出",Connect.getXMPPTCPConnection().getUser().toString());
+            }
+        }
+        Log.d("重连成功",Connect.getXMPPTCPConnection().getUser().toString());
+
+        Log.e("总好友数", String.valueOf(Connect.getRoster().getEntryCount()));
+        Collection<RosterEntry> rosterEntries=Connect.getRoster().getEntries();
+        for(RosterEntry entry:rosterEntries){
+            Log.d("", "initFriend: roster类型："+entry.getType() );
+            if(entry.getType().equals(RosterPacket.ItemType.both)) {//双方互相订阅
+                Log.e("", "initFriend: 双方互相订阅" );
+                FriendInfo friendInfo = new FriendInfo();
+                String user = entry.getUser().split("@")[0];
+                friendInfo.setUserName(user);
+                friendInfo.setNicName(user);
+                String pinyin = Cn2Spell.getPinYin(user); // 根据姓名获取拼音
+                String firstLetter = pinyin.substring(0, 1).toUpperCase(); // 获取拼音首字母并转成大写
+                if (!firstLetter.matches("[A-Z]")) { // 如果不在A-Z中则默认为“#”
+                    firstLetter = "#";
+                }
+                friendInfo.setPinyin(pinyin);
+                friendInfo.setFirstLetter(firstLetter);
+                String sex = VCardManager.getUserVcard(user).getField("gender");
+                if (sex == null) {
+                    sex = "保密";
+                }else if(sex.equals("male")){
+                    sex="男";
+                }else if(sex.equals("female")){
+                    sex="女";
+                }else{
+                    sex="保密";
+                }
+                friendInfo.setSex(sex);
+                String email = VCardManager.getUserVcard(user).getField("email");
+                if (email == null) {
+                    email = "";
+                }
+                friendInfo.setEmail(email);
+                Log.e("", "initFriend: sex :" + sex + "   email:" + email);
+                Bitmap bitmap = VCardManager.getUserImage(user);
+                friendInfo.setHeadBt(bitmap);  //设置头像
+                String friendHeadBitmapRoad = AlbumUtil.saveHeadBitmap(user, bitmap);  //保存好友头像
+                friendInfo.setHeadBtRoad(friendHeadBitmapRoad);
+                Log.d("好友头像保存路径", "initFriend: " + friendHeadBitmapRoad);
+                //添加返回一个values对象，须要db添加提交
+                MessageManager.getDataBaseHelp().addFriendInfo(friendInfo);
+                MessageManager.getContantFriendInfoList().add(friendInfo);
+                Log.d("", "initFriend:添加进通讯录   " + MessageManager.getContantFriendInfoList().size());
+            }
+        }
+        Connect.getRoster().addRosterListener(new RosterListener() {                                                //TODO 花名册监听
+            @Override
+            public void entriesAdded(Collection<String> collection) {
+                Log.d("添加监听", "entriesAdded: "+collection.toString());
+            }
+
+            @Override
+            public void entriesUpdated(Collection<String> collection) {
+                Log.d("添加监听", "entriesUpdated: "+collection.toString());
+            }
+
+            @Override
+            public void entriesDeleted(Collection<String> collection) {
+                Log.d("添加监听", "entriesDeleted: "+collection.toString());
+            }
+
+            @Override
+            public void presenceChanged(Presence presence) {
+                Log.d("添加监听", "presenceChanged 状态改变: "+presence.toString());
+            }
+        });
+
+
     }
     //获取离线消息
     //猜想 Message 继承Packet 在Message处理之前先转换成Staza看是不是添加好友删除好友的包

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.cm.R;
+import com.example.cm.myInfo.VCardManager;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
@@ -82,7 +83,7 @@ public class Comments extends AppCompatActivity {
             public void run() {
                 remarks=ServerFunction.getRemark(postInfo);
                 for(int i=1;i<=remarks.size();i++){
-                    CommentList.add(new CommentItem(Connect.getUserImage(remarks.get(i-1).getUsername()),i+"F",remarks.get(i-1).getUsername(),remarks.get(i-1).getContent()));
+                    CommentList.add(new CommentItem(VCardManager.getUserImage(remarks.get(i-1).getUsername()),i+"F",remarks.get(i-1).getUsername(),remarks.get(i-1).getContent()));
                 }
                 commentAdapter=new CommentAdapter(CommentList);
                 runOnUiThread(new Runnable() {

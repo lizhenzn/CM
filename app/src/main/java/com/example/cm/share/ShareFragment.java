@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.cm.R;
+import com.example.cm.myInfo.VCardManager;
 import com.example.cm.util.ClothesEstimater;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
@@ -85,9 +86,9 @@ public class ShareFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                        init();
-                        shareAdapter.notifyDataSetChanged();
-                        swipeRefreshLayout.setRefreshing(false);
+                init();
+                shareAdapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
         return  view;
@@ -108,9 +109,9 @@ public class ShareFragment extends Fragment {
             public void onLoadMore() {
                 shareAdapter.setLoadState(shareAdapter.LOADING);
                 Log.d(TAG, "onLoadMore: loadState="+shareAdapter.getLoadState());
-               if (countLeft>0) {
-                   getData(false);
-                   shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
+                if (countLeft>0) {
+                    getData(false);
+                    shareAdapter.setLoadState(shareAdapter.LOADING_COMPLETE);
                 } else {
                     // 显示加载到底的提示
                     shareAdapter.setLoadState(shareAdapter.LOADING_END);
@@ -119,8 +120,6 @@ public class ShareFragment extends Fragment {
         });
     }
     private void getData(boolean refresh)  {
-        for (int i = 0; i <= 9; i++) {
-            shareItemList.add(new ShareItem(R.drawable.friend1, MessageManager.getSmackUserInfo().getUserName(),R.drawable.friend1,
         if(refresh){
             countLeft=-1;
             new Thread(new Runnable() {
@@ -162,13 +161,12 @@ public class ShareFragment extends Fragment {
                         Log.d(TAG, "run: "+i);
                         while(!serverFunction.getShareManager().transfer_flags[i]){}
                         Log.d(TAG, "run: quite while");
-                        shareItemList.set(shareItemList.size()-10+i,new ShareItem(serverFunction.getPost(),R.drawable.friend1,MessageManager.getSmackUserInfo().getUserName(),serverFunction.getSmallUpImg(),
                         PostInfo post=serverFunction.getPost();
                         String userName=null;
                         userName=serverFunction.getUserName();
                         while(userName==null){}
                         Log.d(TAG, "run: username="+userName);
-                        shareItemList.set(shareItemList.size()-count+i,new ShareItem(post,Connect.getUserImage(userName),userName,serverFunction.getSmallUpImg(),
+                        shareItemList.set(shareItemList.size()-count+i,new ShareItem(post, VCardManager.getUserImage(userName),userName,serverFunction.getSmallUpImg(),
                                 serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
                         getActivity().runOnUiThread(new Runnable() {
                             @Override

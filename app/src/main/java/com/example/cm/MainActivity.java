@@ -358,18 +358,20 @@ public class MainActivity extends AppCompatActivity{
     protected void onDestroy() {
         super.onDestroy();
         //退出登录
-        if(Connect.getXMPPTCPConnection()!=null){
+        if(Connect.getXMPPTCPConnection()!=null) {
             Connect.signOut();
-            Connect.isLogined=false;
+            Connect.isLogined = false;
             Connect.setRoster(null);
             Connect.setXmpptcpConnection(null);
 
-    public static void setFragmentTabHostVisibility(boolean visibility){
-        if(visibility){
+
+
+        }}
+    public static void setFragmentTabHostVisibility( boolean visibility){
+        if (visibility) {
             fragmentTabHost.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             fragmentTabHost.setVisibility(View.GONE);
         }
     }
-
 }
