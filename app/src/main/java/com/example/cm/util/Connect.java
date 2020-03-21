@@ -124,7 +124,8 @@ public class Connect {
     public static void setRoster(Roster mRoster){
         roster=mRoster;
     }
-    public static boolean login(String userName,String passwd){
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static boolean login(String userName, String passwd){
         try {
             while(xmpptcpConnection==null){
                 getXMPPTCPConnection();
@@ -139,19 +140,15 @@ public class Connect {
             }
 
             if(getXMPPTCPConnection().isConnected()) {
-                boolean sameUser=false;
-                boolean beforeLogined=false;
-                String beforeUser=MessageManager.getSharedPreferences().getString("userName","");                 //得到之前登陆的人名，与此次登陆的比较
                 Presence presence1 = new Presence(Presence.Type.unavailable);
                 presence1.setStatus("OFFLINE");
                 Presence presence2 = new Presence(Presence.Type.available);
                 presence2.setStatus("ONLINE");
                  getXMPPTCPConnection().login(userName, passwd);    //login TODO
+
                 Log.d("", "login: 设置离线状态");
                 getXMPPTCPConnection().sendStanza(presence1);           //设置离线状态获取离线消息
-                MainActivity.bindPacket();//绑定
-                MessageManager.getOfflineMessage();
-                getXMPPTCPConnection().sendStanza(presence2);//设置在线状态
+
                 getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);//设置手动处理好友请求
 
                 //1 同一人，则不获取好友信息 2 不同，先关闭数据库，然后创建数据库，再获取好友信息,还要删除好友列表和会话列表信息 3 之前没登陆过，创建数据库，获取好友信息
@@ -160,17 +157,32 @@ public class Connect {
                 MessageManager.clearAllList();//清理所有的list
                 MessageManager.initFriend();    //获取好友列表
                 MessageManager.setMessageMap(MessageManager.getDataBaseHelp().getMessageHashMap());//数据库获得聊天信息
-
+                MainActivity.bindPacket();//绑定
+                MessageManager.getOfflineMessage();
+                VCard selfVCard=VCardManager.getUserVcard(userName);
+                Log.e("自己VCard", "login: "+selfVCard );
                 MessageManager.getSmackUserInfo().setUserName(userName);
+                String nicName="";
+                nicName=selfVCard.getNickName();
+                if(nicName.equals("")){
+                    MessageManager.getSmackUserInfo().setNiC(userName);
+                }else {
+                    MessageManager.getSmackUserInfo().setNiC(nicName);
+                }
+                MessageManager.getSmackUserInfo().setEmail(selfVCard.getField("email"));
+                MessageManager.getSmackUserInfo().setSex(selfVCard.getField("gender"));
                 Bitmap bitmap= VCardManager.getUserImage(userName);
                 MessageManager.getSmackUserInfo().setHeadBt(bitmap);
                 String headBitmapRoad=AlbumUtil.saveHeadBitmap(userName,bitmap);
                 Log.d("保存头像路径", "run: "+headBitmapRoad);
                 MessageManager.getEditor().putString("userName",userName);
                 MessageManager.getEditor().putString("passward",passwd);
-                MessageManager.getEditor().putString("userHeadBtRoad",headBitmapRoad);
+                MessageManager.getEditor().putString("NickName",selfVCard.getField("NickName"));
+                MessageManager.getEditor().putString("gender",selfVCard.getField("gender"));
+                MessageManager.getEditor().putString("email",selfVCard.getField("email"));
                 MessageManager.getEditor().putString("userHeadBtRoad",headBitmapRoad);
                 MessageManager.getEditor().commit();
+                getXMPPTCPConnection().sendStanza(presence2);//设置在线状态
                 Log.d("登陆后写入的登录名", "run: "+MessageManager.getSharedPreferences().getString("userName",""));
             }
             else{
@@ -219,6 +231,7 @@ public class Connect {
                            VCardManager.setSelfInfo(xmpptcpConnection,mapKey,mapValue);//设置注册信息
                            System.out.println(mapKey+":"+mapValue);
                        }
+                       VCardManager.setSelfInfo(xmpptcpConnection,"NickName",user);
                        xmpptcpConnection.disconnect();//关闭连接
 
                    } catch (SmackException.NoResponseException e) {

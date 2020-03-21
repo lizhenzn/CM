@@ -42,6 +42,10 @@ import android.widget.Toast;
 
 import com.example.cm.R;
 import com.example.cm.util.AlbumUtil;
+import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
+
+import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,8 +66,8 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     private String xingBie[]=new String[]{"男","女","保密"};
     public static String path="/sdcard/Clothes/MyInfo/head";
     public static final int OPEN_ALBUM=1;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    //SharedPreferences sharedPreferences;
+    //SharedPreferences.Editor editor;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +84,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        String nc=sharedPreferences.getString("user","");
+        String nc= MessageManager.getSmackUserInfo().getUserName();
         nicheng_tv.setHint(nc);
     }
 
@@ -89,8 +93,6 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         //初始化控件
         Toolbar toolbar=(Toolbar)findViewById(R.id.myInfo_toolbar);
         setSupportActionBar(toolbar);
-        sharedPreferences=getSharedPreferences("myInfo",MODE_PRIVATE);
-        editor=sharedPreferences.edit();
         head_view=(View)findViewById(R.id.head_view);
         head_left_iv=(ImageView)findViewById(R.id.head_left_iv);
         head_right_iv=(ImageView)findViewById(R.id.head_right_iv);
@@ -105,23 +107,13 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         shenGao_view.setOnClickListener(this);
         niCheng_view.setOnClickListener(this);
         nicheng_tv.setOnClickListener(this);
-        Bitmap bitmap= BitmapFactory.decodeFile(path+"head.jpg");
-        if(bitmap!=null){
-            @SuppressWarnings("deprecation")
-            Drawable drawable=new BitmapDrawable(bitmap);
-            head_left_iv.setImageDrawable(drawable);
-        }
-        else{
-            //如果SD卡没有，从服务器获取，然后保存到SD
-            Log.d("MyInfo","No head image");
+        //设置信息
+        head_left_iv.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
 
-        }
-        //从文件读昵称
-        String nc=sharedPreferences.getString("user","");
+        String nc=MessageManager.getSmackUserInfo().getUserName();
         nicheng_tv.setHint(nc);
-        shenGao_tv.setHint(sharedPreferences.getString("shenGao",""));
-        xingBie_tv.setHint(sharedPreferences.getString("xingBie",""));
-
+        xingBie_tv.setHint(MessageManager.getSmackUserInfo().getSex());
+        shenGao_tv.setHint(MessageManager.getSmackUserInfo().getHeight());
 
     }
 
@@ -130,22 +122,39 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.head_view:
-               if(!AlbumUtil.checkStorage(MyInfoActivity.this))
-                     AlbumUtil.requestStorage(MyInfoActivity.this);
-                else
-                    openAlbum();
+                if(Connect.isLogined) {
+                    if (!AlbumUtil.checkStorage(MyInfoActivity.this))
+                        AlbumUtil.requestStorage(MyInfoActivity.this);
+                    else
+                        openAlbum();
+                }else{
+                    Toast.makeText(this,"请先登录",Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.xingbie_view:
-                showXingBieChoose();
+                if(Connect.isLogined) {
+                    showXingBieChoose();
+                }else{
+                    Toast.makeText(this,"请先登录",Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.shengao_view:
-                shenGaoChoose();
+                if(Connect.isLogined) {
+                    shenGaoChoose();
+                }else{
+                    Toast.makeText(this,"请先登录",Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.nichen_view:
-                Intent intent=new Intent(MyInfoActivity.this,EditNiChengActivity.class);
-                String nc=nicheng_tv.getHint().toString();
-                intent.putExtra("niCheng",nc);
-                startActivityForResult(intent,2);
+                if(Connect.isLogined) {
+                    Intent intent = new Intent(MyInfoActivity.this, EditNiChengActivity.class);
+                    String nc = nicheng_tv.getHint().toString();
+                    intent.putExtra("niCheng", nc);
+                    startActivityForResult(intent, 2);
+                }else{
+                    Toast.makeText(this,"请先登录",Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
@@ -156,8 +165,17 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 xingBie_tv.setHint(xingBie[which]);
-                editor.putString("xingBie",xingBie[which].toString());
-                editor.apply();
+                String gender=null;
+                if(xingBie[which].equals("男")){
+                    gender="male";
+                }else if(xingBie[which].equals("女")){
+                    gender="female";
+                }else{
+                    gender="secrecy";
+                }
+                VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"gender",gender);
+                MessageManager.getSmackUserInfo().setSex(xingBie[which]);
+                Log.e("", "onClick: 修改性别后："+gender );
                 dialog.dismiss();
             }
         });
@@ -165,7 +183,6 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void shenGaoChoose(){
-        Log.d("4234","shjdah");
         View contentView= View.inflate(MyInfoActivity.this,R.layout.numberpicker,null);
         View rootView=View.inflate(MyInfoActivity.this,R.layout.my_info,null);
         final NumberPicker numberPicker=(NumberPicker)contentView.findViewById(R.id.number_picker);
@@ -179,9 +196,9 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 String data=String.valueOf(numberPicker.getValue());
-
-                editor.putString("shenGao",data);
-                editor.apply();
+                VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"height",data);
+                Log.e("", "onValueChange: 修改身高后："+data );
+                MessageManager.getSmackUserInfo().setHeight(data);
                 shenGao_tv.setHint(data);
             }
         });
@@ -218,6 +235,13 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                     if(imagePath!=null){
                         Bitmap bitmap= BitmapFactory.decodeFile(imagePath);
                         head_left_iv.setImageBitmap(bitmap);   //设置头像
+                        try {
+                            VCardManager.changeImage(Connect.getXMPPTCPConnection(),imagePath);
+                        } catch (XMPPException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         //AlbumUtil.saveBitmap(bitmap);
                     }else
                         Toast.makeText(MyInfoActivity.this,"Failed to get image",Toast.LENGTH_SHORT).show();
@@ -226,78 +250,13 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                 break;
             case 2:
                 if(requestCode==RESULT_OK) {
-                    String nic=sharedPreferences.getString("user","");
-                    nicheng_tv.setHint(nic);
+                    //String nic=sharedPreferences.getString("user","");
+                    nicheng_tv.setHint(MessageManager.getSmackUserInfo().getNiC());
                 }
                 break;
         }
     }
-   /* @TargetApi(19)
-    private void handleImageOnKitKat(Intent data){
-        String imagePath=null;
-        Uri uri=data.getData();
-        if(DocumentsContract.isDocumentUri(this,uri)){
-            //如果是Document类型文件，则通过Document id处理
-            String docId=DocumentsContract.getDocumentId(uri);
-            if("com.android.providers.media.documents".equals(uri.getAuthority())){
-                String id=docId.split(":")[1];//解析出数字格式的id
-                String selection= MediaStore.Images.Media._ID+"="+id;
-                imagePath=getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
-            }else if("com.android.providers.downloads.documents".equals(uri.getAuthority())){
-                Uri contentUri= ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(docId));
-                imagePath=getImagePath(contentUri,null);
-            }
-        }else if("content".equalsIgnoreCase(uri.getScheme())){
-            imagePath=getImagePath(uri,null);
-        }else if("file".equalsIgnoreCase(uri.getScheme())) {
-            imagePath = uri.getPath();
-        }
-        displayImage(imagePath);
-    }
-    private String getImagePath(Uri uri,String selection){
-        String path=null;
-        //通过Uri和selection获取图片真实路径
-        Cursor cursor=getContentResolver().query(uri,null,selection,null,null);
-        if(cursor!=null){
-            if(cursor.moveToFirst()){
-                path=cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-            }
-            cursor.close();
-        }
-        return  path;
-    }
-    private void displayImage(String imagePath){
-        if(imagePath!=null){
-            Bitmap bitmap= BitmapFactory.decodeFile(imagePath);
-            head_left_iv.setImageBitmap(bitmap);
-            setPicToView(bitmap);
-        }else
-            Toast.makeText(this,"Failed to get image",Toast.LENGTH_SHORT).show();
-    }
 
-    private void setPicToView(Bitmap bitmap){
-        String sdStatus= Environment.getExternalStorageState();
-        if(!sdStatus.equals(Environment.MEDIA_MOUNTED))//检测SD是否可用
-            return;
-        FileOutputStream b=null;
-        File file=new File(path);
-        file.mkdirs();//创建文件夹
-        String fileName=path+"head.jpg";
-        try{
-            b=new FileOutputStream(fileName);
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,b);//把数据写入文件
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }finally {
-            try{
-                b.flush();
-                b.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

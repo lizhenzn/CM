@@ -31,6 +31,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.myInfo.SmackUserInfo;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Toolbar toolbar;
-    private TextView nichengTV,zhangHaoTV;
+    private TextView nichengTV;
     private static TextView titleTV;
     private ImageView navi_head,head_home;
     private static String path="/sdcard/Clothes/MyInfo/head";
@@ -105,20 +106,12 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()){
-                    case R.id.settin:{
+                    /*case R.id.settin:{
                         navi_head.setImageResource(R.drawable.unlogin);
-                    }break;
+                    }break;*/
                     case R.id.navi_sign_out:{
-                        Connect.signOut();   //退出登录
-                    }break;
-                    case R.id.navi_set_head:{   //设置头像
-                        if(AlbumUtil.checkStorage(MainActivity.this)){
-                            Intent intent=new Intent("android.intent.action.GET_CONTENT");
-                            intent.setType("image/*");
-                            startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
-                        }else{
-                            Toast.makeText(MainActivity.this,"You denied the permission",Toast.LENGTH_SHORT).show();
-                        }
+                        Connect.signOut();   //注销登录
+                        nichengTV.setText("点击登录");
                     }break;
                     default:
                         break;
@@ -133,14 +126,26 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 //如果图片是默认的未登录图片，说明还没有登陆,点击进入登陆活动
-                if(navi_head.getDrawable().getCurrent().getConstantState().equals(getResources().getDrawable(R.drawable.unlogin).getConstantState())){
+                /*if(navi_head.getDrawable().getCurrent().getConstantState().equals(getResources().getDrawable(R.drawable.unlogin).getConstantState())){
                     intent=new Intent(MainActivity.this, LoginActivity.class);
                     startActivityForResult(intent,LOGIN);
                 }else{
                 intent=new Intent(MainActivity.this,MyInfoActivity.class);
                 startActivity(intent);
-                }
+                }*/
+                intent=new Intent(MainActivity.this,MyInfoActivity.class);
+                startActivity(intent);
 
+
+            }
+        });
+        nichengTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(nichengTV.getText().equals("点击登录")){
+                    Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                    startActivityForResult(intent,LOGIN);
+                }
             }
         });
         //点击左上角头像，打开侧滑栏
@@ -202,12 +207,21 @@ public class MainActivity extends AppCompatActivity{
         navi_head=(ImageView)headerView.findViewById(R.id.navi_head);
         head_home=(ImageView)findViewById(R.id.head_home);
         nichengTV=(TextView)headerView.findViewById(R.id.nicheng);
-        zhangHaoTV=(TextView)headerView.findViewById(R.id.zhanghao);
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
         //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
         if(MessageManager.getSharedPreferences().contains("userName")){  //有此userName键值，说明登陆过
             MessageManager.getSmackUserInfo().setUserName(MessageManager.getSharedPreferences().getString("userName",""));
+            String nicName=MessageManager.getSharedPreferences().getString("NickName","");
+            if(nicName.equals("")){
+                MessageManager.getSmackUserInfo().setNiC(MessageManager.getSmackUserInfo().getUserName());
+
+            }else{
+                MessageManager.getSmackUserInfo().setNiC(nicName);
+
+            }
+            MessageManager.getSmackUserInfo().setSex(MessageManager.getSharedPreferences().getString("gender","保密"));
+            MessageManager.getSmackUserInfo().setEmail(MessageManager.getSharedPreferences().getString("email",""));
             String cachePasswd=MessageManager.getSharedPreferences().getString("passward","");//缓存的密码
             String headBtRoad=MessageManager.getSharedPreferences().getString("userHeadBtRoad","");
             MessageManager.getSmackUserInfo().setHeadBt(BitmapFactory.decodeFile(headBtRoad));
@@ -220,6 +234,7 @@ public class MainActivity extends AppCompatActivity{
             //TODO        初始化聊天信息和好友信息
             MessageManager.setContantFriendInfoList(MessageManager.getDataBaseHelp().getContantFriendInfoList());
             new Thread(new Runnable() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void run() {
                     Connect.login(MessageManager.getSmackUserInfo().getUserName(), cachePasswd);
@@ -232,8 +247,11 @@ public class MainActivity extends AppCompatActivity{
 
         }else{//此前没有登陆过
             MessageManager.getSmackUserInfo().setUserName("点击登录");
+            MessageManager.getSmackUserInfo().setNiC("点击登录");
             Bitmap bitmap=BitmapFactory.decodeResource(this.getResources(),R.drawable.unlogin);
             MessageManager.getSmackUserInfo().setHeadBt(bitmap);           //设置为未登陆的照片
+            MessageManager.getSmackUserInfo().setEmail("");
+            MessageManager.getSmackUserInfo().setSex("保密");
         }
         setInfo();        //调用设置头像、昵称函数
 
@@ -242,7 +260,7 @@ public class MainActivity extends AppCompatActivity{
     public void setInfo(){
         navi_head.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
         head_home.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
-        nichengTV.setText(MessageManager.getSmackUserInfo().getUserName());
+        nichengTV.setText(MessageManager.getSmackUserInfo().getNiC());
     }
     //初始化FragmentTabHost
     public void initTabhost(){
@@ -304,7 +322,8 @@ public class MainActivity extends AppCompatActivity{
         switch(requestCode){
             case LOGIN:{
                 if(resultCode==RESULT_OK){
-                    zhangHaoTV.setText("账号： "+data.getStringExtra("zhanghao"));
+                    //nichengTV.setText(MessageManager.getSmackUserInfo().getNiC());
+                    setInfo();
                 }
 
             }break;

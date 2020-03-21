@@ -6,12 +6,22 @@ import java.util.List;
 
 public class SmackUserInfo {
     String userName;
+    String niC;//昵称
     String passwd;
     Bitmap headBt;      //头像
     String sex;         //性别
     String height;     //身高
     String email;
     String sortLetter;  //排序用的首字母
+
+    public String getNiC() {
+        return niC;
+    }
+
+    public void setNiC(String niC) {
+        this.niC = niC;
+    }
+
     public static List<FriendInfo> friendInfoList;
 
     public String getUserName() {

@@ -296,6 +296,7 @@ public class MessageManager {
     }
     //获取离线消息
     //猜想 Message 继承Packet 在Message处理之前先转换成Staza看是不是添加好友删除好友的包
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public static List<com.example.cm.friend.chat.Message> getOfflineMessage(){
         List<com.example.cm.friend.chat.Message> messageList=new ArrayList<>();
         OfflineMessageManager offlineMessageManager=new OfflineMessageManager(Connect.getXMPPTCPConnection());
@@ -316,6 +317,7 @@ public class MessageManager {
             }
             for(int i=0;i<messages.size();i++){
                 org.jivesoftware.smack.packet.Message message=messages.get(i);
+                mergeMessage(message);
                 //TODO 处理每一条离线信息
             }
             offlineMessageManager.deleteMessages();//删除离线消息
@@ -332,7 +334,7 @@ public class MessageManager {
     }
     //将离线消息合并到聊天信息中
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static void mergeOfflineMessage(org.jivesoftware.smack.packet.Message message){
+    public static void mergeMessage(org.jivesoftware.smack.packet.Message message){
         if (!TextUtils.isEmpty(message.getBody())) {
             try {
                 //JSONObject object = new JSONObject(message.getBody());

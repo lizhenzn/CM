@@ -34,17 +34,13 @@ public class FriendInfoActivity extends AppCompatActivity {
 
         init();
         VCard vCard= VCardManager.getUserVcard(userName);
-        Log.d("联系人信息", "onCreate: "+vCard);
+        Log.e("联系人信息", "onCreate: "+vCard);
         Log.d("邮件", "onCreate: email"+vCard.getField("email"));
-        Log.d("性别", "onCreate: sex:"+vCard.getField("sex"));
-        Log.d("性别gender", "onCreate: sex:"+vCard.getField("gender"));
-
-        Log.d("性别", "onCreate: sex:"+vCard.getEmailHome());
-        Log.d("性别", "onCreate: sex:"+vCard.getEmailWork());
-        Log.d("性别", "onCreate: sex:"+vCard.getJabberId());
+        Log.d("性别", "onCreate: sex:"+vCard.getField("gender"));
+        Log.d("emailHome", "onCreate: sex:"+vCard.getEmailHome());
+        Log.d("emailWork", "onCreate: sex:"+vCard.getEmailWork());
+        Log.d("JabberId", "onCreate: sex:"+vCard.getJabberId());
         Log.d("昵称", "onCreate: Nic:"+vCard.getNickName());
-
-        //Connect.setInfo();
 
 
         setting_btn.setOnClickListener(new View.OnClickListener() {

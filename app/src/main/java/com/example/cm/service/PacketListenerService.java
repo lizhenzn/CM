@@ -186,7 +186,7 @@ public class PacketListenerService extends Service {
             @Override
             public void processMessage(Chat chat, Message message) {
                 //当消息返回为空的时候，表示用户正在聊天窗口编辑信息并未发出消息
-                MessageManager.mergeOfflineMessage(message);
+                MessageManager.mergeMessage(message);
             }
         };
         ChatManagerListener chatManagerListener = new ChatManagerListener() {

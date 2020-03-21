@@ -11,14 +11,13 @@
     <TextView
         android:id="@+id/nicheng"
         android:layout_below="@id/navi_head"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="昵称："/>
-    <TextView
-        android:id="@+id/zhanghao"
-        android:layout_below="@id/nicheng"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="账号："/>
+        android:layout_marginTop="24dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/colornew"
+        android:textSize="40px"
+        android:hint=""/>
+
 
 </RelativeLayout>
