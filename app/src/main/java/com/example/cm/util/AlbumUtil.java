@@ -116,7 +116,7 @@ public class AlbumUtil {
             filename=dateStr+".jpg";
             fileRoad=MESSAGEBITMAP;   //文件名加入时间戳，以确定文件不重复
         }else{
-            fileRoad=FRIENDHEADFILEROAD+"/"+Connect.smackUserInfo.getUserName();
+            fileRoad=FRIENDHEADFILEROAD+"/"+MessageManager.getSmackUserInfo().getUserName();
             filename=user+"head.jpg";
         }
         String sdStatus= Environment.getExternalStorageState();

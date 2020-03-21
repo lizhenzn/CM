@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.cm.R;
 import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
 import java.util.List;
@@ -147,7 +148,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if(ServerFunction.getShareManager().like(ShareItemList.get(position).getPostInfo(), Connect.smackUserInfo.getUserName())){
+                            if(ServerFunction.getShareManager().like(ShareItemList.get(position).getPostInfo(), MessageManager.getSmackUserInfo().getUserName())){
                                 ((Activity)context).runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {

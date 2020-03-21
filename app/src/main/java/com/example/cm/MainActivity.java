@@ -38,12 +38,17 @@ import android.widget.Toast;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.myInfo.SmackUserInfo;
+import com.example.cm.myInfo.VCardManager;
 import com.example.cm.service.PacketListenerService;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.DataBase;
+import com.example.cm.util.MessageManager;
 
+import org.jivesoftware.smack.PresenceListener;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
 
 import java.io.IOException;
 
@@ -54,18 +59,16 @@ import q.rorbin.badgeview.QBadgeView;
 //import main.TransferManager;
 public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawerLayout;
-private NavigationView navigationView;
-private Toolbar toolbar;
-private TextView nichengTV,zhangHaoTV;
-private static TextView titleTV;
-private ImageView navi_head,head_home;
-private static String path="/sdcard/Clothes/MyInfo/head";
-private SharedPreferences sharedPreferences;
-private SharedPreferences.Editor editor;
-private final int LOGIN=1;
-private QBadgeView naviQBadgeView;
-private static ServiceConnection serviceConnection;   //用于连接服务通信
-private static PacketListenerService.MyBinder binder;   //服务中Binder
+    private NavigationView navigationView;
+    private Toolbar toolbar;
+    private TextView nichengTV,zhangHaoTV;
+    private static TextView titleTV;
+    private ImageView navi_head,head_home;
+    private static String path="/sdcard/Clothes/MyInfo/head";
+    private final int LOGIN=1;
+    private QBadgeView naviQBadgeView;
+    private static ServiceConnection serviceConnection;   //用于连接服务通信
+    private static PacketListenerService.MyBinder binder;   //服务中Binder
     private static Context mainActivityContext;   //主活动的Context
     public static Boolean isBinded;
     private static final String TAG = "MainActivity";
@@ -89,7 +92,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //getSupportActionBar().hide();
+
         init();
         initTabhost();
         setToolbarText("搭配");
@@ -135,8 +138,8 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
                     intent=new Intent(MainActivity.this, LoginActivity.class);
                     startActivityForResult(intent,LOGIN);
                 }else{
-                intent=new Intent(MainActivity.this,MyInfoActivity.class);
-                startActivity(intent);
+                    intent=new Intent(MainActivity.this,MyInfoActivity.class);
+                    startActivity(intent);
                 }
 
             }
@@ -148,10 +151,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
-        Log.d("获取头像并设置", "onCreate: 设置侧滑栏头像之前");
 
-        //head_home.setImageDrawable(Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]));
-        Log.d("获取头像并设置", "onCreate: 设置侧滑栏头像之后");
 
     }
 
@@ -179,19 +179,15 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     public static void setToolbarText(CharSequence title) {
         titleTV.setText(title);
     }
+    public static Context getInstance(){  //返回上下文环境
+        return mainActivityContext;
+    }
 
     //初始化各控件
     public void init(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-               if(Connect.getXMPPTCPConnection()) {//连接服务器
-                   Log.d(TAG, "run: MainActivity服务器连接成功");
-               }
-            }
-        }).start();
         isBinded=false;
         mainActivityContext=MainActivity.this;
+        MessageManager.initAllList();
         Connect.init();             //初始化适配器列表
         if(!AlbumUtil.checkStorage(this)){
             AlbumUtil.requestStorage(this);        //申请存储读取权限
@@ -199,12 +195,6 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
         naviQBadgeView=new QBadgeView(this);
         //sharedPreferences=getSharedPreferences("myInfo",MODE_PRIVATE);
         //editor=sharedPreferences.edit();
-        Connect.sharedPreferences=getSharedPreferences("LoginedInfo",MODE_PRIVATE);
-        Connect.editor=Connect.sharedPreferences.edit();
-        // Connect.editor.clear();            //TODO
-        //Connect.editor.commit();
-        Connect.smackUserInfo=new SmackUserInfo();          //用LoginedInfo里保存上次登陆人的信息初始化登陆人信息
-
         toolbar=(Toolbar)findViewById(R.id.toolabr);
         setSupportActionBar(toolbar);
         navigationView=(NavigationView)findViewById(R.id.navi);
@@ -217,52 +207,43 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
         //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
-        if(Connect.sharedPreferences.contains("userName")){  //有此userName键值，说明登陆过
-
-            Connect.smackUserInfo.setUserName(Connect.sharedPreferences.getString("userName",""));
-            String cachePasswd=Connect.sharedPreferences.getString("passward","");//缓存的密码
-            String headBtRoad=Connect.sharedPreferences.getString("userHeadBtRoad","");
-            Connect.smackUserInfo.setHeadBt(BitmapFactory.decodeFile(headBtRoad));
+        if(MessageManager.getSharedPreferences().contains("userName")){  //有此userName键值，说明登陆过
+            MessageManager.getSmackUserInfo().setUserName(MessageManager.getSharedPreferences().getString("userName",""));
+            String cachePasswd=MessageManager.getSharedPreferences().getString("passward","");//缓存的密码
+            String headBtRoad=MessageManager.getSharedPreferences().getString("userHeadBtRoad","");
+            MessageManager.getSmackUserInfo().setHeadBt(BitmapFactory.decodeFile(headBtRoad));
             Log.d(TAG, "init: 设置自己头像之后");
-            Connect.dataBaseHelp=new DataBase(this,"DataBaseOf"+Connect.smackUserInfo.getUserName()+".db",null,1,Connect.smackUserInfo.getUserName());
+            MessageManager.setDataBaseHelp(MessageManager.getSmackUserInfo().getUserName());
             //Connect.smackUserInfo.setSex(Connect.sharedPreferences.getString("userSex",""));
             //Connect.smackUserInfo.setHeight(Connect.sharedPreferences.getString("userHeight","180"));
             //Connect.smackUserInfo.setEmail(Connect.sharedPreferences.getString("userEmail",""));
-            Connect.db=Connect.dataBaseHelp.getWritableDatabase();
+
             //TODO        初始化聊天信息和好友信息
-            Connect.contantFriendInfoList=Connect.dataBaseHelp.getContantFriendInfoList();
+            MessageManager.setContantFriendInfoList(MessageManager.getDataBaseHelp().getContantFriendInfoList());
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Connect.login(Connect.smackUserInfo.getUserName(), cachePasswd, mainActivityContext);
+                    Connect.login(MessageManager.getSmackUserInfo().getUserName(), cachePasswd);
+                    Log.e(TAG, "run: 上次登录启动自动登录："+MessageManager.getSmackUserInfo().getUserName()+cachePasswd );
                 }
             }).start();
 
 
 
 
-
         }else{//此前没有登陆过
-            Connect.smackUserInfo.setUserName("点击登录");
+            MessageManager.getSmackUserInfo().setUserName("点击登录");
             Bitmap bitmap=BitmapFactory.decodeResource(this.getResources(),R.drawable.unlogin);
-            Connect.smackUserInfo.setHeadBt(bitmap);           //设置为未登陆的照片
+            MessageManager.getSmackUserInfo().setHeadBt(bitmap);           //设置为未登陆的照片
         }
-
-
-
         setInfo();        //调用设置头像、昵称函数
 
     }
     //设置昵称、头像...
     public void setInfo(){
-        navi_head.setImageBitmap(Connect.smackUserInfo.getHeadBt());
-        head_home.setImageBitmap(Connect.smackUserInfo.getHeadBt());
-        nichengTV.setText(Connect.smackUserInfo.getUserName());
-            //navi_head.setImageDrawable(drawable);
-            //head_home.setImageDrawable(drawable);
-        //从文件读昵称
-        //String nc=sharedPreferences.getString("user","");
-        //nichengTV.setHint("昵称："+nc);
+        navi_head.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
+        head_home.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
+        nichengTV.setText(MessageManager.getSmackUserInfo().getUserName());
     }
     //初始化FragmentTabHost
     public void initTabhost(){
@@ -287,7 +268,6 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
             naviQBadgeView.setBadgeText("");
             tabSpec.setIndicator(indicator);
             fragmentTabHost.addTab(tabSpec,tabs1.getaClass(),null);
-
         }
 
 
@@ -333,7 +313,7 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
             case AlbumUtil.OPEN_ALBUM:{
                 String photoRoad=AlbumUtil.getImageAbsolutePath(data,MainActivity.this);
                 try {
-                    Connect.changeImage(Connect.xmpptcpConnection,photoRoad);
+                    VCardManager.changeImage(Connect.getXMPPTCPConnection(),photoRoad);
                     Toast.makeText(MainActivity.this,"更改头像成功",Toast.LENGTH_SHORT).show();
                 } catch (XMPPException e) {
                     e.printStackTrace();
@@ -373,10 +353,11 @@ private static PacketListenerService.MyBinder binder;   //服务中Binder
     protected void onDestroy() {
         super.onDestroy();
         //退出登录
-        if(Connect.xmpptcpConnection!=null){
+        if(Connect.getXMPPTCPConnection()!=null){
             Connect.signOut();
             Connect.isLogined=false;
-            Connect.xmpptcpConnection=null;
+            Connect.setRoster(null);
+            Connect.setXmpptcpConnection(null);
 
         }
     }

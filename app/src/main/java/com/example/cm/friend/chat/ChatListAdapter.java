@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.example.cm.R;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,12 +47,12 @@ public class ChatListAdapter extends BaseAdapter  {
 
     @Override
     public int getCount() {
-        return Connect.friendInfoList.size();
+        return MessageManager.getFriendInfoList().size();
     }
 
     @Override
     public Object getItem(int position) {
-        return Connect.messageMap.get(Connect.friendInfoList.get(position).getUserName());
+        return MessageManager.getMessageMap().get(MessageManager.getFriendInfoList().get(position).getUserName());
     }
 
     @Override
@@ -90,12 +91,12 @@ public class ChatListAdapter extends BaseAdapter  {
         //ViewGroup.LayoutParams params=viewHolder.relativeLayout.getLayoutParams();
        // params.width=displayMetrics.widthPixels;
            //设置会话列表信息显示各个好友最后一条信息时间、内容
-        String userName=Connect.friendInfoList.get(position).getUserName();
-        List<Message> messageList=Connect.messageMap.get(userName);            //对应friendName的聊天信息列表
+        String userName= MessageManager.getFriendInfoList().get(position).getUserName();
+        List<Message> messageList=MessageManager.getMessageMap().get(userName);            //对应friendName的聊天信息列表
         //viewHolder.headImage.setImageDrawable(context.getResources().getDrawable(Integer.parseInt(map.get(Connect.friendInfoList.get(position).get("friendName").getHeadBt())));
         //viewHolder.headImage.setImageBitmap(map.get(Connect.friendInfoList.get(position).get("friendInfo").getHeadBt()));
         //viewHolder.headImage.setImageResource(cm);
-        viewHolder.headImage.setImageBitmap(Connect.friendInfoList.get(position).getHeadBt());
+        viewHolder.headImage.setImageBitmap(MessageManager.getFriendInfoList().get(position).getHeadBt());
         viewHolder.nameTV.setText(userName);
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("HH:MM");
         if(messageList.size()>=1) {

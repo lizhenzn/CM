@@ -12,7 +12,9 @@ import com.example.cm.R;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
+import com.example.cm.myInfo.VCardManager;
 import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 
@@ -31,7 +33,7 @@ public class FriendInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_friend_info);
 
         init();
-        VCard vCard=Connect.getUserVcard(userName);
+        VCard vCard= VCardManager.getUserVcard(userName);
         Log.d("联系人信息", "onCreate: "+vCard);
         Log.d("邮件", "onCreate: email"+vCard.getField("email"));
         Log.d("性别", "onCreate: sex:"+vCard.getField("sex"));
@@ -60,11 +62,11 @@ public class FriendInfoActivity extends AppCompatActivity {
                 //判断会话列表有没有此好友
                 boolean contain=false;
                 FriendInfo friendInfo;
-                Connect.contantFriendInfoList.get(position).setChated(1); //设置为在聊天列表
-                friendInfo=Connect.contantFriendInfoList.get(position);
+                MessageManager.getContantFriendInfoList().get(position).setChated(1); //设置为在聊天列表
+                friendInfo=MessageManager.getContantFriendInfoList().get(position);
                 String userName=friendInfo.getUserName();
-                for(int i=0;i<Connect.friendInfoList.size();i++){
-                    if(Connect.friendInfoList.get(i).getUserName().equals(userName)){     //会话列表包含此好友
+                for(int i=0;i<MessageManager.getFriendInfoList().size();i++){
+                    if(MessageManager.getFriendInfoList().get(i).getUserName().equals(userName)){     //会话列表包含此好友
                         //list.get(i).get(message.getFrom()).add(message1);
                         contain=true;
                         Log.d("ContantClick点击的好友条目名", "onChildClick: "+userName);
@@ -72,12 +74,12 @@ public class FriendInfoActivity extends AppCompatActivity {
                     }
                 }
                 if(!contain){  //会话列表不包含此好友
-                    Connect.dataBaseHelp.changeChatState(userName,1);            //改变数据库中聊天状态
+                    MessageManager.getDataBaseHelp().changeChatState(userName,1);            //改变数据库中聊天状态
                     //friendInfo.setHeadBt(message.getBody());
-                    Connect.friendInfoList.add(Connect.friendInfoList.size(),friendInfo);//
+                    MessageManager.getFriendInfoList().add(MessageManager.getFriendInfoList().size(),friendInfo);//
                     List<Message> messageList=new ArrayList<>();
                     ////messageList.add(message1);
-                    Connect.messageMap.put(userName,messageList);
+                    MessageManager.getMessageMap().put(userName,messageList);
                     Log.d("ContantClick点击的好友条目名", "onChildClick: "+userName);
                 }
                 //String userName= Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getUserName();

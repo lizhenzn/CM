@@ -4,6 +4,7 @@
     package="com.example.cm">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -23,7 +24,6 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".friend.ManagerGroupActivity" />
         <activity android:name=".friend.FriendSettingActivity" />
         <activity android:name=".friend.FriendInfoActivity" />
         <activity android:name=".share.PresentShareItem" />
@@ -33,10 +33,7 @@
         <activity android:name=".myInfo.RegisterActivity" />
         <activity android:name=".share.Comments" />
 
-        <service
-            android:name=".ConnectService"
-            android:enabled="true"
-            android:exported="true" />
+
 
         <activity android:name=".myInfo.LoginActivity" />
         <activity android:name=".myInfo.EditNiChengActivity" />
