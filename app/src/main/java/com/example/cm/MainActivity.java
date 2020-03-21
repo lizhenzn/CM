@@ -1,17 +1,13 @@
 package com.example.cm;
 
-import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,11 +21,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -77,20 +73,22 @@ public class MainActivity extends AppCompatActivity{
     private static int clothes_down=-1;
     private static boolean choose_flag=false;
 
-    public static int getClothesUp(){
+    private static FragmentTabHost fragmentTabHost;
+    public static int getClothes_up(){
         return clothes_up;
     }
-    public static void setClothes_up(int clothes_up){clothes_up=clothes_up;}
+    public static void setClothes_up(int up){clothes_up=up;}
     public static int getClothes_down(){ return clothes_down;}
-    public static void setClothes_down(int clothes_down){clothes_down=clothes_down;}
+    public static void setClothes_down(int down){clothes_down=down;}
     public static boolean isChoose_flag(){
         return choose_flag;
     }
-    public static void setChoose_flag(boolean choose_flag){choose_flag=choose_flag;}
+    public static void setChoose_flag(boolean choose_flag){MainActivity.choose_flag=choose_flag;}
 //每一个页面写一次setToolbarText()函数   ******************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
         init();
@@ -100,6 +98,7 @@ public class MainActivity extends AppCompatActivity{
         if(actionBar!=null){
             //actionBar.setDisplayHomeAsUpEnabled(true);
             //actionBar.setHomeAsUpIndicator(R.mipmap.ic_launcher_round);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
         navigationView.setCheckedItem(R.id.setting);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -138,8 +137,8 @@ public class MainActivity extends AppCompatActivity{
                     intent=new Intent(MainActivity.this, LoginActivity.class);
                     startActivityForResult(intent,LOGIN);
                 }else{
-                    intent=new Intent(MainActivity.this,MyInfoActivity.class);
-                    startActivity(intent);
+                intent=new Intent(MainActivity.this,MyInfoActivity.class);
+                startActivity(intent);
                 }
 
             }
@@ -247,7 +246,7 @@ public class MainActivity extends AppCompatActivity{
     }
     //初始化FragmentTabHost
     public void initTabhost(){
-        FragmentTabHost fragmentTabHost=(FragmentTabHost)findViewById(R.id.tabhost);
+        fragmentTabHost=(FragmentTabHost)findViewById(R.id.tabhost);
         //将FragmentTabhost与FrameLayout关联
         fragmentTabHost.setup(getApplicationContext(),getSupportFragmentManager(),R.id.tab_main_content);
         //添加tab和其对应的fragment
@@ -269,7 +268,6 @@ public class MainActivity extends AppCompatActivity{
             tabSpec.setIndicator(indicator);
             fragmentTabHost.addTab(tabSpec,tabs1.getaClass(),null);
         }
-
 
     }
     //绑定监听
@@ -340,6 +338,13 @@ public class MainActivity extends AppCompatActivity{
                     Toast.makeText(this,"You denied the permission",Toast.LENGTH_SHORT).show();
                 }
             }break;
+            case AlbumUtil.REQUEST_CAMERA:{
+                if(grantResults.length>0&&grantResults[0]== PackageManager.PERMISSION_GRANTED){
+
+                }else{
+                    Toast.makeText(this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                }
+            }break;
         }
     }
 
@@ -359,8 +364,12 @@ public class MainActivity extends AppCompatActivity{
             Connect.setRoster(null);
             Connect.setXmpptcpConnection(null);
 
+    public static void setFragmentTabHostVisibility(boolean visibility){
+        if(visibility){
+            fragmentTabHost.setVisibility(View.VISIBLE);
+        }else{
+            fragmentTabHost.setVisibility(View.GONE);
         }
     }
-
 
 }

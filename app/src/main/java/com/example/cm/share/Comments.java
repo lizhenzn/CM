@@ -1,11 +1,12 @@
 package com.example.cm.share;
 
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +23,7 @@ import main.PostInfo;
 import main.RemarkInfo;
 
 public class Comments extends AppCompatActivity {
+    private static final String TAG = "Comments";
     private List<CommentItem> CommentList;
     private PostInfo postInfo;
     private ArrayList<RemarkInfo> remarks;
@@ -45,6 +47,8 @@ public class Comments extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        ServerFunction.sendRemark(postInfo, MessageManager.getSmackUserInfo().getUserName(),content,"2019-08-23 14:55:50");
+                        Log.d(TAG, "run: execute sendRemark,posi_id="+postInfo.getPost_id()+",userName="+MessageManager.getSmackUserInfo().getUserName()+",content="+content);
                         ServerFunction.sendRemark(postInfo, MessageManager.getSmackUserInfo().getUserName(),content,"2019-08-23 14:55:50");
                         runOnUiThread(new Runnable() {
                             @Override
@@ -78,7 +82,7 @@ public class Comments extends AppCompatActivity {
             public void run() {
                 remarks=ServerFunction.getRemark(postInfo);
                 for(int i=1;i<=remarks.size();i++){
-                    CommentList.add(new CommentItem(R.drawable.friend1,i+"F",remarks.get(i-1).getUsername(),remarks.get(i-1).getContent()));
+                    CommentList.add(new CommentItem(Connect.getUserImage(remarks.get(i-1).getUsername()),i+"F",remarks.get(i-1).getUsername(),remarks.get(i-1).getContent()));
                 }
                 commentAdapter=new CommentAdapter(CommentList);
                 runOnUiThread(new Runnable() {

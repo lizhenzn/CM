@@ -25,13 +25,13 @@ public class PresentShareItem extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_present_share_item);
         CircleImageView headImage = findViewById(R.id.headImage);
-        headImage.setImageResource(R.drawable.friend1);
+        //headImage.setImageResource(R.drawable.friend1);
         ImageView clothesUp = findViewById(R.id.clothes_up);
         clothesUp.setImageResource(R.drawable.friend1);
         ImageView clothesDown = findViewById(R.id.clothes_down);
         clothesDown.setImageResource(R.drawable.friend1);
         TextView userName = findViewById(R.id.userName);
-        userName.setTextSize(30);
+        //userName.setTextSize(30);
         TextView description = findViewById(R.id.description);
         description.setText("");
         TextView likeNum = findViewById(R.id.like_num);
@@ -47,7 +47,7 @@ public class PresentShareItem extends AppCompatActivity {
                     @Override
                     public void run() {
                         likeNum.setText(shareItem.getPostInfo().getLike_num()+"");
-                        userName.setText(shareItem.getUserName());
+                        //userName.setText(shareItem.getUserName());
                         clothesUp.setImageURI(Uri.fromFile(ServerFunction.getUpImg(shareItem.getPostInfo())));
                         clothesDown.setImageURI(Uri.fromFile(ServerFunction.getDownImg(shareItem.getPostInfo())));
                         description.setText(shareItem.getDescription());
@@ -79,6 +79,13 @@ public class PresentShareItem extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     Toast.makeText(PresentShareItem.this,"点赞成功",Toast.LENGTH_SHORT).show();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //点赞数+1
+                                            likeNum.setText(shareItem.getPostInfo().getLike_num()+1+"");
+                                        }
+                                    });
                                 }
                             });
                         }

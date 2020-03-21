@@ -17,9 +17,9 @@ import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
-
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -28,14 +28,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import android.util.Base64;
-
 import java.util.Date;
 
 
 //相册工具类
 public class AlbumUtil {
     public static final int REQUEST_STORAGE=6;
+    public static final int REQUEST_CAMERA=8;
     public static final int OPEN_ALBUM=7;
     public static String FRIENDHEADFILEROAD="/data/data/com.example.cm/cache/friendHead";          //好友头像存储文件 本应用的cache中
     private static String MESSAGEBITMAP="/sdcard/CM/messageBitmap";            //聊天信息图片存储文件
@@ -52,6 +51,18 @@ public class AlbumUtil {
             //需要自己在活动里面重写 onRequestPermissionsResult()接收结果 requestCode为AlbumUtil.REQUEST_STORAGE
             ActivityCompat.requestPermissions((Activity) context,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_STORAGE);
 
+    }
+    public static boolean checkCamera(Context context){
+        if(ContextCompat.checkSelfPermission(context,
+                Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED)
+            return false;
+        return  true;
+    }
+    public static void requestCamera(Context context){
+        //需要自己在活动里面重写 onRequestPermissionsResult()接收结果 requestCode为AlbumUtil.REQUEST_STORAGE
+        ActivityCompat.requestPermissions((Activity) context,
+                new String[]{Manifest.permission.CAMERA},
+                REQUEST_CAMERA);
     }
 
     //处理返回的结果

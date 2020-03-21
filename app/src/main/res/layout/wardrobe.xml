@@ -1,23 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-  <android.support.v4.view.ViewPager
-      android:id="@+id/wardrobeVP"
-      android:layout_weight="1"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
+
+  <LinearLayout
       android:layout_width="match_parent"
-      android:layout_height="0dp">
-  </android.support.v4.view.ViewPager>
-  <android.support.v7.widget.RecyclerView
-      android:id="@+id/wardrobeR1"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content">
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
 
-  </android.support.v7.widget.RecyclerView>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/wardrobeR2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <android.support.v4.view.ViewPager
+        android:id="@+id/wardrobeVP"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_weight="1"></android.support.v4.view.ViewPager>
 
-    </android.support.v7.widget.RecyclerView>
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/wardrobeUpControl"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:elevation="4dp"
+        android:background="@color/colorGray">
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/wardrobeUpLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+      <android.support.v7.widget.RecyclerView
+          android:id="@+id/wardrobeR1"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_weight="3">
+
+      </android.support.v7.widget.RecyclerView>
+
+      <ImageView
+          android:id="@+id/wardrobeUpAdd"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:src="@drawable/chat_add" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/wardrobeDownControl"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:elevation="2dp"
+        android:background="@color/colorGray">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/wardrobeDownLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+      <!--设置自动动画效果-->
+      <android.support.v7.widget.RecyclerView
+          android:id="@+id/wardrobeR2"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_weight="3">
+
+      </android.support.v7.widget.RecyclerView>
+      <ImageView
+          android:id="@+id/wardrobeDownAdd"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:src="@drawable/chat_add" />
+    </LinearLayout>
+  </LinearLayout>
+</ScrollView>

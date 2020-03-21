@@ -56,36 +56,38 @@
         />
 
 
-    <ImageButton
-        android:id="@+id/giveLike"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/givelike"
-        app:layout_constraintRight_toLeftOf="@id/comment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/description"
-         />
+    <!--<ImageButton-->
+        <!--android:id="@+id/giveLike"-->
+        <!--android:layout_width="60dp"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:src="@drawable/givelike"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/description"-->
+         <!--/>-->
 
-    <ImageButton
-        android:id="@+id/comment"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/comment"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/description"
-        />
+    <!--<ImageButton-->
+        <!--android:id="@+id/comment"-->
+        <!--android:layout_width="60dp"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:src="@drawable/comment"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/description"-->
+        <!--/>-->
     <TextView
         android:id="@+id/like_num"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0"
-        app:layout_constraintRight_toLeftOf="@id/giveLike"
-        app:layout_constraintBottom_toBottomOf="@id/giveLike"
-        app:layout_constraintTop_toTopOf="@id/giveLike"
-        />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+        <!--app:layout_constraintRight_toLeftOf="@id/giveLike"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/giveLike"-->
+        <!--app:layout_constraintTop_toTopOf="@id/giveLike"-->
+
 
 </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

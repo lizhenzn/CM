@@ -23,15 +23,20 @@ import java.util.List;
 
 public class ClothesEstimater {
     private Context applicationContext;
-    ClothesEstimater(Context applicationContext){
+    public ClothesEstimater(Context applicationContext){
         this.applicationContext=applicationContext;
     }
 
     public int estimateClothes(String up,String down){
         Bitmap nup=getScaleBitmap(up);
         Bitmap ndown=getScaleBitmap(down);
+        return estimateClothes(nup,ndown);
+    }
+    public int estimateClothes(Bitmap up,Bitmap down){
+        Bitmap nup=zoomImg(up,224,112);
+        Bitmap ndown=zoomImg(down,224,112);
         if(nup==null||ndown==null)return -1;
-        Bitmap bitmap=getJointBitmap(nup,ndown);
+        Bitmap bitmap=getJointBitmap(nup,ndown);nup=null;ndown=null;
         if(bitmap!=null)return estimateGood(bitmap);
         else return -1;
     }
@@ -119,7 +124,7 @@ public class ClothesEstimater {
      *
      * @return 经过适当缩放的BitMap
      */
-    private Bitmap getScaleBitmap(String filename){
+    public static Bitmap getScaleBitmap(String filename){
         BitmapFactory.Options opt=new BitmapFactory.Options();
         opt.inJustDecodeBounds=true;
         //标准防爆内存操作，开始时只解析图片大小，不解析图片内容
@@ -129,6 +134,7 @@ public class ClothesEstimater {
             //直接通过文件路径读取不了，通过输入流读取
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
         int bmpWidth = opt.outWidth;
         int bmpHeight = opt.outHeight;
@@ -144,7 +150,7 @@ public class ClothesEstimater {
         try {
             Bitmap bmp=BitmapFactory.decodeStream(new FileInputStream(new File(filename)),null,opt);
             //Bitmap bmp=BitmapFactory.decodeStream(getApplicationContext().getAssets().open(filename),null,opt);
-            if(bmp!=null) return  zoomImg(bmp,224,112);
+            if(bmp!=null) return  bmp;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -208,7 +214,7 @@ public class ClothesEstimater {
         int index=get_max_result(results);
         Log.d("test", "estimateGood: "+results[0]+" "+results[1]);
         if(results[index]>0.95)
-            return index;
+            return 1;
         else return 0;
     }
 
