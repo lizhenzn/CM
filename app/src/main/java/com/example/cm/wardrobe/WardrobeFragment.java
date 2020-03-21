@@ -232,7 +232,8 @@ public class WardrobeFragment extends Fragment  {
                                     return;
                                 }
                                 Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
-                                if(takePhotoIntent.resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
+                                if(takePhotoIntent.
+                                        resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
                                     File picFile=creatImageFile(BASE_DIR,2);
                                     downFileName.add(picFile.getName());
                                     Uri imageUri=FileProvider.getUriForFile(getContext(),
@@ -241,7 +242,9 @@ public class WardrobeFragment extends Fragment  {
                                     takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
                                     startActivityForResult(takePhotoIntent,WardrobeFragment.CAMERA_DOWN);//启动相机
                                 }else{
-                                    Toast.makeText(getContext(),"没有相机，无法完成操作",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(),
+                                            "没有相机，无法完成操作",
+                                            Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }).show();
@@ -308,7 +311,8 @@ public class WardrobeFragment extends Fragment  {
                     File pic=new File(BASE_DIR,"upClothes"+
                             File.separatorChar+
                             upFileName.get(upFileName.size()-1));
-                    Log.d("wardrobe", "onActivityResult: "+upFileName.get(upFileName.size()-1));
+                    Log.d("wardrobe", "onActivityResult: "+
+                            upFileName.get(upFileName.size()-1));
                     Bitmap bitmap =ClothesEstimater.getScaleBitmap(pic.getAbsolutePath());
                     if(bitmap!=null) {
                         WardrobeFragment.photoList1.add(bitmap);
@@ -323,7 +327,8 @@ public class WardrobeFragment extends Fragment  {
                     File pic=new File(BASE_DIR,"downClothes"+
                             File.separatorChar+
                             downFileName.get(downFileName.size()-1));
-                    Log.d("wardrobe", "onActivityResult: "+downFileName.get(downFileName.size()-1));
+                    Log.d("wardrobe", "onActivityResult: "+
+                            downFileName.get(downFileName.size()-1));
                     Bitmap bitmap =ClothesEstimater.getScaleBitmap(pic.getAbsolutePath());
                     if(bitmap!=null) {
                         WardrobeFragment.photoList2.add(bitmap);
@@ -446,7 +451,9 @@ public class WardrobeFragment extends Fragment  {
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             ViewHolder viewHolder=null;
-            View view= LayoutInflater.from(context).inflate(R.layout.wardrobe_recycler,viewGroup,false);
+            View view= LayoutInflater.from(context).inflate(R.layout.wardrobe_recycler,
+                    viewGroup,
+                    false);
             viewHolder=new ViewHolder(view);
             ViewHolder finalViewHolder = viewHolder;
             viewHolder.imageView.setOnClickListener(new View.OnClickListener() {

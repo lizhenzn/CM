@@ -12,17 +12,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
 import com.example.cm.SendShare;
-import com.example.cm.share.Comments;
-import com.example.cm.share.PresentShareItem;
+import com.example.cm.util.ClothesEstimater;
 import com.example.cm.wardrobe.WardrobeFragment;
 
+import static com.example.cm.MainActivity.getClothes_down;
+import static com.example.cm.MainActivity.getClothes_up;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class MatchFragment extends Fragment {
@@ -91,6 +92,19 @@ public class MatchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //智能搭配功能
+                if(getClothes_up()!=-1&&getClothes_down()!=-1){
+                    ClothesEstimater estimater=new ClothesEstimater(getContext());
+                    int result=estimater.estimateClothes(WardrobeFragment.photoList1.get(getClothes_up()),
+                            WardrobeFragment.photoList2.get(getClothes_down()));
+                    switch(result){
+                        case 1:
+                            Toast.makeText(getContext(),"Good",Toast.LENGTH_LONG).show();break;
+                        case 0:
+                            Toast.makeText(getContext(),"Bad",Toast.LENGTH_LONG).show();break;
+                        case -1:
+                            Toast.makeText(getContext(),"Error",Toast.LENGTH_LONG).show();break;
+                    }
+                }
             }
         });
         //发送分享入口

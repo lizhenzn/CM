@@ -23,7 +23,7 @@ import java.util.List;
 
 public class ClothesEstimater {
     private Context applicationContext;
-    ClothesEstimater(Context applicationContext){
+    public ClothesEstimater(Context applicationContext){
         this.applicationContext=applicationContext;
     }
 
@@ -214,7 +214,7 @@ public class ClothesEstimater {
         int index=get_max_result(results);
         Log.d("test", "estimateGood: "+results[0]+" "+results[1]);
         if(results[index]>0.95)
-            return index;
+            return 1;
         else return 0;
     }
 
