@@ -36,6 +36,8 @@ import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smack.XMPPException;
 
+import java.io.IOException;
+
 @SuppressLint("SdCardPath")
 public class MyInfoActivity extends AppCompatActivity implements View.OnClickListener{
 

@@ -150,7 +150,6 @@ public class WardrobeFragment extends Fragment  {
         upAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 new ActionSheetDialog(getContext())
                         .builder()
                         .setCancelable(false)

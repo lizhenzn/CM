@@ -213,7 +213,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     footViewHolder.tvLoading.setVisibility(View.VISIBLE);
                     footViewHolder.tvLoading.setText("加载到底" );
                     Log.d(TAG, "onBindViewHolder: LOADING_END");
-//                    footViewHolder.llEnd.setVisibility(View.VISIBLE);
+//                   footViewHolder.llEnd.setVisibility(View.VISIBLE);
                     break;
 
                 default:

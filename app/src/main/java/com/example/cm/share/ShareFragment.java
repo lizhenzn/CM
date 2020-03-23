@@ -77,7 +77,6 @@ public class ShareFragment extends Fragment {
         context=getActivity();
         view=View.inflate(context, R.layout.share,null);
         serverFunction=new ServerFunction(context.getCacheDir());
-        Button button=(Button)view.findViewById(R.id.share_btn);
         init();
         recyclerView.addItemDecoration(new ShareItemDecoration());
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
@@ -140,8 +139,9 @@ public class ShareFragment extends Fragment {
         else{
             count=countLeft;
         }
+        Log.d(TAG, "getData: countLeft="+countLeft+",count="+count);
         for (int i = 0; i < count; i++) {
-            shareItemList.add(new ShareItem(R.drawable.friend1, MessageManager.getSmackUserInfo().getUserName(),R.drawable.friend1,
+            shareItemList.add(new ShareItem(R.drawable.friend1, "用户名",R.drawable.friend1,
                     R.drawable.friend1,"",R.drawable.givelike,R.drawable.comment));
         }
         countLeft-=count;
@@ -180,7 +180,6 @@ public class ShareFragment extends Fragment {
                         }
                     }
                 }
-
             }
         }).start();
     }

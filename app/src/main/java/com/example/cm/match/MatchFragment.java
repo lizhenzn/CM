@@ -23,6 +23,7 @@ import com.example.cm.util.ClothesEstimater;
 import com.example.cm.util.Connect;
 import com.example.cm.wardrobe.WardrobeFragment;
 
+
 import static com.example.cm.MainActivity.getClothes_down;
 import static com.example.cm.MainActivity.getClothes_up;
 import static com.example.cm.MainActivity.setToolbarText;
@@ -93,19 +94,28 @@ public class MatchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //智能搭配功能
-                if(getClothes_up()!=-1&&getClothes_down()!=-1){
+
+                int clothes_up=-1;
+                int clothes_down=-1;
+                int clothes_up_count=WardrobeFragment.photoList1.size();
+                int clothes_down_count=WardrobeFragment.photoList2.size();
+                clothes_up=(int)(Math.random()*clothes_up_count);
+                clothes_down=(int)(Math.random()*clothes_down_count);
+                Log.d(TAG, "onClick: choose clothes_up="+clothes_up+",choose clothes_down="+clothes_down);
                     ClothesEstimater estimater=new ClothesEstimater(getContext());
-                    int result=estimater.estimateClothes(WardrobeFragment.photoList1.get(getClothes_up()),
-                            WardrobeFragment.photoList2.get(getClothes_down()));
-                    switch(result){
+                    int result=estimater.estimateClothes(WardrobeFragment.photoList1.get(clothes_up),
+                            WardrobeFragment.photoList2.get(clothes_down));
+                    switch(result) {
                         case 1:
-                            Toast.makeText(getContext(),"Good",Toast.LENGTH_LONG).show();break;
+                            Toast.makeText(getContext(), "Good", Toast.LENGTH_LONG).show();
+                            break;
                         case 0:
-                            Toast.makeText(getContext(),"Bad",Toast.LENGTH_LONG).show();break;
+                            Toast.makeText(getContext(), "Bad", Toast.LENGTH_LONG).show();
+                            break;
                         case -1:
-                            Toast.makeText(getContext(),"Error",Toast.LENGTH_LONG).show();break;
+                            Toast.makeText(getContext(), "Error", Toast.LENGTH_LONG).show();
+                            break;
                     }
-                }
             }
         });
         //发送分享入口
