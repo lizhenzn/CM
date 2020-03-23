@@ -91,7 +91,6 @@ public class WardrobeFragment extends Fragment  {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
             case AlbumUtil.REQUEST_CAMERA:
-
         }
     }
 
