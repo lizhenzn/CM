@@ -103,14 +103,15 @@ public class MatchFragment extends Fragment {
                     Toast.makeText(getContext(), "缺少搭配的衣物", Toast.LENGTH_LONG).show();
                     return;
                 }
-                up=(int)(Math.random()*clothes_up_count);
-                down=(int)(Math.random()*clothes_down_count);
+                up=(int)(Math.random()*(clothes_up_count-1));
+                down=(int)(Math.random()*(clothes_down_count-1));
                 int i=up;
                 int j=down;
                 Log.d(TAG, "onClick: choose clothes_up="+up+",choose clothes_down="+down);
                 ClothesEstimater estimater=new ClothesEstimater(getContext());
                 do{
                     do {
+                        Log.d(TAG, "onClick: i="+i+",j="+j);
                         int result = estimater.estimateClothes(WardrobeFragment.photoList1.get(i), WardrobeFragment.photoList2.get(j));
                         if (result == 1) {
                             Toast.makeText(getContext(), "已给出智能搭配", Toast.LENGTH_LONG).show();
