@@ -59,7 +59,7 @@ public class WardrobeFragment extends Fragment  {
     private RecyclerView wardrobeR1,wardrobeR2;
     private WardrobeAdapter wardrobeAdapter1,wardrobeAdapter2;
     private LinearLayout layout_up,layout_down,layout_up_control,layout_down_control;
-    private ImageView upAdd,downAdd;
+    private ImageView upAdd,downAdd,upPointer,downPointer;
     private static ViewPager viewPager;
     private  static  WardrobeVPAdapter wardrobeVPAdapter;
     private boolean upClothes,downClothes;
@@ -106,10 +106,6 @@ public class WardrobeFragment extends Fragment  {
 
 
         view=View.inflate(context, R.layout.wardrobe,null);
-        layout_up=view.findViewById(R.id.wardrobeUpLayout);
-        if(!upClothes)layout_up.setVisibility(View.GONE);
-        layout_down=view.findViewById(R.id.wardrobeDownLayout);
-        if(!downClothes)layout_down.setVisibility(View.GONE);
         layout_up_control=view.findViewById(R.id.wardrobeUpControl);//控制上选单伸缩
         layout_down_control=view.findViewById(R.id.wardrobeDownControl);//控制下选单伸缩
         viewPager=(ViewPager)view.findViewById(R.id.wardrobeVP);
@@ -119,6 +115,8 @@ public class WardrobeFragment extends Fragment  {
         wardrobeR2=(RecyclerView)view.findViewById(R.id.wardrobeR2);
         upAdd=view.findViewById(R.id.wardrobeUpAdd);
         downAdd=view.findViewById(R.id.wardrobeDownAdd);
+        upPointer=view.findViewById(R.id.wardrobeUpPointer);
+        downPointer=view.findViewById(R.id.wardrobeDownPointer);
         LinearLayoutManager linearLayoutManager1=new LinearLayoutManager(context);
         LinearLayoutManager linearLayoutManager2=new LinearLayoutManager(context);
         linearLayoutManager1.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -127,13 +125,25 @@ public class WardrobeFragment extends Fragment  {
         wardrobeR2.setLayoutManager(linearLayoutManager2);
         wardrobeR1.setAdapter(wardrobeAdapter1);
         wardrobeR2.setAdapter(wardrobeAdapter2);
+        layout_up=view.findViewById(R.id.wardrobeUpLayout);
+        if(!upClothes){layout_up.setVisibility(View.GONE);
+        upPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);}
+        else{layout_up.setVisibility(View.VISIBLE);
+        upPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);}
+        layout_down=view.findViewById(R.id.wardrobeDownLayout);
+        if(!downClothes){layout_down.setVisibility(View.GONE);
+        downPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);}
+        else{layout_down.setVisibility(View.VISIBLE);
+        downPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp); }
         layout_down_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(downClothes)
-                {layout_down.setVisibility(View.GONE);downClothes=false;}
+                {layout_down.setVisibility(View.GONE);downClothes=false;
+                downPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);}
                 else
-                {layout_down.setVisibility(View.VISIBLE);downClothes=true;}
+                {layout_down.setVisibility(View.VISIBLE);downClothes=true;
+                downPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);}
             }
         });
         layout_up_control.setOnClickListener(new View.OnClickListener() {
@@ -141,9 +151,11 @@ public class WardrobeFragment extends Fragment  {
             public void onClick(View v) {
                 layout_up.setVisibility(View.GONE);
                 if(upClothes)
-                {layout_up.setVisibility(View.GONE);upClothes=false;}
+                {layout_up.setVisibility(View.GONE);upClothes=false;
+                upPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);}
                 else
-                {layout_up.setVisibility(View.VISIBLE);upClothes=true;}
+                {layout_up.setVisibility(View.VISIBLE);upClothes=true;
+                upPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);}
             }
         });
         upAdd.setOnClickListener(new View.OnClickListener() {

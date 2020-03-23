@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -26,27 +25,27 @@
         android:src="@drawable/match"
         />
 
-    <android.support.design.widget.FloatingActionButton
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <ImageView
         android:id="@+id/smart_match"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_ai_match"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/clothes_down"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/comment"
-        />
+        app:layout_constraintTop_toBottomOf="@id/clothes_down" />
 
-    <android.support.design.widget.FloatingActionButton
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <ImageView
         android:id="@+id/send_share"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:layout_constraintLeft_toRightOf="@id/smart_match"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/clothes_down"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/comment"
-        />
+        android:src="@drawable/ic_send_post" />
 
 
 
