@@ -157,29 +157,38 @@ public class Connect {
                 MessageManager.clearAllList();//清理所有的list
                 MessageManager.initFriend();    //获取好友列表
                 MessageManager.setMessageMap(MessageManager.getDataBaseHelp().getMessageHashMap());//数据库获得聊天信息
-                MainActivity.bindPacket();//绑定
                 MessageManager.getOfflineMessage();
+                MainActivity.bindPacket();//绑定
+
                 VCard selfVCard=VCardManager.getUserVcard(userName);
                 Log.e("自己VCard", "login: "+selfVCard );
                 MessageManager.getSmackUserInfo().setUserName(userName);
-                String nicName="";
-                nicName=selfVCard.getNickName();
-                if(nicName.equals("")){
+                Log.e("", "login: "+selfVCard.getNickName() );
+                if(selfVCard.getNickName()==null){
+                    Log.e("", "login: 为空" );
                     MessageManager.getSmackUserInfo().setNiC(userName);
                 }else {
-                    MessageManager.getSmackUserInfo().setNiC(nicName);
+                    MessageManager.getSmackUserInfo().setNiC(selfVCard.getNickName());
                 }
-                MessageManager.getSmackUserInfo().setEmail(selfVCard.getField("email"));
-                MessageManager.getSmackUserInfo().setSex(selfVCard.getField("gender"));
+                if(selfVCard.getField("email")!=null){
+                    MessageManager.getSmackUserInfo().setEmail(selfVCard.getField("email"));
+                }
+                if(selfVCard.getField("gender")!=null) {
+                    MessageManager.getSmackUserInfo().setSex(selfVCard.getField("gender"));
+                }
+                if(selfVCard.getField("height")!=null) {
+                    MessageManager.getSmackUserInfo().setHeight(selfVCard.getField("height"));
+                }
                 Bitmap bitmap= VCardManager.getUserImage(userName);
                 MessageManager.getSmackUserInfo().setHeadBt(bitmap);
                 String headBitmapRoad=AlbumUtil.saveHeadBitmap(userName,bitmap);
                 Log.d("保存头像路径", "run: "+headBitmapRoad);
                 MessageManager.getEditor().putString("userName",userName);
                 MessageManager.getEditor().putString("passward",passwd);
-                MessageManager.getEditor().putString("NickName",selfVCard.getField("NickName"));
-                MessageManager.getEditor().putString("gender",selfVCard.getField("gender"));
-                MessageManager.getEditor().putString("email",selfVCard.getField("email"));
+                MessageManager.getEditor().putString("NICKNAME",MessageManager.getSmackUserInfo().getNiC());
+                MessageManager.getEditor().putString("gender",MessageManager.getSmackUserInfo().getSex());
+                MessageManager.getEditor().putString("email",MessageManager.getSmackUserInfo().getEmail());
+                MessageManager.getEditor().putString("height",MessageManager.getSmackUserInfo().getHeight());
                 MessageManager.getEditor().putString("userHeadBtRoad",headBitmapRoad);
                 MessageManager.getEditor().commit();
                 getXMPPTCPConnection().sendStanza(presence2);//设置在线状态
@@ -231,7 +240,7 @@ public class Connect {
                            VCardManager.setSelfInfo(xmpptcpConnection,mapKey,mapValue);//设置注册信息
                            System.out.println(mapKey+":"+mapValue);
                        }
-                       VCardManager.setSelfInfo(xmpptcpConnection,"NickName",user);
+                       VCardManager.setSelfInfo(xmpptcpConnection,"NICKNAME",user);
                        xmpptcpConnection.disconnect();//关闭连接
 
                    } catch (SmackException.NoResponseException e) {
