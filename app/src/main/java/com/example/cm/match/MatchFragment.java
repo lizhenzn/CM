@@ -23,6 +23,9 @@ import com.example.cm.util.ClothesEstimater;
 import com.example.cm.util.Connect;
 import com.example.cm.wardrobe.WardrobeFragment;
 
+
+import static com.example.cm.MainActivity.getClothes_down;
+import static com.example.cm.MainActivity.getClothes_up;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class MatchFragment extends Fragment {
@@ -96,26 +99,33 @@ public class MatchFragment extends Fragment {
                 int down=-1;
                 int clothes_up_count=WardrobeFragment.photoList1.size();
                 int clothes_down_count=WardrobeFragment.photoList2.size();
+                if(clothes_up_count==0||clothes_down_count==0){
+                    Toast.makeText(getContext(), "缺少搭配的衣物", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 up=(int)(Math.random()*clothes_up_count);
                 down=(int)(Math.random()*clothes_down_count);
+                int i=up;
+                int j=down;
                 Log.d(TAG, "onClick: choose clothes_up="+up+",choose clothes_down="+down);
-
                 ClothesEstimater estimater=new ClothesEstimater(getContext());
-                    int result=estimater.estimateClothes(WardrobeFragment.photoList1.get(up),
-                            WardrobeFragment.photoList2.get(down));
-                    clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(up));
-                    clothes_down.setImageBitmap(WardrobeFragment.photoList2.get(down));
-                    switch(result) {
-                        case 1:
-                            Toast.makeText(getContext(), "Good", Toast.LENGTH_LONG).show();
-                            break;
-                        case 0:
-                            Toast.makeText(getContext(), "Bad", Toast.LENGTH_LONG).show();
-                            break;
-                        case -1:
-                            Toast.makeText(getContext(), "Error", Toast.LENGTH_LONG).show();
-                            break;
-                    }
+                do{
+                    do {
+                        int result = estimater.estimateClothes(WardrobeFragment.photoList1.get(i), WardrobeFragment.photoList2.get(j));
+                        if (result == 1) {
+                            Toast.makeText(getContext(), "已给出智能搭配", Toast.LENGTH_LONG).show();
+                            MainActivity.setClothes_up(i);
+                            MainActivity.setClothes_down(j);
+                            clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(up));
+                            clothes_down.setImageBitmap(WardrobeFragment.photoList2.get(down));
+                            return;
+                        } else {
+                            j = (j + 1) % clothes_down_count;
+                        }
+                    }while(j!=down);
+                    i = (i + 1) % clothes_up_count;
+                }while(i!=up);
+                Toast.makeText(getContext(), "未能找出合适的搭配", Toast.LENGTH_LONG).show();
             }
         });
         //发送分享入口
