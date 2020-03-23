@@ -23,9 +23,6 @@ import com.example.cm.util.ClothesEstimater;
 import com.example.cm.util.Connect;
 import com.example.cm.wardrobe.WardrobeFragment;
 
-
-import static com.example.cm.MainActivity.getClothes_down;
-import static com.example.cm.MainActivity.getClothes_up;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class MatchFragment extends Fragment {
@@ -95,16 +92,19 @@ public class MatchFragment extends Fragment {
             public void onClick(View v) {
                 //智能搭配功能
 
-                int clothes_up=-1;
-                int clothes_down=-1;
+                int up=-1;
+                int down=-1;
                 int clothes_up_count=WardrobeFragment.photoList1.size();
                 int clothes_down_count=WardrobeFragment.photoList2.size();
-                clothes_up=(int)(Math.random()*clothes_up_count);
-                clothes_down=(int)(Math.random()*clothes_down_count);
-                Log.d(TAG, "onClick: choose clothes_up="+clothes_up+",choose clothes_down="+clothes_down);
-                    ClothesEstimater estimater=new ClothesEstimater(getContext());
-                    int result=estimater.estimateClothes(WardrobeFragment.photoList1.get(clothes_up),
-                            WardrobeFragment.photoList2.get(clothes_down));
+                up=(int)(Math.random()*clothes_up_count);
+                down=(int)(Math.random()*clothes_down_count);
+                Log.d(TAG, "onClick: choose clothes_up="+up+",choose clothes_down="+down);
+
+                ClothesEstimater estimater=new ClothesEstimater(getContext());
+                    int result=estimater.estimateClothes(WardrobeFragment.photoList1.get(up),
+                            WardrobeFragment.photoList2.get(down));
+                    clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(up));
+                    clothes_down.setImageBitmap(WardrobeFragment.photoList2.get(down));
                     switch(result) {
                         case 1:
                             Toast.makeText(getContext(), "Good", Toast.LENGTH_LONG).show();

@@ -338,7 +338,7 @@ public class WardrobeFragment extends Fragment  {
         }
     }
 
-    public void initData(){
+    public static void initData(){
         photoList1=new ArrayList<>();
         photoList2=new ArrayList<>();
         integerList=new ArrayList<>();
@@ -346,29 +346,34 @@ public class WardrobeFragment extends Fragment  {
         detailList2=new ArrayList<>();
         upFileName=new ArrayList<>();
         downFileName=new ArrayList<>();
-        @SuppressLint("ResourceType") InputStream is = getResources().openRawResource(R.drawable.cm);
+        @SuppressLint("ResourceType") InputStream is = MainActivity.getInstance().
+                getResources().openRawResource(R.drawable.cm);
         Bitmap mBitmap = BitmapFactory.decodeStream(is);
-        @SuppressLint("ResourceType") InputStream is1 = getResources().openRawResource(R.drawable.unlogin);
+        @SuppressLint("ResourceType") InputStream is1 = MainActivity.getInstance().
+                getResources().openRawResource(R.drawable.unlogin);
         Bitmap mBitmap1 = BitmapFactory.decodeStream(is1);
-        @SuppressLint("ResourceType") InputStream is2 = getResources().openRawResource(R.drawable.match1);
+        @SuppressLint("ResourceType") InputStream is2 = MainActivity.getInstance().
+                getResources().openRawResource(R.drawable.match1);
         Bitmap mBitmap2 = BitmapFactory.decodeStream(is2);
-        @SuppressLint("ResourceType") InputStream is3 = getResources().openRawResource(R.drawable.wardrobe1);
+        @SuppressLint("ResourceType") InputStream is3 = MainActivity.getInstance().
+                getResources().openRawResource(R.drawable.wardrobe1);
         Bitmap mBitmap3 = BitmapFactory.decodeStream(is3);
 //        for(int i=0;i<66;i++) {
 //
 //            photoList1.add(mBitmap);
 //            photoList2.add(mBitmap1);
 //        }
-        if(!AlbumUtil.checkStorage(getContext()))AlbumUtil.requestStorage(getContext());
-        if(!AlbumUtil.checkStorage(getContext())){
-            Toast.makeText(getContext(),"拒绝权限，无法加载衣柜内容",Toast.LENGTH_LONG).show();
+        if(!AlbumUtil.checkStorage(MainActivity.getInstance()))
+            AlbumUtil.requestStorage(MainActivity.getInstance());
+        if(!AlbumUtil.checkStorage(MainActivity.getInstance())){
+            Toast.makeText(MainActivity.getInstance(),"拒绝权限，无法加载衣柜内容",Toast.LENGTH_LONG).show();
         }
 
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
-            BASE_DIR=getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            BASE_DIR=MainActivity.getInstance().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         } else {
-            BASE_DIR=getActivity().getFilesDir();
+            BASE_DIR=MainActivity.getInstance().getFilesDir();
             if(BASE_DIR==null)Log.e("wardrobe",
                     "load wardrobe failure : get storage dir failed");
         }
