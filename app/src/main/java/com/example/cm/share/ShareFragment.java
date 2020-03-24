@@ -1,12 +1,8 @@
 package com.example.cm.share;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,25 +17,13 @@ import android.widget.Button;
 
 import com.example.cm.R;
 import com.example.cm.myInfo.VCardManager;
-import com.example.cm.util.ClothesEstimater;
-import com.example.cm.myInfo.LoginActivity;
-import com.example.cm.myInfo.MyInfoActivity;
-import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import main.CallBackMethods;
-import main.TransferManager;
-import main.UserInfo;
-
 
 import main.PostInfo;
-import main.ShareManager;
 
 import static com.example.cm.MainActivity.setToolbarText;
 
@@ -77,7 +61,6 @@ public class ShareFragment extends Fragment {
         context=getActivity();
         view=View.inflate(context, R.layout.share,null);
         serverFunction=new ServerFunction(context.getCacheDir());
-        Button button=(Button)view.findViewById(R.id.share_btn);
         init();
         recyclerView.addItemDecoration(new ShareItemDecoration());
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
@@ -140,8 +123,9 @@ public class ShareFragment extends Fragment {
         else{
             count=countLeft;
         }
+        Log.d(TAG, "getData: countLeft="+countLeft+",count="+count);
         for (int i = 0; i < count; i++) {
-            shareItemList.add(new ShareItem(R.drawable.friend1, MessageManager.getSmackUserInfo().getUserName(),R.drawable.friend1,
+            shareItemList.add(new ShareItem(R.drawable.friend1, "用户名",R.drawable.friend1,
                     R.drawable.friend1,"",R.drawable.givelike,R.drawable.comment));
         }
         countLeft-=count;
@@ -159,13 +143,16 @@ public class ShareFragment extends Fragment {
                     for (int i = 0; i < count; i++) {
                         //Log.d(TAG, "run: "+serverFunction.getCurrentPostPosition());
                         Log.d(TAG, "run: "+i);
-                        while(!serverFunction.getShareManager().transfer_flags[i]){}
+                        while(!serverFunction.getShareManager().transfer_flags[i]){ }
                         Log.d(TAG, "run: quite while");
                         PostInfo post=serverFunction.getPost();
                         String userName=null;
                         userName=serverFunction.getUserName();
-                        while(userName==null){}
+                        while(userName==null){ }
                         Log.d(TAG, "run: username="+userName);
+                        Log.d(TAG, "run: shareItem size:"+shareItemList.size());
+                        Log.d(TAG, "run: shareItem count:"+count);
+                        Log.d(TAG, "run: shareItem create:"+i);
                         shareItemList.set(shareItemList.size()-count+i,new ShareItem(post, VCardManager.getUserImage(userName),userName,serverFunction.getSmallUpImg(),
                                 serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
                         getActivity().runOnUiThread(new Runnable() {
@@ -180,7 +167,6 @@ public class ShareFragment extends Fragment {
                         }
                     }
                 }
-
             }
         }).start();
     }

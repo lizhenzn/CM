@@ -78,7 +78,8 @@ public class VCardManager {
     public static VCard getUserVcard(String user){
         VCard vCard=null;
         try {
-            vCard= org.jivesoftware.smackx.vcardtemp.VCardManager.getInstanceFor(Connect.getXMPPTCPConnection()).loadVCard(user+"@"+Connect.SERVERNAME);
+            vCard= org.jivesoftware.smackx.vcardtemp.VCardManager.getInstanceFor(Connect.getXMPPTCPConnection())
+                    .loadVCard(user+"@"+Connect.SERVERNAME);
         } catch (SmackException.NoResponseException e) {
             e.printStackTrace();
         } catch (XMPPException.XMPPErrorException e) {

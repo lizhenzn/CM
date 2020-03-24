@@ -13,4 +13,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="UpControlText">上衣</string>
+    <string name="DownControlText">下衣</string>
 </resources>

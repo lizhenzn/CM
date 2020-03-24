@@ -23,6 +23,27 @@
         android:orientation="horizontal"
         android:elevation="4dp"
         android:background="@color/colorGray">
+
+      <ImageView
+          android:layout_width="5dp"
+          android:layout_height="32dp"
+          android:layout_marginLeft="10dp"
+          android:layout_marginTop="10dp"
+          android:background="#0CC9FA" />
+
+      <TextView
+          android:layout_width="328dp"
+          android:layout_height="match_parent"
+          android:textStyle="bold"
+          android:gravity="center"
+          android:textSize="30dp"
+          android:text="@string/UpControlText"/>
+
+      <ImageView
+          android:id="@+id/wardrobeUpPointer"
+          android:layout_width="62dp"
+          android:layout_height="match_parent"
+          android:src="@drawable/ic_pointer_down_black_24dp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/wardrobeUpLayout"
@@ -32,7 +53,7 @@
 
       <android.support.v7.widget.RecyclerView
           android:id="@+id/wardrobeR1"
-          android:layout_width="wrap_content"
+          android:layout_width="286dp"
           android:layout_height="match_parent"
           android:layout_weight="3">
 
@@ -53,7 +74,26 @@
         android:orientation="horizontal"
         android:elevation="2dp"
         android:background="@color/colorGray">
+      <ImageView
+          android:layout_width="5dp"
+          android:layout_height="32dp"
+          android:layout_marginLeft="10dp"
+          android:layout_marginTop="10dp"
+          android:background="#0CC9FA" />
 
+      <TextView
+          android:layout_width="328dp"
+          android:layout_height="match_parent"
+          android:textStyle="bold"
+          android:gravity="center"
+          android:textSize="30dp"
+          android:text="@string/DownControlText"/>
+
+      <ImageView
+          android:id="@+id/wardrobeDownPointer"
+          android:layout_width="62dp"
+          android:layout_height="match_parent"
+          android:src="@drawable/ic_pointer_right_black_24dp"/>
     </LinearLayout>
 
     <LinearLayout
@@ -64,7 +104,7 @@
       <!--设置自动动画效果-->
       <android.support.v7.widget.RecyclerView
           android:id="@+id/wardrobeR2"
-          android:layout_width="wrap_content"
+          android:layout_width="290dp"
           android:layout_height="match_parent"
           android:layout_weight="3">
 

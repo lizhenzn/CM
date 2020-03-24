@@ -6,7 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -41,19 +40,14 @@ import android.widget.Toast;
 
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
-import com.example.cm.myInfo.SmackUserInfo;
 import com.example.cm.myInfo.VCardManager;
 import com.example.cm.service.PacketListenerService;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
-import com.example.cm.util.DataBase;
-import com.example.cm.util.ServerFunction;
 import com.example.cm.util.MessageManager;
+import com.example.cm.wardrobe.WardrobeFragment;
 
-import org.jivesoftware.smack.PresenceListener;
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Presence;
 
 import java.io.IOException;
 
@@ -108,6 +102,9 @@ public class MainActivity extends AppCompatActivity{
             //actionBar.setHomeAsUpIndicator(R.mipmap.ic_launcher_round);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+        //测试代码片，可能存在严重不稳定情况，方法的静态化可能导致一系列问题
+        WardrobeFragment.initData();
+        //
         navigationView.setCheckedItem(R.id.setting);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
