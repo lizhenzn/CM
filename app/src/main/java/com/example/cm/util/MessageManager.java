@@ -24,6 +24,7 @@ import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 import org.jivesoftware.smackx.offline.OfflineMessageManager;
+import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -233,8 +234,12 @@ public class MessageManager {
                 Log.e("", "initFriend: 双方互相订阅" );
                 FriendInfo friendInfo = new FriendInfo();
                 String user = entry.getUser().split("@")[0];
+                VCard vCard=VCardManager.getUserVcard(user);
                 friendInfo.setUserName(user);
-                friendInfo.setNicName(user);
+                if(vCard.getNickName()==null){
+                    friendInfo.setNicName(user);
+                }
+                friendInfo.setNicName(vCard.getNickName());
                 String pinyin = Cn2Spell.getPinYin(user); // 根据姓名获取拼音
                 String firstLetter = pinyin.substring(0, 1).toUpperCase(); // 获取拼音首字母并转成大写
                 if (!firstLetter.matches("[A-Z]")) { // 如果不在A-Z中则默认为“#”
@@ -242,23 +247,17 @@ public class MessageManager {
                 }
                 friendInfo.setPinyin(pinyin);
                 friendInfo.setFirstLetter(firstLetter);
-                String sex = VCardManager.getUserVcard(user).getField("gender");
+                String sex = vCard.getField("gender");
                 if (sex == null) {
-                    sex = "保密";
-                }else if(sex.equals("male")){
-                    sex="男";
-                }else if(sex.equals("female")){
-                    sex="女";
-                }else{
-                    sex="保密";
+                    sex = "secrecy";
                 }
                 friendInfo.setSex(sex);
-                String email = VCardManager.getUserVcard(user).getField("email");
+                String email = vCard.getField("email");
                 if (email == null) {
                     email = "";
                 }
                 friendInfo.setEmail(email);
-                Log.e("", "initFriend: sex :" + sex + "   email:" + email);
+                Log.e("", "initFriend: gender :" + sex + "   email:" + email);
                 Bitmap bitmap = VCardManager.getUserImage(user);
                 friendInfo.setHeadBt(bitmap);  //设置头像
                 String friendHeadBitmapRoad = AlbumUtil.saveHeadBitmap(user, bitmap);  //保存好友头像
@@ -306,13 +305,7 @@ public class MessageManager {
 
             if(messages.size()>0){
                 for(int i=0;i<messages.size();i++){
-                    Log.d("离线消息", "getOfflineMessage: ");
-                    Log.d("离线消息", "getOfflineMessage: ");
-                    Log.d("离线消息", "getOfflineMessage: ");
                     Log.d("离线消息测试", "getOfflineMessage: "+messages);
-                    Log.d("离线消息", "getOfflineMessage: ");
-                    Log.d("离线消息", "getOfflineMessage: ");
-                    Log.d("离线消息", "getOfflineMessage: ");
                 }
             }
             for(int i=0;i<messages.size();i++){

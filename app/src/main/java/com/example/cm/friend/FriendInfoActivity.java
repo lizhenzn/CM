@@ -27,22 +27,19 @@ public class FriendInfoActivity extends AppCompatActivity {
    private TextView setting_btn;
    private String userName;
    private int position;
+   private FriendInfo curFriendInfo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_info);
 
         init();
-        VCard vCard= VCardManager.getUserVcard(userName);
+        /*VCard vCard= VCardManager.getUserVcard(userName);
         Log.e("联系人信息", "onCreate: "+vCard);
         Log.d("邮件", "onCreate: email"+vCard.getField("email"));
         Log.d("性别", "onCreate: sex:"+vCard.getField("gender"));
-        Log.d("emailHome", "onCreate: sex:"+vCard.getEmailHome());
-        Log.d("emailWork", "onCreate: sex:"+vCard.getEmailWork());
         Log.d("JabberId", "onCreate: sex:"+vCard.getJabberId());
-        Log.d("昵称", "onCreate: Nic:"+vCard.getNickName());
-
-        //Connect.setInfo();
+        Log.d("昵称", "onCreate: Nic:"+vCard.getNickName());*/
 
         ActionBar actionBar=getActionBar();
         if(actionBar!=null)actionBar.setDisplayShowTitleEnabled(false);
@@ -95,5 +92,6 @@ public class FriendInfoActivity extends AppCompatActivity {
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
         position=intent.getIntExtra("position",0);
+        curFriendInfo=MessageManager.getContantFriendInfoList().get(position);
     }
 }

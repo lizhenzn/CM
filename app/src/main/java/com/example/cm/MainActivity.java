@@ -1,17 +1,22 @@
 package com.example.cm;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -22,16 +27,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.myInfo.SmackUserInfo;
@@ -59,22 +66,22 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Toolbar toolbar;
-    private TextView nichengTV;
+    private static TextView nichengTV;
     private static TextView titleTV;
-    private ImageView navi_head,head_home;
+    private static ImageView navi_head,head_home;
     private static String path="/sdcard/Clothes/MyInfo/head";
     private final int LOGIN=1;
     private QBadgeView naviQBadgeView;
     private static ServiceConnection serviceConnection;   //用于连接服务通信
     private static PacketListenerService.MyBinder binder;   //服务中Binder
     private static Context mainActivityContext;   //主活动的Context
+    private static Activity activity;
     public static Boolean isBinded;
     private static final String TAG = "MainActivity";
 
     private static int clothes_up=-1;
     private static int clothes_down=-1;
     private static boolean choose_flag=false;
-
     private static FragmentTabHost fragmentTabHost;
     public static int getClothes_up(){
         return clothes_up;
@@ -186,11 +193,16 @@ public class MainActivity extends AppCompatActivity{
     public static Context getInstance(){  //返回上下文环境
         return mainActivityContext;
     }
+    public static Activity getActivity(){
+        return activity;
+    }
 
     //初始化各控件
     public void init(){
         isBinded=false;
         mainActivityContext=MainActivity.this;
+        activity=MainActivity.this.getParent();
+
         MessageManager.initAllList();
         Connect.init();             //初始化适配器列表
         if(!AlbumUtil.checkStorage(this)){
@@ -209,6 +221,7 @@ public class MainActivity extends AppCompatActivity{
         nichengTV=(TextView)headerView.findViewById(R.id.nicheng);
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
+
         //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
         if(MessageManager.getSharedPreferences().contains("userName")){  //有此userName键值，说明登陆过
             MessageManager.getSmackUserInfo().setUserName(MessageManager.getSharedPreferences().getString("userName",""));
@@ -256,8 +269,9 @@ public class MainActivity extends AppCompatActivity{
         setInfo();        //调用设置头像、昵称函数
 
     }
+
     //设置昵称、头像...
-    public void setInfo(){
+    public static void setInfo(){
         navi_head.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
         head_home.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
         nichengTV.setText(MessageManager.getSmackUserInfo().getNiC());

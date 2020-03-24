@@ -26,6 +26,7 @@
             android:layout_gravity="end"
             />
     </android.support.v7.widget.Toolbar>
+
     <Button
         android:id="@+id/friend_detail_send_btn"
         android:text="发消息"

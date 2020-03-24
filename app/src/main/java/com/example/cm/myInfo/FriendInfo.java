@@ -1,6 +1,13 @@
 package com.example.cm.myInfo;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import com.example.cm.MainActivity;
+import com.example.cm.R;
+
+import java.io.InputStream;
 
 public class FriendInfo implements Comparable<FriendInfo>{
     String userName;   //用户名Jid
@@ -14,6 +21,14 @@ public class FriendInfo implements Comparable<FriendInfo>{
     String firstLetter;     //字母排序索引
     public FriendInfo(){
         this.chated=0; //默认为0
+        userName="";
+        nicName="点击登录";
+        @SuppressLint("ResourceType") InputStream is1 = MainActivity.getInstance().getResources().openRawResource(R.drawable.unlogin);
+        headBt = BitmapFactory.decodeStream(is1);
+        sex="secrecy";
+        email="";
+        firstLetter="#";
+        pinyin="";
     }
 
     public String getUserName() {

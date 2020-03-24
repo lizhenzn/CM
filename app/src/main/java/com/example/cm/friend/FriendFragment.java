@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,15 +22,11 @@ import android.widget.Toast;
 import com.example.cm.R;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.ChatListAdapter;
-import com.example.cm.friend.chat.Message;
-import com.example.cm.myInfo.MyInfoActivity;
-import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TreeMap;
+
 
 import static com.example.cm.MainActivity.setToolbarText;
 
@@ -69,8 +66,7 @@ public class FriendFragment extends Fragment  {
 
 
 
-        //DisplayMetrics displayMetrics=new DisplayMetrics();
-        //getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
         //initChatList();
         chatListAdapter=new ChatListAdapter(getActivity());
         chatLV.setAdapter(chatListAdapter);

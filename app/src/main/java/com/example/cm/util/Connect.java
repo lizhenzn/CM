@@ -1,15 +1,32 @@
 package com.example.cm.util;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.annotation.MainThread;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
@@ -22,6 +39,8 @@ import com.example.cm.myInfo.VCardManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 
 
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -35,10 +54,10 @@ import org.jivesoftware.smack.filter.AndFilter;
 
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 
+import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.roster.Roster;
 
 import org.jivesoftware.smack.roster.RosterEntry;
@@ -70,6 +89,8 @@ import java.util.Map;
 
 import javax.net.ssl.SNIServerName;
 
+import static android.support.v4.content.ContextCompat.getSystemService;
+
 
 public class Connect {
     public static final String SERVERNAME="iz92swk4q6t1a7z";       //服务器名	iz92swk4q6t1a7z
@@ -78,6 +99,7 @@ public class Connect {
     public static boolean isLogined;  //登陆是否
     public  static boolean isNetAvailable;  //网络是否可用
     private static XMPPTCPConnection xmpptcpConnection=null;
+    private static ConnectionListener connectionListener=null;
     private Connect(){}
     public static XMPPTCPConnection getXMPPTCPConnection(){
                 if(xmpptcpConnection==null) {
@@ -107,6 +129,141 @@ public class Connect {
                         return null;
                     }
                 }
+                if(connectionListener==null) {
+                    connectionListener = new ConnectionListener() {
+                        @Override
+                        public void connected(XMPPConnection xmppConnection) {
+                            Log.e("", "connected: 连接成功");
+                        }
+
+                        @Override
+                        public void authenticated(XMPPConnection xmppConnection, boolean b) {
+                            Log.e("", "authenticated: 登陆成功");
+                        }
+
+                        @Override
+                        public void connectionClosed() {
+                            Log.e("", "connectionClosed: 连接关闭");
+
+                        }
+
+                        @Override
+                        public void connectionClosedOnError(Exception e) {
+                            Log.e("", "connectionClosedOnError: 连接异常断开");
+                            if (e instanceof XMPPException) {
+                                XMPPException.StreamErrorException xe = (XMPPException.StreamErrorException) e;
+                                StreamError error = xe.getStreamError();
+                                StreamError.Condition condition;
+                                if (error != null) {
+                                    condition = error.getCondition();
+                                    if (condition.equals(StreamError.Condition.conflict)) {
+                                        Log.e("", "connectionClosedOnError:别处登录冲突 ");
+                                        //TODO 弹出框提示 强制下线
+
+                                        MessageManager.getSmackUserInfo().setNiC("点击登录");
+                                        //Connect.signOut();
+                                        Connect.isLogined = false;
+                                        setRoster(null);
+                                        setXmpptcpConnection(null);
+                                        MessageManager.getDb().close();
+                                        MessageManager.getDataBaseHelp().close();
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+
+                                                Resources resources = MainActivity.getInstance().getResources();
+                                                DisplayMetrics dm = resources.getDisplayMetrics();
+                                                int width = dm.widthPixels;
+                                                int height = dm.heightPixels;
+                                                Looper.prepare();
+                                                Dialog dialog = new Dialog(MainActivity.getInstance(), R.style.LoginConflictDialog);
+                                                View view = View.inflate(MainActivity.getInstance(), R.layout.conflict, null);
+                                                Button ensureBtn=(Button)view.findViewById(R.id.coflict_ensure_btn);
+
+                                                dialog.setContentView(view);
+                                                dialog.setCanceledOnTouchOutside(false);
+                                                view.setMinimumHeight((int) (height * 0.23f));
+                                                Window dialogWindow = dialog.getWindow();
+                                                dialogWindow.setWindowAnimations(R.style.DialogAnimation);//设置Dialog出现退出动画
+                                                WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+                                                lp.width = (int) (width * 0.9f);
+                                                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                                                lp.gravity = Gravity.CENTER;
+                                                dialogWindow.setAttributes(lp);
+                                                ((Activity)MainActivity.getInstance()).runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        Log.e("", "run: 冲突" );
+                                                        MainActivity.setInfo();
+                                                        //dialog.show();
+                                                        connectionListener=null;
+
+
+                                                    }
+                                                });
+                                                dialog.show();
+                                                ensureBtn.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        ((Activity)MainActivity.getInstance()).runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                dialog.dismiss();
+                                                            }
+                                                        });
+                                                    }});
+                                                Looper.loop();
+                                            }
+                                        }).start();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void reconnectionSuccessful() {
+                            Log.e("", "reconnectionSuccessful: 重连成功");
+                            if (xmpptcpConnection.isAuthenticated()) {
+                                try {
+                                    xmpptcpConnection.login();
+                                    //重连之后登录
+                                } catch (XMPPException e) {
+                                    e.printStackTrace();
+                                } catch (SmackException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void reconnectingIn(int i) {
+
+                        }
+
+                        @Override
+                        public void reconnectionFailed(Exception e) {
+                            Log.e("", "reconnectionFailed: 重连失败");
+                        }
+                    };
+                    xmpptcpConnection.addConnectionListener(connectionListener);
+                    Log.e("", "getXMPPTCPConnection: 添加连接监听" );
+                }
         return  xmpptcpConnection;
     }
     public static Roster getRoster(){         //好友花名册
@@ -131,7 +288,6 @@ public class Connect {
                 getXMPPTCPConnection();
                 Log.e("", "login: 连接服务器");
             }
-
             if(MainActivity.isBinded) {
                     MainActivity.unBindPacket();
             }
@@ -216,9 +372,13 @@ public class Connect {
                     presence.setStatus("GONE");
                     try {
                         getXMPPTCPConnection().sendStanza(presence);
+                        getXMPPTCPConnection().removeConnectionListener(connectionListener);
+                        Log.e("", "signOut: 移除连接监听" );
                         getXMPPTCPConnection().disconnect();  //断开连接
                         roster=null;
+                        connectionListener=null;
                         xmpptcpConnection=null;
+                        connectionListener=null;
                         isLogined=false;
                         MessageManager.getDb().close();                 //关闭数据库
                         MessageManager.getDataBaseHelp().close();
@@ -272,10 +432,10 @@ public class Connect {
 
     public static void init(){
         isLogined=false;
-        isNetAvailable=isNetAvailable;
+        isNetAvailable=isNetAvailable();
     }
     //网络是否可用
-    public  boolean isIsNetAvailable() {
+    public static boolean isNetAvailable() {
         boolean isNetUsable = false;
         ConnectivityManager manager = (ConnectivityManager)
                 MainActivity.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
