@@ -59,12 +59,12 @@
 
       </android.support.v7.widget.RecyclerView>
 
-      <ImageView
-          android:id="@+id/wardrobeUpAdd"
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:layout_weight="1"
-          android:src="@drawable/chat_add" />
+        <ImageView
+            android:id="@+id/wardrobeUpAdd"
+            android:layout_width="49dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/chat_add" />
     </LinearLayout>
 
     <LinearLayout
@@ -109,12 +109,13 @@
           android:layout_weight="3">
 
       </android.support.v7.widget.RecyclerView>
-      <ImageView
-          android:id="@+id/wardrobeDownAdd"
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:layout_weight="1"
-          android:src="@drawable/chat_add" />
+
+        <ImageView
+            android:id="@+id/wardrobeDownAdd"
+            android:layout_width="51dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/chat_add" />
     </LinearLayout>
   </LinearLayout>
 </ScrollView>
