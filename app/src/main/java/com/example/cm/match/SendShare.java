@@ -1,4 +1,4 @@
-package com.example.cm;
+package com.example.cm.match;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.cm.MainActivity;
+import com.example.cm.R;
 import com.example.cm.match.MatchFragment;
 import com.example.cm.myInfo.SmackUserInfo;
 import com.example.cm.util.Connect;
@@ -36,7 +38,7 @@ public class SendShare extends AppCompatActivity {
         context=this;
         //上衣图片
         ImageView clothes_up = findViewById(R.id.clothes_up);
-        Log.d(TAG, "onCreate: clothes_up and clothes_down="+MainActivity.getClothes_up()+","+MainActivity.getClothes_down());
+        Log.d(TAG, "onCreate: clothes_up and clothes_down="+ MainActivity.getClothes_up()+","+MainActivity.getClothes_down());
         if(MainActivity.getClothes_up()!=-1){
             clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(MainActivity.getClothes_up()));
         }
