@@ -48,7 +48,7 @@
         <android.support.v4.app.FragmentTabHost
                 android:id="@+id/tabhost"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
+                android:layout_height="45dp"
                 >
                 <FrameLayout
                     android:id="@+id/tabcontent"

@@ -10,12 +10,18 @@
       android:layout_height="wrap_content"
       android:orientation="vertical">
 
-    <android.support.v4.view.ViewPager
+    <!--<android.support.v4.view.ViewPager-->
+        <!--android:id="@+id/wardrobeVP"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="350dp"-->
+        <!--android:layout_weight="1"></android.support.v4.view.ViewPager>-->
+    <ImageView
         android:id="@+id/wardrobeVP"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_weight="1"></android.support.v4.view.ViewPager>
-
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/clothes_up"/>
     <LinearLayout
         android:id="@+id/wardrobeUpControl"
         android:layout_width="match_parent"
