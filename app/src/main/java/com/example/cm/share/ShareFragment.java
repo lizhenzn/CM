@@ -40,13 +40,12 @@ public class ShareFragment extends Fragment {
     private Object ThreadManager=new Object();
     private int countLeft=-1;
     private int count=-1;
-
+    private boolean isRefreshing=true;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setToolbarText("广场");
-
     }
 
     @Override
@@ -69,6 +68,11 @@ public class ShareFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(isRefreshing){
+                    swipeRefreshLayout.setRefreshing(false);
+                    return;
+                }
+                isRefreshing=true;
                 init();
                 shareAdapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
@@ -137,11 +141,8 @@ public class ShareFragment extends Fragment {
                 synchronized (ThreadManager){
                     if(refresh)
                         serverFunction.refresh();
-                    //Log.d(TAG, "run: enter thread");
                     serverFunction.loadPostList();
-                    //Log.d(TAG, "postlist: "+serverFunction.nextPost());
                     for (int i = 0; i < count; i++) {
-                        //Log.d(TAG, "run: "+serverFunction.getCurrentPostPosition());
                         Log.d(TAG, "run: "+i);
                         while(!serverFunction.getShareManager().transfer_flags[i]){ }
                         Log.d(TAG, "run: quite while");
@@ -155,6 +156,7 @@ public class ShareFragment extends Fragment {
                         Log.d(TAG, "run: shareItem create:"+i);
                         shareItemList.set(shareItemList.size()-count+i,new ShareItem(post, VCardManager.getUserImage(userName),userName,serverFunction.getSmallUpImg(),
                                 serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
+                        isRefreshing=false;
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -162,7 +164,6 @@ public class ShareFragment extends Fragment {
                             }
                         });
                         if(!serverFunction.nextPost()){
-                            //Log.d(TAG, "run: "+serverFunction.getCurrentPostPosition());
                             break;
                         }
                     }
