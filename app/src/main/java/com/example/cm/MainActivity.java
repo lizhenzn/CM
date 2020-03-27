@@ -407,12 +407,14 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        //super.onBackPressed();
-        if (System.currentTimeMillis() - backPressTime < 2000) {
-            finish();
-        } else {
-            backPressTime = System.currentTimeMillis();
-            Toast.makeText(mainActivityContext,"再次按返回键退出",Toast.LENGTH_SHORT).show();
+        if(isChoose_flag()){setChoose_flag(false);super.onBackPressed();}
+        else {
+            if (System.currentTimeMillis() - backPressTime < 2000) {
+                finish();
+            } else {
+                backPressTime = System.currentTimeMillis();
+                Toast.makeText(mainActivityContext, "再次按返回键退出", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

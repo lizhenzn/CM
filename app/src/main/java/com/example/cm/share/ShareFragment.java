@@ -13,11 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.example.cm.R;
 import com.example.cm.myInfo.VCardManager;
-import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
 import java.util.ArrayList;
@@ -129,8 +127,8 @@ public class ShareFragment extends Fragment {
         }
         Log.d(TAG, "getData: countLeft="+countLeft+",count="+count);
         for (int i = 0; i < count; i++) {
-            shareItemList.add(new ShareItem(R.drawable.friend1, "用户名",R.drawable.friend1,
-                    R.drawable.friend1,"",R.drawable.givelike,R.drawable.comment));
+            shareItemList.add(new ShareItem(R.drawable.ic_loading, "用户名",R.drawable.ic_loading,
+                    R.drawable.ic_loading,"",R.drawable.givelike,R.drawable.comment));
         }
         countLeft-=count;
         serverFunction.getShareManager().resetTransferFlags();
