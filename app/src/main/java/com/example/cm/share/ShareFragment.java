@@ -14,9 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.cm.R;
 import com.example.cm.myInfo.VCardManager;
+import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
@@ -59,6 +62,12 @@ public class ShareFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context=getActivity();
         view=View.inflate(context, R.layout.share,null);
+        if(!Connect.isLogined){
+            Toast.makeText(context,"您尚未登陆",Toast.LENGTH_LONG).show();
+            ImageView imageView=view.findViewById(R.id.invisible);
+            imageView.setVisibility(View.VISIBLE);
+            return view;
+        }
         serverFunction=new ServerFunction(context.getCacheDir());
         init();
         recyclerView.addItemDecoration(new ShareItemDecoration());
