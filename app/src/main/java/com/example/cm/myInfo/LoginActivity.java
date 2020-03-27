@@ -28,7 +28,7 @@ import java.io.File;
 
 public class LoginActivity extends Activity implements View.OnClickListener{
     private Button loginBtn,pswEnBtn;
-    private ImageView headIM_login;
+    private ImageView headIM_login,visible;
     private EditText userET,pswET;
     private TextView registerTV;
     private Spinner spinner;
@@ -56,7 +56,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         spinner=(Spinner)findViewById(R.id.spinner);
         headIM_login=(ImageView)findViewById(R.id.head_login);
         pswEnBtn=(Button)findViewById(R.id.visible);
-
         progressDialog=new ProgressDialog(LoginActivity.this);
         //注册事件
         loginBtn.setOnClickListener(this);
@@ -113,6 +112,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                 }
                 //TODO 判断是不是和上次登录用户一样 从而决定是否更换从数据库得到的联系人列表和聊天信息列表
                 new Thread(new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void run() {
                     LoginActivity.this.runOnUiThread(new Runnable() {
@@ -181,10 +181,12 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                 if(VISIABLE){
                     //设置可见
                     pswET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    pswEnBtn.setBackgroundResource(R.drawable.can_see);
                     VISIABLE=false;
                 }else{
                     //设置不可见
                     pswET.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    pswEnBtn.setBackgroundResource(R.drawable.cannot_see);
                     VISIABLE=true;
                 }
                 //设置光标位置位于最后
