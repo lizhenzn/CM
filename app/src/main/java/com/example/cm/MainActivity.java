@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity{
                 switch (menuItem.getItemId()){
                     case R.id.navi_sign_out:{
                         Connect.signOut();   //注销登录
-                        nichengTV.setText("点击登录");
+                        setInfo();
                     }break;
                     case R.id.changePassword:{//修改密码
                         Intent intent=new Intent(MainActivity.this, ChangePasswordActivity.class);
@@ -127,15 +127,14 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 //如果图片是默认的未登录图片，说明还没有登陆,点击进入登陆活动
-                /*if(navi_head.getDrawable().getCurrent().getConstantState().equals(getResources().getDrawable(R.drawable.unlogin).getConstantState())){
+                if(!Connect.isLogined){
                     intent=new Intent(MainActivity.this, LoginActivity.class);
                     startActivityForResult(intent,LOGIN);
+                    overridePendingTransition(R.anim.out_from_left,R.anim.in_from_right);
                 }else{
                 intent=new Intent(MainActivity.this,MyInfoActivity.class);
                 startActivity(intent);
-                }*/
-                intent=new Intent(MainActivity.this,MyInfoActivity.class);
-                startActivity(intent);
+                }
 
 
             }
@@ -165,9 +164,6 @@ public class MainActivity extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
         setInfo();
-        if(!Connect.isLogined){
-            nichengTV.setText("点击登录");
-        }
     }
 
     @Override   //标题栏按钮按键
@@ -232,14 +228,11 @@ public class MainActivity extends AppCompatActivity{
             }
             MessageManager.getSmackUserInfo().setSex(MessageManager.getSharedPreferences().getString("gender","保密"));
             MessageManager.getSmackUserInfo().setEmail(MessageManager.getSharedPreferences().getString("email",""));
-            String cachePasswd=MessageManager.getSharedPreferences().getString("passward","");//缓存的密码
+            String cachePasswd=MessageManager.getSharedPreferences().getString("password","");//缓存的密码
             String headBtRoad=MessageManager.getSharedPreferences().getString("userHeadBtRoad","");
             MessageManager.getSmackUserInfo().setHeadBt(BitmapFactory.decodeFile(headBtRoad));
             Log.d(TAG, "init: 设置自己头像之后");
             MessageManager.setDataBaseHelp(MessageManager.getSmackUserInfo().getUserName());
-            //Connect.smackUserInfo.setSex(Connect.sharedPreferences.getString("userSex",""));
-            //Connect.smackUserInfo.setHeight(Connect.sharedPreferences.getString("userHeight","180"));
-            //Connect.smackUserInfo.setEmail(Connect.sharedPreferences.getString("userEmail",""));
 
             //TODO        初始化聊天信息和好友信息
             MessageManager.setContantFriendInfoList(MessageManager.getDataBaseHelp().getContantFriendInfoList());
@@ -249,6 +242,12 @@ public class MainActivity extends AppCompatActivity{
                 public void run() {
                     Connect.login(MessageManager.getSmackUserInfo().getUserName(), cachePasswd);
                     Log.e(TAG, "run: 上次登录启动自动登录："+MessageManager.getSmackUserInfo().getUserName()+cachePasswd );
+                    MainActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setInfo();
+                        }
+                    });
                 }
             }).start();
 
@@ -272,6 +271,12 @@ public class MainActivity extends AppCompatActivity{
         navi_head.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
         head_home.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
         nichengTV.setText(MessageManager.getSmackUserInfo().getNiC());
+    }
+    //设置默认信息
+    public static void setDefaultSmackInfo(){
+        MessageManager.getSmackUserInfo().setNiC("点击登录");
+        Bitmap bitmap=BitmapFactory.decodeResource(getInstance().getResources(),R.drawable.unlogin);
+        MessageManager.getSmackUserInfo().setHeadBt(bitmap);           //设置为未登陆的照片
     }
     //初始化FragmentTabHost
     public void initTabhost(){
@@ -334,9 +339,6 @@ public class MainActivity extends AppCompatActivity{
             case LOGIN:{
                 if(resultCode==RESULT_OK){
                     setInfo();
-                    if(!Connect.isLogined){
-                        nichengTV.setText("点击登录");
-                    }
                 }
 
             }break;

@@ -71,13 +71,13 @@
             android:background="@null"
              />
 
-        <Spinner
+        <!--<Spinner
             android:id="@+id/spinner"
             android:layout_width="40dp"
             android:layout_height="60dp"
             android:layout_marginLeft="20dp"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/user_login" />
+            android:layout_toRightOf="@+id/user_login" />-->
 
 
 

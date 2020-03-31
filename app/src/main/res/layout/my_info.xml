@@ -49,8 +49,10 @@
         <ImageView
             android:id="@+id/head_right_iv"
             android:layout_width="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="6dp"
             android:layout_height="match_parent"
-            android:src="@mipmap/ic_launcher_round"/>
+            android:src="@drawable/arrow_right"/>
 
 
     </LinearLayout>
@@ -83,8 +85,10 @@
             android:gravity="center_vertical"/>
         <ImageView
             android:layout_width="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="6dp"
             android:layout_height="match_parent"
-            android:src="@mipmap/ic_launcher"/>
+            android:src="@drawable/arrow_right"/>
 
     </LinearLayout>
     <View
@@ -117,7 +121,9 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="match_parent"
-            android:src="@mipmap/ic_launcher"/>
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="6dp"
+            android:src="@drawable/arrow_right"/>
 
     </LinearLayout>
     <View
@@ -150,7 +156,9 @@
             android:id="@+id/xingbie_iv"
             android:layout_width="24dp"
             android:layout_height="match_parent"
-            android:src="@mipmap/ic_launcher"/>
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="6dp"
+            android:src="@drawable/arrow_right"/>
 
     </LinearLayout>
     <View
@@ -179,7 +187,9 @@
             android:id="@+id/email_iv"
             android:layout_width="24dp"
             android:layout_height="match_parent"
-            android:src="@mipmap/ic_launcher"/>
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="6dp"
+            android:src="@drawable/arrow_right"/>
 
     </LinearLayout>
     <View

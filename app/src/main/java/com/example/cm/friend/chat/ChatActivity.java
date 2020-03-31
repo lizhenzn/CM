@@ -44,6 +44,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
@@ -201,7 +202,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if(Connect.isLogined) {
                         try {
                             Date date = new Date();
-                            chat.sendMessage(toJson(mesBody, "text", date.getTime()));
+                            chat.sendMessage(toJson(mesBody, "text", date.getTime()+28800));
                             Message message = new Message();
                             message.setType(1);
                             message.setMessageType("text"); //文本消息
@@ -223,8 +224,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     }else{
                         Toast.makeText(this,"未登录...",Toast.LENGTH_SHORT).show();
                     }
-
-
                     //chatAdapter.notifyDataSetChanged();
                     //chatItemLV.smoothScrollToPosition(chatActivitymessageList.size()-1);
                 }

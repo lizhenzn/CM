@@ -33,7 +33,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     private ImageView headIM_login;
     private EditText userET,pswET;
     private TextView registerTV;
-    private Spinner spinner;
     private int loginResult;
     private String result;
     private final int REGISTER=1;
@@ -58,7 +57,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         userET=(EditText)findViewById(R.id.user_login);
         pswET=(EditText)findViewById(R.id.password);
         registerTV=(TextView)findViewById(R.id.register);
-        spinner=(Spinner)findViewById(R.id.spinner);
         headIM_login=(ImageView)findViewById(R.id.head_login);
         pswEnBtn=(Button)findViewById(R.id.visible);
         cacheUser=MessageManager.getSharedPreferences().getString("userName","");
@@ -108,9 +106,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             userET.setHint("帐号");
             pswET.setHint("密码");
         }
-        adapterXML= (ArrayAdapter<CharSequence>) ArrayAdapter.createFromResource(this,R.array.datalist,R.layout.support_simple_spinner_dropdown_item);
-        spinner.setAdapter(adapterXML);
-
     }
 
     @Override
@@ -209,12 +204,10 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                     pswET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
                     VISIABLE=true;
                     pswEnBtn.setBackgroundResource(R.drawable.can_see);
-                    VISIABLE=false;
                 }else{
                     //设置不可见
                     pswET.setTransformationMethod(PasswordTransformationMethod.getInstance());
                     pswEnBtn.setBackgroundResource(R.drawable.cannot_see);
-                    VISIABLE=true;
                     VISIABLE=false;
                 }
                 //设置光标位置位于最后

@@ -287,6 +287,7 @@ public class Connect {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static int login(String userName, String passwd){
         try {
+            isLogined=false;
             while(xmpptcpConnection==null){
                 getXMPPTCPConnection();
                 Log.e("", "login: 连接服务器");
@@ -345,7 +346,7 @@ public class Connect {
                 String headBitmapRoad=AlbumUtil.saveHeadBitmap(userName,bitmap);
                 Log.d("保存头像路径", "run: "+headBitmapRoad);
                 MessageManager.getEditor().putString("userName",userName);
-                MessageManager.getEditor().putString("passward",passwd);
+                MessageManager.getEditor().putString("password",passwd);
                 MessageManager.getEditor().putString("NICKNAME",MessageManager.getSmackUserInfo().getNiC());
                 MessageManager.getEditor().putString("gender",MessageManager.getSmackUserInfo().getSex());
                 MessageManager.getEditor().putString("email",MessageManager.getSmackUserInfo().getEmail());
@@ -356,6 +357,7 @@ public class Connect {
                 Log.d("登陆后写入的登录名", "run: "+MessageManager.getSharedPreferences().getString("userName",""));
             }
             else{
+                MainActivity.setDefaultSmackInfo();
                 if(xmpptcpConnection!=null){
                     xmpptcpConnection.removeConnectionListener(connectionListener);
                     connectionListener=null;
@@ -368,6 +370,7 @@ public class Connect {
 
         } catch (SmackException | IOException  e) {
             e.printStackTrace();
+            MainActivity.setDefaultSmackInfo();
             if(xmpptcpConnection!=null){
                 xmpptcpConnection.removeConnectionListener(connectionListener);
                 connectionListener=null;
@@ -378,6 +381,7 @@ public class Connect {
             return 1;
         }
         catch (XMPPException.XMPPErrorException e){
+            MainActivity.setDefaultSmackInfo();
             if(xmpptcpConnection!=null){
                 xmpptcpConnection.removeConnectionListener(connectionListener);
                 connectionListener=null;
@@ -392,6 +396,7 @@ public class Connect {
             }
         }catch (XMPPException e){
             e.printStackTrace();
+            MainActivity.setDefaultSmackInfo();
             if(xmpptcpConnection!=null){
                 xmpptcpConnection.removeConnectionListener(connectionListener);
                 connectionListener=null;
@@ -418,6 +423,7 @@ public class Connect {
                 xmpptcpConnection=null;
                 connectionListener=null;
                 isLogined=false;
+                MainActivity.setDefaultSmackInfo();
                 MessageManager.getDb().close();                 //关闭数据库
                 MessageManager.getDataBaseHelp().close();
             } catch (SmackException.NotConnectedException e) {
