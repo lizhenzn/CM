@@ -85,6 +85,8 @@ public class DataBase extends SQLiteOpenHelper {
         values.put("date",message.getDate());
         values.put("photoRoad",message.getPhotoRoad());
         MessageManager.getDb().insert("MessageTable",null,values);
+        Log.e("", "addMessage: 添加聊天信息进数据库"+message );
+
 
     }
     /*得到数据库的聊天记录
@@ -104,10 +106,16 @@ public class DataBase extends SQLiteOpenHelper {
                String photoRoad=cursor.getString(cursor.getColumnIndex("photoRoad"));
                message.setPhotoRoad(photoRoad);
                message.setDate(Long.valueOf(cursor.getString(cursor.getColumnIndex("date"))));
-               message.setPhoto(BitmapFactory.decodeFile(photoRoad));
                message.setMessageType(cursor.getString(cursor.getColumnIndex("messageType")));
+               if(message.getMessageType().equalsIgnoreCase("photo")){
+                   //TODO 异常则设置默认异常图片
+                   message.setPhoto(BitmapFactory.decodeFile(photoRoad));
+               }else{
+                   message.setPhoto(null);
+               }
                //message.setDate(cursor.getShort(cursor.getColumnIndex("date")));
                //添加进整体聊天记录
+                Log.e("读取的数据库消息", "getMessageHashMap: "+message.getFrom()+"  "+message.getTo()+"  "+message.getBody() );
                messageList.add(message);
             }while (cursor.moveToNext());
         }
@@ -133,6 +141,17 @@ public class DataBase extends SQLiteOpenHelper {
                     messageList1.add(messageList.get(i));
                 }
             }
+            MessageManager.getDataBaseHelp().changeChatState(chatedName,1);           //改变数据库中聊天状态
+            FriendInfo friendInfo=null;
+            for(int j=0;j<MessageManager.getContantFriendInfoList().size();j++){
+                if(MessageManager.getContantFriendInfoList().get(j).getUserName().equals(chatedName)){
+                    MessageManager.getContantFriendInfoList().get(j).setChated(1);//设置为正在聊天标记
+                    friendInfo= MessageManager.getContantFriendInfoList().get(j);
+                    break;
+                }
+            }
+            MessageManager.getFriendInfoList().add(friendInfo);//将其添加进正在聊天列表
+            Log.e("", "getMessageHashMap: 添加进会话列表" +chatedName);
             //TODO messagelist1 需要排序
             map.put(chatedName,messageList1); //设置聊天记录
             for(int j=size-1;j>=0;j--){

@@ -61,7 +61,6 @@ public class MatchFragment extends Fragment {
         view = View.inflate(context, R.layout.match, null);
         ImageView clothes_up = view.findViewById(R.id.clothes_up);
         ImageView clothes_down = view.findViewById(R.id.clothes_down);
-
         //上衣点击事件
         clothes_up.setOnClickListener(new View.OnClickListener() {
             @Override

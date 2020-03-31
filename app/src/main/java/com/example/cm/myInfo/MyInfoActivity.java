@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
@@ -42,19 +43,11 @@ import java.io.IOException;
 public class MyInfoActivity extends AppCompatActivity implements View.OnClickListener{
 
     private ImageView head_left_iv,head_right_iv;
-    private View head_view,xingBie_view,shenGao_view,niCheng_view;
-    private EditText mine_et;
-    private Bitmap head;
-    private Button button;
-    private TextView xingBie_tv,shenGao_tv,nicheng_tv;
-    private NumberPicker numberPicker;
-    private PopupWindow popupWindow;
-    private String xingBie[]=new String[]{"男","女","保密"};
+    private View head_view,xingBie_view,niCheng_view;
+    private TextView xingBie_tv,email_tv,nicheng_tv,account_tv;
     public static String path="/sdcard/Clothes/MyInfo/head";
     public static final int OPEN_ALBUM=1;
-    private static String height="0";
-    //SharedPreferences sharedPreferences;
-    //SharedPreferences.Editor editor;
+    private String gender;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +66,8 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         super.onResume();
         String nc= MessageManager.getSmackUserInfo().getNiC();
         nicheng_tv.setText(nc);
+        account_tv.setText(MessageManager.getSmackUserInfo().getUserName());
+        email_tv.setText(MessageManager.getSmackUserInfo().getEmail());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -85,13 +80,13 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         head_right_iv=(ImageView)findViewById(R.id.head_right_iv);
         xingBie_view=(View)findViewById(R.id.xingbie_view);
         xingBie_tv=(TextView)findViewById(R.id.xingbie_tv);
-        shenGao_view=(View)findViewById(R.id.shengao_view);
-        shenGao_tv=(TextView)findViewById(R.id.shengao_tv);
+        account_tv=(TextView)findViewById(R.id.account_tv);
+        email_tv=(TextView)findViewById(R.id.email_tv);
         niCheng_view=(View)findViewById(R.id.nichen_view);
         nicheng_tv=(TextView)findViewById(R.id.nichen_tv);
         head_view.setOnClickListener((View.OnClickListener) this);
         xingBie_view.setOnClickListener(this);
-        shenGao_view.setOnClickListener(this);
+        email_tv.setOnClickListener(this);
         niCheng_view.setOnClickListener(this);
         nicheng_tv.setOnClickListener(this);
         //设置信息
@@ -107,8 +102,8 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
         }else{
             xingBie_tv.setText("保密");
         }
-        shenGao_tv.setText(MessageManager.getSmackUserInfo().getHeight());
-
+        account_tv.setText(MessageManager.getSmackUserInfo().getUserName());
+        email_tv.setText(MessageManager.getSmackUserInfo().getEmail());
     }
 
 
@@ -132,13 +127,6 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                     Toast.makeText(this,"请先登录",Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case R.id.shengao_view:
-                if(Connect.isLogined) {
-                    shenGaoChoose();
-                }else{
-                    Toast.makeText(this,"请先登录",Toast.LENGTH_SHORT).show();
-                }
-                break;
             case R.id.nichen_view:
                 if(Connect.isLogined) {
                     Intent intent = new Intent(MyInfoActivity.this, EditNiChengActivity.class);
@@ -149,54 +137,47 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                     Toast.makeText(this,"请先登录",Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case R.id.email_tv:{
+                if(Connect.isLogined) {
+                    Intent intent=new Intent(MyInfoActivity.this,EditEmailActivity.class);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(this,"请先登录",Toast.LENGTH_SHORT).show();
+                }
+            }break;
+            default:break;
         }
     }
 
     private void showXingBieChoose() {
-
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        builder.setSingleChoiceItems(xingBie, 0, new DialogInterface.OnClickListener() {
+        new ActionSheetDialog(MyInfoActivity.this)
+                .builder()
+                .setCanceledOnTouchOutside(true)
+                .setCancelable(true)
+                .addSheetItem("男", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(int which) {
+                        gender="male";
+                        xingBie_tv.setText("男");
+                        Log.e("", "onClick: 点击"+"男" );
+                    }
+                }).addSheetItem("女", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                xingBie_tv.setText(xingBie[which]);
-                String gender=null;
-                if(xingBie[which].equals("男")){
-                    gender="male";
-                }else if(xingBie[which].equals("女")){
-                    gender="female";
-                }else{
-                    gender="secrecy";
-                }
-                VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"gender",gender);
-                MessageManager.getSmackUserInfo().setSex(gender);
-                Log.e("", "onClick: 修改性别后："+gender );
-                dialog.dismiss();
+            public void onClick(int which) {
+                gender="female";
+                xingBie_tv.setText("女");
+                Log.e("", "onClick: 点击"+"女" );
             }
-        });
-        builder.show();
-    }
-
-    private void shenGaoChoose(){
-        View contentView= View.inflate(MyInfoActivity.this,R.layout.numberpicker,null);
-        View rootView=View.inflate(MyInfoActivity.this,R.layout.my_info,null);
-        final NumberPicker numberPicker=(NumberPicker)contentView.findViewById(R.id.number_picker);
-        final int[] data = new int[1];
-        numberPicker.setMaxValue(200 );
-        numberPicker.setMinValue(0);
-        numberPicker.setValue(175);
-        PopupWindow popupWindow=new PopupWindow(contentView, LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,true);
-        popupWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
-        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+        }).addSheetItem("保密", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
             @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                height=String.valueOf(numberPicker.getValue());
+            public void onClick(int which) {
+                gender="secrecy";
+                xingBie_tv.setText("保密");
+                Log.e("", "onClick: 点击"+"保密" );
             }
-        });
-        VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"height",height);
-        Log.e("", "onValueChange: 修改身高后："+height );
-        MessageManager.getSmackUserInfo().setHeight(height);
-        shenGao_tv.setText(height);
-
+        }).show();
+        VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"gender", gender);
+        MessageManager.getSmackUserInfo().setSex(gender);
     }
 
     private void openAlbum(){

@@ -1,19 +1,16 @@
 package com.example.cm.share;
 
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
-import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
@@ -28,9 +25,9 @@ public class PresentShareItem extends AppCompatActivity {
         setContentView(R.layout.activity_present_share_item);
         CircleImageView headImage = findViewById(R.id.headImage);
         ImageView clothesUp = findViewById(R.id.clothes_up);
-        clothesUp.setImageResource(R.drawable.friend1);
+        clothesUp.setImageResource(R.drawable.ic_loading);
         ImageView clothesDown = findViewById(R.id.clothes_down);
-        clothesDown.setImageResource(R.drawable.friend1);
+        clothesDown.setImageResource(R.drawable.ic_loading);
         TextView userName = findViewById(R.id.userName);
         TextView description = findViewById(R.id.description);
         description.setText("");

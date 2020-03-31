@@ -66,6 +66,7 @@ public class ContantActivity extends AppCompatActivity {
                 intent.putExtra("userName",userName);
                 intent.putExtra("position",position);
                 startActivity(intent);
+                overridePendingTransition(R.anim.in_from_right,R.anim.out_from_left);
             }
         });
         if(sideBar==null){
@@ -96,7 +97,10 @@ public class ContantActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case android.R.id.home:this.finish();break;
+            case android.R.id.home:
+                this.finish();
+                overridePendingTransition(R.anim.bottom_silent,R.anim.bottom_out);
+                break;
             default:break;
         }
         return true;
@@ -128,5 +132,12 @@ public class ContantActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         work=false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.bottom_silent,R.anim.bottom_out);
+        return;
     }
 }

@@ -1,9 +1,12 @@
 package com.example.cm.friend;
 
-import android.app.ActionBar;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -18,13 +21,18 @@ public class FriendSettingActivity extends AppCompatActivity {
 private Button delete_btn;
 private Button save_nic_btn;
 private String userName;
-private int groupPosition,childPosition;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar=getActionBar();
-        if(actionBar!=null)actionBar.setDisplayShowTitleEnabled(false);
         setContentView(R.layout.activity_friend_setting);
+        Toolbar toolbar=(Toolbar)findViewById(R.id.friendSetting_toolabr);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar=getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
+
         init();
         delete_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +73,14 @@ private int groupPosition,childPosition;
         save_nic_btn=(Button)findViewById(R.id.friend_setting_save);
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
-        groupPosition=intent.getIntExtra("groupPosition",0);
-        childPosition=intent.getIntExtra("childPosition",0);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{this.finish();}break;
+            default:break;
+        }
+        return true;
     }
 }

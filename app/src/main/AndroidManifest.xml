@@ -19,6 +19,9 @@
         android:roundIcon="@drawable/cm"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".myInfo.ChangePasswordActivity"></activity>
+        <activity android:name=".myInfo.EditEmailActivity" />
+
         <service
             android:name=".service.PacketListenerService"
             android:enabled="true"
@@ -42,6 +45,7 @@
         <activity android:name=".friend.ContantActivity" />
         <activity android:name=".myInfo.RegisterActivity" />
         <activity android:name=".share.Comments" />
+        <activity android:name=".SendShare" />
         <activity android:name=".match.SendShare"/>
 
 

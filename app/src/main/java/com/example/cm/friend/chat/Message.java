@@ -91,4 +91,7 @@ public class Message {
     public void setPhotoRoad(String photoRoad) {
         this.photoRoad = photoRoad;
     }
+    public String toString(){
+        return "From:"+getFrom()+"  To:"+getTo()+"  Type"+getType()+"  Body:"+getBody();
+    }
 }

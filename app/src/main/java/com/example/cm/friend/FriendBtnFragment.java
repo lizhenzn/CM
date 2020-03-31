@@ -1,5 +1,6 @@
 package com.example.cm.friend;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.cm.MainActivity;
 import com.example.cm.R;
 
 
@@ -27,6 +29,8 @@ private Button friendBtn;
                 Toast.makeText(getActivity(),"233333",Toast.LENGTH_LONG).show();
                 Intent intent=new Intent(getContext(),ContantActivity.class);
                 startActivity(intent);
+                ((Activity)MainActivity.getInstance()).overridePendingTransition(R.anim.bottom_in,R.anim.bottom_silent);
+
             }
         });
         return view;

@@ -40,7 +40,9 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 
 
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.ReconnectionManager;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -52,12 +54,17 @@ import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.filter.AndFilter;
 
 
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketIDFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 
 import org.jivesoftware.smack.packet.StreamError;
+import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smack.roster.Roster;
 
 import org.jivesoftware.smack.roster.RosterEntry;
@@ -67,6 +74,7 @@ import org.jivesoftware.smack.roster.packet.RosterPacket;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
+import org.jivesoftware.smackx.iqregister.packet.Registration;
 import org.jivesoftware.smackx.offline.OfflineMessageManager;
 
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
@@ -84,6 +92,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,168 +111,156 @@ public class Connect {
     private static ConnectionListener connectionListener=null;
     private Connect(){}
     public static XMPPTCPConnection getXMPPTCPConnection(){
-                if(xmpptcpConnection==null) {
-                    XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                            .setServiceName(SERVERNAME)
-                            .setHost(IP)
-                            .setPort(5222)
-                            .setSendPresence(false)         //设置false可以接受离线信息
-                            .setDebuggerEnabled(true)
-                            .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
-                            .build();
-                    xmpptcpConnection = new XMPPTCPConnection(config);
-                    Log.d("XMPPTCP new 之后", ""+xmpptcpConnection);
-                    try {
-                        Log.d("", "getXMPPTCPConnection: connect之前"+xmpptcpConnection);
-                        xmpptcpConnection.connect();
-                        return xmpptcpConnection;
+        if(xmpptcpConnection==null) {
+            XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
+                    .setServiceName(SERVERNAME)
+                    .setHost(IP)
+                    .setPort(5222)
+                    .setSendPresence(false)         //设置false可以接受离线信息
+                    .setDebuggerEnabled(true)
+                    .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
+                    .build();
+            xmpptcpConnection = new XMPPTCPConnection(config);
+            Log.d("XMPPTCP new 之后", ""+xmpptcpConnection);
+            try {
+                Log.d("", "getXMPPTCPConnection: connect之前"+xmpptcpConnection);
+                xmpptcpConnection.connect();
+                return xmpptcpConnection;
 
-                    } catch (SmackException e) {
-                        e.printStackTrace();
-                        return null;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
+            } catch (SmackException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            } catch (XMPPException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        if(connectionListener==null) {
+            connectionListener = new ConnectionListener() {
+                @Override
+                public void connected(XMPPConnection xmppConnection) {
+                    Log.e("", "connected: 连接成功");
                 }
-                if(connectionListener==null) {
-                    connectionListener = new ConnectionListener() {
-                        @Override
-                        public void connected(XMPPConnection xmppConnection) {
-                            Log.e("", "connected: 连接成功");
-                        }
 
-                        @Override
-                        public void authenticated(XMPPConnection xmppConnection, boolean b) {
-                            Log.e("", "authenticated: 登陆成功");
-                        }
+                @Override
+                public void authenticated(XMPPConnection xmppConnection, boolean b) {
+                    Log.e("", "authenticated: 登陆成功");
+                }
 
-                        @Override
-                        public void connectionClosed() {
-                            Log.e("", "connectionClosed: 连接关闭");
+                @Override
+                public void connectionClosed() {
+                    Log.e("", "connectionClosed: 连接关闭");
 
-                        }
+                }
 
-                        @Override
-                        public void connectionClosedOnError(Exception e) {
-                            Log.e("", "connectionClosedOnError: 连接异常断开");
-                            if (e instanceof XMPPException) {
-                                XMPPException.StreamErrorException xe = (XMPPException.StreamErrorException) e;
-                                StreamError error = xe.getStreamError();
-                                StreamError.Condition condition;
-                                if (error != null) {
-                                    condition = error.getCondition();
-                                    if (condition.equals(StreamError.Condition.conflict)) {
-                                        Log.e("", "connectionClosedOnError:别处登录冲突 ");
-                                        //TODO 弹出框提示 强制下线
+                @Override
+                public void connectionClosedOnError(Exception e) {
+                    Log.e("", "connectionClosedOnError: 连接异常断开");
+                    if (e instanceof XMPPException) {
+                        XMPPException.StreamErrorException xe = (XMPPException.StreamErrorException) e;
+                        StreamError error = xe.getStreamError();
+                        StreamError.Condition condition;
+                        if (error != null) {
+                            condition = error.getCondition();
+                            if (condition.equals(StreamError.Condition.conflict)) {
+                                Log.e("", "connectionClosedOnError:别处登录冲突 ");
+                                //TODO 弹出框提示 强制下线
 
-                                        MessageManager.getSmackUserInfo().setNiC("点击登录");
-                                        //Connect.signOut();
-                                        Connect.isLogined = false;
-                                        setRoster(null);
-                                        setXmpptcpConnection(null);
-                                        MessageManager.getDb().close();
-                                        MessageManager.getDataBaseHelp().close();
-                                        new Thread(new Runnable() {
+                                MessageManager.getSmackUserInfo().setNiC("点击登录");
+                                //Connect.signOut();
+                                Connect.isLogined = false;
+                                setRoster(null);
+                                setXmpptcpConnection(null);
+                                MessageManager.getDb().close();
+                                MessageManager.getDataBaseHelp().close();
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        Resources resources = MainActivity.getInstance().getResources();
+                                        DisplayMetrics dm = resources.getDisplayMetrics();
+                                        int width = dm.widthPixels;
+                                        int height = dm.heightPixels;
+                                        Looper.prepare();
+                                        Dialog dialog = new Dialog(MainActivity.getInstance(), R.style.LoginConflictDialog);
+                                        View view = View.inflate(MainActivity.getInstance(), R.layout.conflict, null);
+                                        Button ensureBtn=(Button)view.findViewById(R.id.coflict_ensure_btn);
+
+                                        dialog.setContentView(view);
+                                        dialog.setCanceledOnTouchOutside(false);
+                                        view.setMinimumHeight((int) (height * 0.23f));
+                                        Window dialogWindow = dialog.getWindow();
+                                        dialogWindow.setWindowAnimations(R.style.DialogAnimation);//设置Dialog出现退出动画
+                                        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+                                        lp.width = (int) (width * 0.9f);
+                                        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                                        lp.gravity = Gravity.CENTER;
+                                        dialogWindow.setAttributes(lp);
+                                        ((Activity)MainActivity.getInstance()).runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
+                                                Log.e("", "run: 冲突" );
+                                                MainActivity.setInfo();
+                                                //dialog.show();
+                                                connectionListener=null;
 
-                                                Resources resources = MainActivity.getInstance().getResources();
-                                                DisplayMetrics dm = resources.getDisplayMetrics();
-                                                int width = dm.widthPixels;
-                                                int height = dm.heightPixels;
-                                                Looper.prepare();
-                                                Dialog dialog = new Dialog(MainActivity.getInstance(), R.style.LoginConflictDialog);
-                                                View view = View.inflate(MainActivity.getInstance(), R.layout.conflict, null);
-                                                Button ensureBtn=(Button)view.findViewById(R.id.coflict_ensure_btn);
 
-                                                dialog.setContentView(view);
-                                                dialog.setCanceledOnTouchOutside(false);
-                                                view.setMinimumHeight((int) (height * 0.23f));
-                                                Window dialogWindow = dialog.getWindow();
-                                                dialogWindow.setWindowAnimations(R.style.DialogAnimation);//设置Dialog出现退出动画
-                                                WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-                                                lp.width = (int) (width * 0.9f);
-                                                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                                                lp.gravity = Gravity.CENTER;
-                                                dialogWindow.setAttributes(lp);
+                                            }
+                                        });
+                                        dialog.show();
+                                        ensureBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
                                                 ((Activity)MainActivity.getInstance()).runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        Log.e("", "run: 冲突" );
-                                                        MainActivity.setInfo();
-                                                        //dialog.show();
-                                                        connectionListener=null;
-
-
+                                                        dialog.dismiss();
                                                     }
                                                 });
-                                                dialog.show();
-                                                ensureBtn.setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View view) {
-                                                        ((Activity)MainActivity.getInstance()).runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                dialog.dismiss();
-                                                            }
-                                                        });
-                                                    }});
-                                                Looper.loop();
-                                            }
-                                        }).start();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                                            }});
+                                        Looper.loop();
                                     }
-                                }
+                                }).start();
+
+
                             }
                         }
-
-                        @Override
-                        public void reconnectionSuccessful() {
-                            Log.e("", "reconnectionSuccessful: 重连成功");
-                            if (xmpptcpConnection.isAuthenticated()) {
-                                try {
-                                    xmpptcpConnection.login();
-                                    //重连之后登录
-                                } catch (XMPPException e) {
-                                    e.printStackTrace();
-                                } catch (SmackException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void reconnectingIn(int i) {
-
-                        }
-
-                        @Override
-                        public void reconnectionFailed(Exception e) {
-                            Log.e("", "reconnectionFailed: 重连失败");
-                        }
-                    };
-                    xmpptcpConnection.addConnectionListener(connectionListener);
-                    Log.e("", "getXMPPTCPConnection: 添加连接监听" );
+                    }
                 }
+
+                @Override
+                public void reconnectionSuccessful() {
+                    Log.e("", "reconnectionSuccessful: 重连成功");
+                    if (xmpptcpConnection.isAuthenticated()) {
+                        try {
+                            xmpptcpConnection.login();
+                            //重连之后登录
+                        } catch (XMPPException e) {
+                            e.printStackTrace();
+                        } catch (SmackException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void reconnectingIn(int i) {
+
+                }
+
+                @Override
+                public void reconnectionFailed(Exception e) {
+                    Log.e("", "reconnectionFailed: 重连失败");
+                }
+            };
+            xmpptcpConnection.addConnectionListener(connectionListener);
+            Log.e("", "getXMPPTCPConnection: 添加连接监听" );
+        }
         return  xmpptcpConnection;
     }
     public static Roster getRoster(){         //好友花名册
@@ -281,15 +278,21 @@ public class Connect {
     public static void setRoster(Roster mRoster){
         roster=mRoster;
     }
+
+    /*
+    *param userName
+    * param passwd
+    * @return 0:服务器连接异常 1:登陆异常 2：登陆成功 3：密码错误
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static boolean login(String userName, String passwd){
+    public static int login(String userName, String passwd){
         try {
             while(xmpptcpConnection==null){
                 getXMPPTCPConnection();
                 Log.e("", "login: 连接服务器");
             }
             if(MainActivity.isBinded) {
-                    MainActivity.unBindPacket();
+                MainActivity.unBindPacket();
             }
             if(isLogined){
                 signOut();//注销登录的
@@ -300,8 +303,7 @@ public class Connect {
                 presence1.setStatus("OFFLINE");
                 Presence presence2 = new Presence(Presence.Type.available);
                 presence2.setStatus("ONLINE");
-                 getXMPPTCPConnection().login(userName, passwd);    //login TODO
-
+                getXMPPTCPConnection().login(userName, passwd);    //login TODO
                 Log.d("", "login: 设置离线状态");
                 getXMPPTCPConnection().sendStanza(presence1);           //设置离线状态获取离线消息
 
@@ -313,6 +315,9 @@ public class Connect {
                 MessageManager.clearAllList();//清理所有的list
                 MessageManager.initFriend();    //获取好友列表
                 MessageManager.setMessageMap(MessageManager.getDataBaseHelp().getMessageHashMap());//数据库获得聊天信息
+                Log.e("", "login: "+MessageManager.getMessageMap() );
+                MessageManager.setHaveNewMessage(true);
+                Log.e("", "login: 数据库获取聊天消息之后" );
                 MessageManager.getOfflineMessage();
                 MainActivity.bindPacket();//绑定
 
@@ -351,43 +356,80 @@ public class Connect {
                 Log.d("登陆后写入的登录名", "run: "+MessageManager.getSharedPreferences().getString("userName",""));
             }
             else{
-                xmpptcpConnection=null;
+                if(xmpptcpConnection!=null){
+                    xmpptcpConnection.removeConnectionListener(connectionListener);
+                    connectionListener=null;
+                    xmpptcpConnection.disconnect();
+                    xmpptcpConnection=null;
+                }
                 //Toast.makeText(context,"登陆异常",Toast.LENGTH_SHORT).show();
-                return  false;
+                return  0;
             }
 
-        } catch (SmackException | IOException | XMPPException e) {
+        } catch (SmackException | IOException  e) {
             e.printStackTrace();
-            xmpptcpConnection=null;
+            if(xmpptcpConnection!=null){
+                xmpptcpConnection.removeConnectionListener(connectionListener);
+                connectionListener=null;
+                xmpptcpConnection.disconnect();
+                xmpptcpConnection=null;
+            }
             //Toast.makeText(context,"登陆异常",Toast.LENGTH_SHORT).show();
-            return false;
+            return 1;
+        }
+        catch (XMPPException.XMPPErrorException e){
+            if(xmpptcpConnection!=null){
+                xmpptcpConnection.removeConnectionListener(connectionListener);
+                connectionListener=null;
+                xmpptcpConnection.disconnect();
+                xmpptcpConnection=null;
+            }
+            XMPPError error=e.getXMPPError();
+            if(error.getCondition().equals(XMPPError.Condition.item_not_found)) {  //密码错误
+                return 3;
+            }else{
+                return 1;
+            }
+        }catch (XMPPException e){
+            e.printStackTrace();
+            if(xmpptcpConnection!=null){
+                xmpptcpConnection.removeConnectionListener(connectionListener);
+                connectionListener=null;
+                xmpptcpConnection.disconnect();
+                xmpptcpConnection=null;
+            }
+            return 1;
         }
         isLogined=true;
-        return true;
+        return 2;
     }
     //退出登录
     public static void signOut()  {
-                if(xmpptcpConnection!=null){
-                    Presence presence=new Presence(Presence.Type.unavailable);
-                    presence.setStatus("GONE");
-                    try {
-                        getXMPPTCPConnection().sendStanza(presence);
-                        getXMPPTCPConnection().removeConnectionListener(connectionListener);
-                        Log.e("", "signOut: 移除连接监听" );
-                        getXMPPTCPConnection().disconnect();  //断开连接
-                        roster=null;
-                        connectionListener=null;
-                        xmpptcpConnection=null;
-                        connectionListener=null;
-                        isLogined=false;
-                        MessageManager.getDb().close();                 //关闭数据库
-                        MessageManager.getDataBaseHelp().close();
-                    } catch (SmackException.NotConnectedException e) {
-                        e.printStackTrace();
-                    }
-                }
+        if(xmpptcpConnection!=null){
+            Presence presence=new Presence(Presence.Type.unavailable);
+            presence.setStatus("GONE");
+            try {
+                getXMPPTCPConnection().sendStanza(presence);
+                getXMPPTCPConnection().removeConnectionListener(connectionListener);
+                Log.e("", "signOut: 移除连接监听" );
+                getXMPPTCPConnection().disconnect();  //断开连接
+                roster=null;
+                connectionListener=null;
+                xmpptcpConnection=null;
+                connectionListener=null;
+                isLogined=false;
+                MessageManager.getDb().close();                 //关闭数据库
+                MessageManager.getDataBaseHelp().close();
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+            }
+        }
     }
-    public static boolean register(String user, String passwd, Map<String,String> info){
+    /* @user 用户账号
+    * @passwd 密码
+    * @return 0、服务器无反应 1、注册成功 2、已有此账号 3、注册失败
+    * */
+    public static int register(String user, String passwd, Map<String,String> info){
         XMPPTCPConnection xmpptcpConnection=getXMPPTCPConnection();
                if(xmpptcpConnection.isConnected()) {
                    AccountManager accountManager = AccountManager.getInstance(xmpptcpConnection);
@@ -402,31 +444,39 @@ public class Connect {
                        }
                        VCardManager.setSelfInfo(xmpptcpConnection,"NICKNAME",user);
                        xmpptcpConnection.disconnect();//关闭连接
-
                    } catch (SmackException.NoResponseException e) {
                        //Toast.makeText(context,"注册异常",Toast.LENGTH_SHORT).show();
                        e.printStackTrace();
-                       return false;
+                       return 0;
                    } catch (XMPPException.XMPPErrorException e) {
                        //Toast.makeText(context,"注册异常",Toast.LENGTH_SHORT).show();
                        e.printStackTrace();
-                       return false;
+                       XMPPError error=e.getXMPPError();
+                       if(error.getCondition().equals(XMPPError.Condition.conflict)) {  //已有此账号，冲突
+                           Log.e("", "register: 已有此账号，冲突" );
+                           return 2;
+                       }else{
+                           return 3;
+                       }
                    } catch (SmackException.NotConnectedException e) {
                        //Toast.makeText(context,"注册异常",Toast.LENGTH_SHORT).show();
                        e.printStackTrace();
-                       return false;
+                       return 0;
                    } catch (XMPPException e) {
                        e.printStackTrace();
+                       return 3;
                    } catch (IOException e) {
                        e.printStackTrace();
+                       return 3;
                    } catch (SmackException e) {
                        e.printStackTrace();
+                       return 3;
                    }
                }else{
                    //Toast.makeText(context,"连接不到服务器",Toast.LENGTH_SHORT).show();
-                   return false;
+                   return 0;
                }
-        return true;
+        return 1;
 
     }
 

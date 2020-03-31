@@ -1,9 +1,7 @@
 package com.example.cm.share;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -13,15 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.cm.R;
-import com.example.cm.util.Connect;
-import com.example.cm.util.MessageManager;
-import com.example.cm.util.ServerFunction;
 
 import java.util.List;
 
@@ -118,8 +110,8 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ShareItem shareItem = ShareItemList.get(position);
             RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) viewHolder;
             if(shareItem.isBlankItemFlag()){
-                recyclerViewHolder.ClothesUp.setImageResource(R.drawable.friend1);
-                recyclerViewHolder.ClothesDown.setImageResource(R.drawable.friend1);
+                recyclerViewHolder.ClothesUp.setImageResource(R.drawable.ic_loading);
+                recyclerViewHolder.ClothesDown.setImageResource(R.drawable.ic_loading);
             }
             else{
                 recyclerViewHolder.LikeNum.setText(ShareItemList.get(position).getPostInfo().getLike_num()+"人觉得很赞");
