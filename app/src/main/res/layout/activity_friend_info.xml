@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".friend.FriendInfoActivity">
     <android.support.v7.widget.Toolbar
-        android:id="@+id/add_friend_toolabr"
+        android:id="@+id/friendInfo_toolabr"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colornew"
@@ -27,13 +27,63 @@
             />
     </android.support.v7.widget.Toolbar>
 
+    <android.support.design.card.MaterialCardView
+        android:id="@+id/friend_detail_mcv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="center_horizontal"
+        android:layout_margin="20dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="12dp"
+        app:cardMaxElevation="12dp"
+        app:layout_constraintTop_toBottomOf="@id/friendInfo_toolabr"
+        tools:ignore="MissingConstraints">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/friend_detail_iv"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="centerCrop"/>
+
+            <TextView
+                android:id="@+id/friend_detail_user_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/friend_detail_nic_tv"
+                app:layout_constraintLeft_toRightOf="@id/friend_detail_iv" />
+
+            <TextView
+                android:id="@+id/friend_detail_nic_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                app:layout_constraintLeft_toRightOf="@id/friend_detail_iv" />
+
+            <TextView
+                android:id="@+id/friend_detail_sex_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                app:layout_constraintLeft_toRightOf="@id/friend_detail_iv"
+                app:layout_constraintTop_toBottomOf="@id/friend_detail_user_tv" />
+        </android.support.constraint.ConstraintLayout>
+    </android.support.design.card.MaterialCardView>
+
     <Button
         android:id="@+id/friend_detail_send_btn"
         android:text="发消息"
         app:layout_constraintCircleRadius="66dp"
-        android:layout_margin="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_margin="20dp"
+        app:layout_constraintTop_toBottomOf="@id/friend_detail_mcv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="60dp" />
 
 </android.support.constraint.ConstraintLayout>

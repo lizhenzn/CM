@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.cm.MainActivity;
 import com.example.cm.R;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.ChatListAdapter;
@@ -31,11 +32,8 @@ import java.util.List;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class FriendFragment extends Fragment  {
-    private Context context;
-    private View view;
-    private ListView chatLV;
-    private ChatListAdapter chatListAdapter;
-    private List<HashMap<String,Object>> list;      //会话列表
+    private static ListView chatLV;
+    private static ChatListAdapter chatListAdapter;
     static boolean working;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

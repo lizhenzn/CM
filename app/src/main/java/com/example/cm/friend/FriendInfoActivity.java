@@ -1,12 +1,15 @@
 package com.example.cm.friend;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cm.R;
@@ -14,19 +17,24 @@ import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.VCardManager;
+import com.example.cm.util.ActionSheetDialog;
+import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class FriendInfoActivity extends AppCompatActivity {
    private Button send_btn;
    private TextView setting_btn;
    private String userName;
    private int position;
+   private ImageView friend_headIV;
+   private TextView userTV,nicTV,sexTV;
    private FriendInfo curFriendInfo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,22 +42,49 @@ public class FriendInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_friend_info);
 
         init();
-        /*VCard vCard= VCardManager.getUserVcard(userName);
-        Log.e("联系人信息", "onCreate: "+vCard);
-        Log.d("邮件", "onCreate: email"+vCard.getField("email"));
-        Log.d("性别", "onCreate: sex:"+vCard.getField("gender"));
-        Log.d("JabberId", "onCreate: sex:"+vCard.getJabberId());
-        Log.d("昵称", "onCreate: Nic:"+vCard.getNickName());*/
+        Toolbar toolbar=(Toolbar)findViewById(R.id.friendInfo_toolabr);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar=getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
 
-        ActionBar actionBar=getActionBar();
-        if(actionBar!=null)actionBar.setDisplayShowTitleEnabled(false);
+        }
         setting_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(FriendInfoActivity.this, FriendSettingActivity.class);
-                intent.putExtra("userName",userName);
-                intent.putExtra("position",position);
-                startActivity(intent);
+                new ActionSheetDialog(FriendInfoActivity.this)
+                        .builder()
+                        .setCanceledOnTouchOutside(true)
+                        .setCancelable(true)
+                        .addSheetItem("删除", ActionSheetDialog.SheetItemColor.Red, new ActionSheetDialog.OnSheetItemClickListener() {
+                            @Override
+                            public void onClick(int which) {
+                                Log.e("", "onClick: 点击删除" );
+                                while (!Connect.getRoster().isLoaded()){
+                                    try {
+                                        Connect.getRoster().reload();
+                                    } catch (SmackException.NotLoggedInException e) {
+                                        e.printStackTrace();
+                                    } catch (SmackException.NotConnectedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                userName=userName+"@"+Connect.SERVERNAME;
+                                try {
+                                    Connect.getRoster().removeEntry(Connect.getRoster().getEntry(userName));
+                                    MessageManager.deleteFriend(userName);        //TODO 删除好友
+                                } catch (SmackException.NotLoggedInException e) {
+                                    e.printStackTrace();
+                                } catch (SmackException.NoResponseException e) {
+                                    e.printStackTrace();
+                                } catch (XMPPException.XMPPErrorException e) {
+                                    e.printStackTrace();
+                                } catch (SmackException.NotConnectedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).show();
             }
         });
         send_btn.setOnClickListener(new View.OnClickListener() {
@@ -89,9 +124,32 @@ public class FriendInfoActivity extends AppCompatActivity {
     public void init(){
         send_btn=(Button)findViewById(R.id.friend_detail_send_btn);
         setting_btn=(TextView)findViewById(R.id.friend_detail_setting);
+        userTV=(TextView)findViewById(R.id.friend_detail_user_tv);
+        nicTV=(TextView)findViewById(R.id.friend_detail_nic_tv);
+        sexTV=(TextView)findViewById(R.id.friend_detail_sex_tv);
+        friend_headIV=(ImageView)findViewById(R.id.friend_detail_iv);
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
         position=intent.getIntExtra("position",0);
         curFriendInfo=MessageManager.getContantFriendInfoList().get(position);
+        friend_headIV.setImageBitmap(curFriendInfo.getHeadBt());
+        userTV.setText("帐号:"+curFriendInfo.getUserName());
+        nicTV.setText("用户名："+curFriendInfo.getNicName());
+        String sex="保密";
+        if(curFriendInfo.getSex().equalsIgnoreCase("male")){
+            sex="男";
+        }else if(curFriendInfo.getSex().equalsIgnoreCase("female")){
+            sex="女";
+        }
+        sexTV.setText("性别:"+sex);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{this.finish();}break;
+            default:break;
+        }
+        return true;
     }
 }

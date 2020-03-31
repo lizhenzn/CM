@@ -100,6 +100,39 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
+            android:text="帐号"
+            android:textColor="#2B2B2B"
+            android:textSize="24sp" />
+
+        <View
+            android:id="@+id/account_view"
+            android:layout_width="344dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <TextView
+            android:id="@+id/account_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"/>
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:src="@mipmap/ic_launcher"/>
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2px"
+        android:background="#c2c2c2"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
             android:text="性别"
             android:textColor="#2B2B2B"
             android:textSize="24sp" />
@@ -133,27 +166,17 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:text="身高"
+            android:text="邮箱"
             android:textColor="#2B2B2B"
             android:textSize="24sp" />
-        <View
-            android:id="@+id/shengao_view"
+        <TextView
+            android:id="@+id/email_tv"
+            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
-        <TextView
-            android:id="@+id/shengao_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"/>
-        <TextView
-            android:id="@+id/shengao_tv2"
-            android:text="cm"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical|right"/>
         <ImageView
-            android:id="@+id/shengao_iv"
+            android:id="@+id/email_iv"
             android:layout_width="24dp"
             android:layout_height="match_parent"
             android:src="@mipmap/ic_launcher"/>

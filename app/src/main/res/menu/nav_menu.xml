@@ -1,28 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group
-        android:id="@+id/navi_group1"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/collect"
-            android:icon="@mipmap/ic_launcher"
-            android:title="我的收藏"
-            />
-        <item
-            android:id="@+id/care"
-            android:icon="@mipmap/ic_launcher"
-            android:title="我的关注"
-            />
 
-    </group>
     <group
         android:id="@+id/navi_group2"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/setting"
+            android:id="@+id/changePassword"
             android:icon="@mipmap/ic_launcher"
-            android:title="设置"
+            android:title="修改密码"
             />
 
 

@@ -38,6 +38,8 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cm.friend.FriendFragment;
+import com.example.cm.myInfo.ChangePasswordActivity;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.myInfo.VCardManager;
@@ -105,18 +107,19 @@ public class MainActivity extends AppCompatActivity{
         //测试代码片，可能存在严重不稳定情况，方法的静态化可能导致一系列问题
         WardrobeFragment.initData();
         //
-        navigationView.setCheckedItem(R.id.setting);
+        //navigationView.setCheckedItem(R.id.setting);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()){
-                    /*case R.id.settin:{
-                        navi_head.setImageResource(R.drawable.unlogin);
-                    }break;*/
                     case R.id.navi_sign_out:{
                         Connect.signOut();   //注销登录
                         nichengTV.setText("点击登录");
                     }break;
+                    case R.id.changePassword:{//修改密码
+                        Intent intent=new Intent(MainActivity.this, ChangePasswordActivity.class);
+                        startActivity(intent);
+                    }break;//修改密码
                     default:
                         break;
 
@@ -149,6 +152,7 @@ public class MainActivity extends AppCompatActivity{
                 if(nichengTV.getText().equals("点击登录")){
                     Intent intent=new Intent(MainActivity.this,LoginActivity.class);
                     startActivityForResult(intent,LOGIN);
+                    overridePendingTransition(R.anim.out_from_left,R.anim.in_from_right);
                 }
             }
         });
@@ -167,6 +171,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
         setInfo();
+        if(!Connect.isLogined){
+            nichengTV.setText("点击登录");
+        }
     }
 
     @Override   //标题栏按钮按键
@@ -199,7 +206,6 @@ public class MainActivity extends AppCompatActivity{
         isBinded=false;
         mainActivityContext=MainActivity.this;
         activity=MainActivity.this.getParent();
-
         MessageManager.initAllList();
         Connect.init();             //初始化适配器列表
         if(!AlbumUtil.checkStorage(this)){
@@ -261,7 +267,7 @@ public class MainActivity extends AppCompatActivity{
             Bitmap bitmap=BitmapFactory.decodeResource(this.getResources(),R.drawable.unlogin);
             MessageManager.getSmackUserInfo().setHeadBt(bitmap);           //设置为未登陆的照片
             MessageManager.getSmackUserInfo().setEmail("");
-            MessageManager.getSmackUserInfo().setSex("保密");
+            MessageManager.getSmackUserInfo().setSex("secrecy");
         }
         setInfo();        //调用设置头像、昵称函数
 
@@ -333,8 +339,10 @@ public class MainActivity extends AppCompatActivity{
         switch(requestCode){
             case LOGIN:{
                 if(resultCode==RESULT_OK){
-                    //nichengTV.setText(MessageManager.getSmackUserInfo().getNiC());
                     setInfo();
+                    if(!Connect.isLogined){
+                        nichengTV.setText("点击登录");
+                    }
                 }
 
             }break;
@@ -365,7 +373,7 @@ public class MainActivity extends AppCompatActivity{
                     //intent.setType("image/*");
                     //startActivityForResult(intent,AlbumUtil.OPEN_ALBUM);
                 }else{
-                    Toast.makeText(this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,"您拒绝了存储权限，可能会影响使用",Toast.LENGTH_SHORT).show();
                 }
             }break;
             case AlbumUtil.REQUEST_CAMERA:{

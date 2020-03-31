@@ -5,10 +5,11 @@
         android:angle="48"
         android:endColor="#CCCCCC"
         android:startColor="#CCCC"/>  -->
+
     <padding
         android:bottom="7dp"
-        android:left="7dp"
-        android:right="7dp"
+        android:left="20dp"
+        android:right="20dp"
         android:top="7dp"/>
     <corners
         android:radius="3dp"/>

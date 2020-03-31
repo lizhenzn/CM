@@ -1,6 +1,7 @@
 package com.example.cm.friend;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,13 @@ import com.example.cm.util.MessageManager;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.search.ReportedData;
+import org.jivesoftware.smackx.search.UserSearchManager;
+import org.jivesoftware.smackx.vcardtemp.packet.VCard;
+import org.jivesoftware.smackx.xdata.Form;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class AddFriendActivity extends AppCompatActivity implements View.OnClickListener{
 private Button add_btn,search_btn;
@@ -127,14 +135,55 @@ private boolean work;
             }break;
             case R.id.add_friend_search:{//查找此用户
                 if(Connect.isLogined) {
+                    boolean have=false;
                     String userName = String.valueOf(userName_et.getText());
-                    Bitmap bitmap = VCardManager.getUserImage(userName);
-                    if (bitmap != null) {//有此用户
-                        linearLayout.setVisibility(View.VISIBLE);
-                        headImage.setImageBitmap(bitmap);
-                        userName_tv.setText(userName);
-                    } else {//没有这个用户
-                        Toast.makeText(AddFriendActivity.this, "抱歉，没有这个用户", Toast.LENGTH_SHORT).show();
+                    if(userName.equalsIgnoreCase("")) {
+                        Toast.makeText(AddFriendActivity.this, "输入不能为空", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        //************//
+                        try {
+                            UserSearchManager search = new UserSearchManager(Connect.getXMPPTCPConnection());
+                            //此处一定要加上 search.
+                            Form searchForm = search.getSearchForm("search." + Connect.getXMPPTCPConnection().getServiceName());
+                            Form answerForm = searchForm.createAnswerForm();
+                            answerForm.setAnswer("Username", true);
+                            answerForm.setAnswer("search", userName);
+                            ReportedData data = search.getSearchResults(answerForm, "search." + Connect.getXMPPTCPConnection().getServiceName());
+                            List<ReportedData.Row> it = data.getRows();
+                            /*if (!it.isEmpty()) {
+                                Log.e("", "onClick: 有此用户" );
+                                have=true;
+                                VCard vCard = VCardManager.getUserVcard(userName);
+                                linearLayout.setVisibility(View.VISIBLE);
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(vCard.getAvatar(), 0, vCard.getAvatar().length);
+                                headImage.setImageBitmap(bitmap);
+                                userName_tv.setText(userName);
+
+                            }else{
+                                Toast.makeText(AddFriendActivity.this, "抱歉，没有这个用户", Toast.LENGTH_SHORT).show();
+                            }*/
+                            for(int i=0;i<it.size();i++){
+                                List<String> user=it.get(i).getValues("UserName");
+                                String u=user.get(0);
+                                Log.e("", "onClick: "+i+user );
+                                if(u.equals(userName)){
+                                    have=true;
+                                }
+                            }
+                            if(have){
+                                Bitmap bitmap=VCardManager.getUserImage(userName);
+                                linearLayout.setVisibility(View.VISIBLE);
+                                headImage.setImageBitmap(bitmap);
+                                userName_tv.setText(userName);
+                            }else{
+                                Toast.makeText(AddFriendActivity.this, "抱歉，没有这个用户", Toast.LENGTH_SHORT).show();
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        //***********//
+
                     }
                 }else{
                     Toast.makeText(AddFriendActivity.this,"未登录...",Toast.LENGTH_SHORT).show();

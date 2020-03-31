@@ -1,6 +1,7 @@
 package com.example.cm.friend.chat;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,9 +44,8 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         ViewHolder viewHolder=null;
-        if(convertView==null){
+        //if(convertView==null){
             viewHolder=new ViewHolder();
             if(messageList.get(position).getType()==1) {   //自己发送的信息
                 if(messageList.get(position).getMessageType().equals("text")) //文本信息
@@ -65,9 +65,9 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
             else
                 viewHolder.photoIV=(ImageView)convertView.findViewById(R.id.chat_item_photo);
             convertView.setTag(viewHolder);
-        }else{
+        /*}else{
             viewHolder= (ViewHolder) convertView.getTag();
-        }
+        }*/
 
         viewHolder.imageView.setOnClickListener(this);
         if(messageList.get(position).getType()==1) {
@@ -80,11 +80,8 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
         if(messageList.get(position).getMessageType().equals("text"))
             viewHolder.mesTV.setText(messageList.get(position).getBody());
         else {
-            //viewHolder.photoIV.setImageResource(R.drawable.cm);
-            //viewHolder.photoIV.setImageDrawable(Connect.getUserImage(Connect.xmpptcpConnection.getUser().split("/")[0]));
             viewHolder.photoIV.setImageBitmap(messageList.get(position).getPhoto());
         }
-          //viewHolder.photoIV.setImageBitmap(messageList.get(position).getPhoto());
         return convertView;
     }
 
