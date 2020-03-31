@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
-import com.example.cm.SendShare;
 import com.example.cm.util.ClothesEstimater;
 import com.example.cm.util.Connect;
 import com.example.cm.wardrobe.WardrobeFragment;
@@ -62,7 +61,6 @@ public class MatchFragment extends Fragment {
         view = View.inflate(context, R.layout.match, null);
         ImageView clothes_up = view.findViewById(R.id.clothes_up);
         ImageView clothes_down = view.findViewById(R.id.clothes_down);
-
         //上衣点击事件
         clothes_up.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +87,6 @@ public class MatchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //智能搭配功能
-
                 int up=-1;
                 int down=-1;
                 int clothes_up_count=WardrobeFragment.photoList1.size();
@@ -131,6 +128,10 @@ public class MatchFragment extends Fragment {
             public void onClick(View v) {
                 if(!Connect.isLogined){
                     Toast.makeText(context,"您未登录",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if(MainActivity.getClothes_up()==-1||MainActivity.getClothes_down()==-1){
+                    Toast.makeText(context,"搭配不完整",Toast.LENGTH_LONG).show();
                     return;
                 }
                 Intent intent=new Intent(getActivity(), SendShare.class);

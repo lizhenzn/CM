@@ -1,11 +1,8 @@
-package com.example.cm;
+package com.example.cm.match;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,11 +10,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.cm.match.MatchFragment;
-import com.example.cm.myInfo.SmackUserInfo;
-import com.example.cm.util.Connect;
+import com.example.cm.MainActivity;
+import com.example.cm.R;
 import com.example.cm.util.MessageManager;
-import com.example.cm.util.ServerFunction;
 import com.example.cm.wardrobe.WardrobeFragment;
 
 import java.util.ArrayList;
@@ -32,11 +27,13 @@ public class SendShare extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         setContentView(R.layout.activity_send_share);
         context=this;
         //上衣图片
         ImageView clothes_up = findViewById(R.id.clothes_up);
-        Log.d(TAG, "onCreate: clothes_up and clothes_down="+MainActivity.getClothes_up()+","+MainActivity.getClothes_down());
+        Log.d(TAG, "onCreate: clothes_up and clothes_down="+ MainActivity.getClothes_up()+","+MainActivity.getClothes_down());
         if(MainActivity.getClothes_up()!=-1){
             clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(MainActivity.getClothes_up()));
         }

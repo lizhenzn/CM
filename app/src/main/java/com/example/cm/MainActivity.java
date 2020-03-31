@@ -1,21 +1,17 @@
 package com.example.cm;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -26,13 +22,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -67,6 +60,7 @@ public class MainActivity extends AppCompatActivity{
     private static ImageView navi_head,head_home;
     private static String path="/sdcard/Clothes/MyInfo/head";
     private final int LOGIN=1;
+    private long backPressTime;
     private QBadgeView naviQBadgeView;
     private static ServiceConnection serviceConnection;   //用于连接服务通信
     private static PacketListenerService.MyBinder binder;   //服务中Binder
@@ -394,22 +388,41 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         //退出登录
-        if(Connect.getXMPPTCPConnection()!=null) {
-            Connect.signOut();
-            Connect.isLogined = false;
-            Connect.setRoster(null);
-            Connect.setXmpptcpConnection(null);
-
-
-
-        }}
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(Connect.getXMPPTCPConnection()!=null) {
+                    Connect.signOut();
+                    Connect.setRoster(null);
+                    Connect.setXmpptcpConnection(null);
+                    Connect.isLogined = false;
+                }
+            }
+        }).start();
+        int i=Integer.MIN_VALUE;
+        while(Connect.isLogined){i++;}
+        if(isBinded)unBindPacket();
+        super.onDestroy();
+    }
     public static void setFragmentTabHostVisibility( boolean visibility){
         if (visibility) {
             fragmentTabHost.setVisibility(View.VISIBLE);
         } else {
             fragmentTabHost.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isChoose_flag()){setChoose_flag(false);super.onBackPressed();}
+        else {
+            if (System.currentTimeMillis() - backPressTime < 2000) {
+                finish();
+            } else {
+                backPressTime = System.currentTimeMillis();
+                Toast.makeText(mainActivityContext, "再次按返回键退出", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

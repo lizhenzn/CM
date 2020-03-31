@@ -126,6 +126,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                 }
                 //TODO 判断是不是和上次登录用户一样 从而决定是否更换从数据库得到的联系人列表和聊天信息列表
                 new Thread(new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void run() {
                     LoginActivity.this.runOnUiThread(new Runnable() {
@@ -207,9 +208,13 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                     //设置可见
                     pswET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
                     VISIABLE=true;
+                    pswEnBtn.setBackgroundResource(R.drawable.can_see);
+                    VISIABLE=false;
                 }else{
                     //设置不可见
                     pswET.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    pswEnBtn.setBackgroundResource(R.drawable.cannot_see);
+                    VISIABLE=true;
                     VISIABLE=false;
                 }
                 //设置光标位置位于最后

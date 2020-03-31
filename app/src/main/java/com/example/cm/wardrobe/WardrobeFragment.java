@@ -15,8 +15,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -59,9 +57,9 @@ public class WardrobeFragment extends Fragment  {
     private RecyclerView wardrobeR1,wardrobeR2;
     private WardrobeAdapter wardrobeAdapter1,wardrobeAdapter2;
     private LinearLayout layout_up,layout_down,layout_up_control,layout_down_control;
-    private ImageView upAdd,downAdd,upPointer,downPointer;
-    private static ViewPager viewPager;
-    private  static  WardrobeVPAdapter wardrobeVPAdapter;
+    private ImageView upAdd,downAdd,upPointer,downPointer,VUPage;
+    //private static ViewPager viewPager;
+    //private  static  WardrobeVPAdapter wardrobeVPAdapter;
     private boolean upClothes,downClothes;
     private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4;
     public static final int  TYPE_UP=5,TYPE_DOWN=6;
@@ -75,7 +73,7 @@ public class WardrobeFragment extends Fragment  {
         initData();//initData
         context=getActivity();
         upClothes=true;downClothes=false;
-        wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
+        //wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
         wardrobeAdapter1=new WardrobeAdapter(context,photoList1,1);
         wardrobeAdapter2=new WardrobeAdapter(context,photoList2,2);
     }
@@ -108,8 +106,11 @@ public class WardrobeFragment extends Fragment  {
         view=View.inflate(context, R.layout.wardrobe,null);
         layout_up_control=view.findViewById(R.id.wardrobeUpControl);//控制上选单伸缩
         layout_down_control=view.findViewById(R.id.wardrobeDownControl);//控制下选单伸缩
-        viewPager=(ViewPager)view.findViewById(R.id.wardrobeVP);
-        viewPager.setPageTransformer(true,new Transform());
+        //viewPager=(ViewPager)view.findViewById(R.id.wardrobeVP);
+        //viewPager.setPageTransformer(true,new Transform());
+        VUPage=view.findViewById(R.id.wardrobeVP);
+        wardrobeAdapter1.bindViewPage(VUPage);
+        wardrobeAdapter2.bindViewPage(VUPage);
         //viewPager.setAdapter(wardrobeVPAdapter);
         wardrobeR1=(RecyclerView)view.findViewById(R.id.wardrobeR1);
         wardrobeR2=(RecyclerView)view.findViewById(R.id.wardrobeR2);
@@ -419,44 +420,46 @@ public class WardrobeFragment extends Fragment  {
     }
 
 
-    class Transform implements ViewPager.PageTransformer{
-        public  float MIN_ALPHA = 0.5f;
-        public  float MIN_SCALE = 0.8f;
-        @Override
-        public void transformPage(@NonNull View view, float position)  {
-            if (position < -1 || position > 1) {
-                viewPager.setAlpha(MIN_ALPHA);
-                viewPager.setScaleX(MIN_SCALE);
-                viewPager.setScaleY(MIN_SCALE);
-                Log.i("info", "缩放：position < -1 || position > 1");
-            } else if (position <= 1) { // [-1,1]
-                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
-                if (position < 0) {
-                    float scaleX = 1 + 0.2f * position;
-                    Log.i("info", "缩放：position < 0");
-                    viewPager.setScaleX(scaleX);
-                    viewPager.setScaleY(scaleX);
-                } else {
-                    float scaleX = 1 - 0.2f * position;
-                    viewPager.setScaleX(scaleX);
-                    viewPager.setScaleY(scaleX);
-                    Log.i("info", "缩放：position <= 1 >=0");
-                }
-                viewPager.setAlpha(MIN_ALPHA + (scaleFactor - MIN_SCALE) / (1 - MIN_SCALE) * (1 - MIN_ALPHA));
-            }
-        }
-
-
-    }
+//    class Transform implements ViewPager.PageTransformer{
+//        public  float MIN_ALPHA = 0.5f;
+//        public  float MIN_SCALE = 0.8f;
+//        @Override
+//        public void transformPage(@NonNull View view, float position)  {
+//            if (position < -1 || position > 1) {
+//                viewPager.setAlpha(MIN_ALPHA);
+//                viewPager.setScaleX(MIN_SCALE);
+//                viewPager.setScaleY(MIN_SCALE);
+//                Log.i("info", "缩放：position < -1 || position > 1");
+//            } else if (position <= 1) { // [-1,1]
+//                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
+//                if (position < 0) {
+//                    float scaleX = 1 + 0.2f * position;
+//                    Log.i("info", "缩放：position < 0");
+//                    viewPager.setScaleX(scaleX);
+//                    viewPager.setScaleY(scaleX);
+//                } else {
+//                    float scaleX = 1 - 0.2f * position;
+//                    viewPager.setScaleX(scaleX);
+//                    viewPager.setScaleY(scaleX);
+//                    Log.i("info", "缩放：position <= 1 >=0");
+//                }
+//                viewPager.setAlpha(MIN_ALPHA + (scaleFactor - MIN_SCALE) / (1 - MIN_SCALE) * (1 - MIN_ALPHA));
+//            }
+//        }
+//
+//
+//    }
 
     public static class WardrobeAdapter extends RecyclerView.Adapter<WardrobeAdapter.ViewHolder> {
         private List<Bitmap> photoList;
         private  Context context;
+        private ImageView VUPage;
         int type;
         public WardrobeAdapter(Context context,List<Bitmap> photoList,int type){
             this.context=context;
             this.photoList=photoList;
             this.type=type;
+            this.VUPage=VUPage;
         }
         public static interface OnItemClickListener {
             void onItemClick(View view);
@@ -476,7 +479,7 @@ public class WardrobeFragment extends Fragment  {
                 @Override
                 public void onClick(View v) {
                     int position= finalViewHolder.getAdapterPosition();
-
+                    VUPage.setImageBitmap(photoList.get(position));
                     if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
@@ -539,8 +542,8 @@ public class WardrobeFragment extends Fragment  {
             }else if(type==2){
                 integerList=detailList2.get(position);
             }
-            wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
-            viewPager.setAdapter(wardrobeVPAdapter);
+            //wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
+            //viewPager.setAdapter(wardrobeVPAdapter);
         }
 
 
@@ -567,41 +570,44 @@ public class WardrobeFragment extends Fragment  {
                 imageView=itemView.findViewById(R.id.wardrobeR_IV);
             }
         }
-    }
-
-    public static class WardrobeVPAdapter extends PagerAdapter {
-        private List<View> viewList;
-        private List<Bitmap> integerList;        //选中图片的各个方向照
-        private Context context;
-        public WardrobeVPAdapter(Context context,List<Bitmap> integerList){
-            this.context=context;
-            this.integerList=integerList;
-        }
-        @Override
-        public int getCount() {
-            return 4;
-        }
-
-        @Override
-        public boolean isViewFromObject(@NonNull View view, @NonNull Object o) {
-            return view==o;
-        }
-
-        @NonNull
-        @Override
-        public Object instantiateItem(@NonNull ViewGroup container, int position) {
-             View view= LayoutInflater.from(context).inflate(R.layout.wardrobe_vp,container,false);
-            ImageView imageView=(ImageView)view.findViewById(R.id.wardrobeVP_IV);
-            imageView.setImageBitmap(integerList.get(position));
-            container.addView(view);
-            return view;
-        }
-
-        @Override
-        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-            container.removeView((View)object);
+        public void bindViewPage(ImageView VUPage){
+            this.VUPage=VUPage;
         }
     }
+
+//    public static class WardrobeVPAdapter extends PagerAdapter {
+//        private List<View> viewList;
+//        private List<Bitmap> integerList;        //选中图片的各个方向照
+//        private Context context;
+//        public WardrobeVPAdapter(Context context,List<Bitmap> integerList){
+//            this.context=context;
+//            this.integerList=integerList;
+//        }
+//        @Override
+//        public int getCount() {
+//            return 4;
+//        }
+//
+//        @Override
+//        public boolean isViewFromObject(@NonNull View view, @NonNull Object o) {
+//            return view==o;
+//        }
+//
+//        @NonNull
+//        @Override
+//        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+//             View view= LayoutInflater.from(context).inflate(R.layout.wardrobe_vp,container,false);
+//            ImageView imageView=(ImageView)view.findViewById(R.id.wardrobeVP_IV);
+//            imageView.setImageBitmap(integerList.get(position));
+//            container.addView(view);
+//            return view;
+//        }
+//
+//        @Override
+//        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+//            container.removeView((View)object);
+//        }
+//    }
     /**
      * 保存bitmap到本地
      *
