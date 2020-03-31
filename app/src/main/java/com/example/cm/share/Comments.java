@@ -49,8 +49,6 @@ public class Comments extends AppCompatActivity {
                     @Override
                     public void run() {
                         ServerFunction.sendRemark(postInfo, MessageManager.getSmackUserInfo().getUserName(),content,"2019-08-23 14:55:50");
-                        Log.d(TAG, "run: execute sendRemark,posi_id="+postInfo.getPost_id()+",userName="+MessageManager.getSmackUserInfo().getUserName()+",content="+content);
-                        ServerFunction.sendRemark(postInfo, MessageManager.getSmackUserInfo().getUserName(),content,"2019-08-23 14:55:50");
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
