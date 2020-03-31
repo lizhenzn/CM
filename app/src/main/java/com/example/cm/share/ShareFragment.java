@@ -66,6 +66,8 @@ public class ShareFragment extends Fragment {
             Toast.makeText(context,"您尚未登陆",Toast.LENGTH_LONG).show();
             ImageView imageView=view.findViewById(R.id.invisible);
             imageView.setVisibility(View.VISIBLE);
+            swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
+            swipeRefreshLayout.setEnabled(false);
             return view;
         }
         serverFunction=new ServerFunction(context.getCacheDir());
@@ -79,6 +81,11 @@ public class ShareFragment extends Fragment {
             public void onRefresh() {
                 if(isRefreshing){
                     swipeRefreshLayout.setRefreshing(false);
+                    return;
+                }
+                if(!Connect.isLogined){
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(context,"您尚未登陆",Toast.LENGTH_LONG).show();
                     return;
                 }
                 isRefreshing=true;
