@@ -65,9 +65,14 @@ private boolean work;
                             @Override
                             public void run() {
                                 addFriendAdapter.notifyDataSetChanged();
-                                MessageManager.setContantListChanged(false);
+                                MessageManager.setAddFriendItemListChanged(false);
                             }
                         });
+                        try{
+                            Thread.sleep(1000);
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
                     }
                 }
 
@@ -115,7 +120,7 @@ private boolean work;
                     addFriendItem.setReason("Hello,World!");
                     addFriendItem.setResult("已发送验证");
 
-                    MessageManager.setContantListChanged(true);
+                    MessageManager.setAddFriendItemListChanged(true);
 
                     try {
                         while(!Connect.getRoster().isLoaded()){
@@ -221,7 +226,6 @@ private boolean work;
                 Connect.getRoster().reload();
             }
             Connect.getRoster().createEntry(userName+"@"+Connect.SERVERNAME,userName,new String[]{"Friends"});
-            Log.e("ADD", "onClick: 申请发送成功");
             Log.e("", "agreeAddFriend: 同意添加好友" );
         }catch(SmackException.NotConnectedException e){
             e.printStackTrace();

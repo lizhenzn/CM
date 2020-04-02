@@ -208,9 +208,11 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                     String imagePath=AlbumUtil.getImageAbsolutePath(data,MyInfoActivity.this);//调用工具类处理返回的数据  得到图片绝对路径
                     if(imagePath!=null){
                         Bitmap bitmap= BitmapFactory.decodeFile(imagePath);
-                        head_left_iv.setImageBitmap(bitmap);   //设置头像
+
                         try {
                             VCardManager.changeImage(Connect.getXMPPTCPConnection(),imagePath);
+                            head_left_iv.setImageBitmap(bitmap);   //设置头像
+                            MessageManager.getSmackUserInfo().setHeadBt(bitmap);
                         } catch (XMPPException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
