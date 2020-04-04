@@ -299,7 +299,7 @@ public class WardrobeFragment extends Fragment  {
                 Log.d("addTest", "从相册选择_上:path="+absoluteRoad);
                 if(absoluteRoad!=null) {
                     Bitmap bitmap = ClothesEstimater.getScaleBitmap(absoluteRoad);
-                    WardrobeFragment.photoList1.add(bitmap);
+                    wardrobeAdapter1.photoList.add(bitmap);
                     wardrobeAdapter1.notifyDataSetChanged();
                     upFileName.add(saveBitmap(bitmap,baseDir,1));
                 }
@@ -309,7 +309,7 @@ public class WardrobeFragment extends Fragment  {
                 Log.d("addTest", "从相册选择_下:path="+absoluteRoad);
                 if(absoluteRoad!=null) {
                     Bitmap bitmap = ClothesEstimater.getScaleBitmap(absoluteRoad);
-                    WardrobeFragment.photoList2.add(bitmap);
+                    wardrobeAdapter2.photoList.add(bitmap);
                     wardrobeAdapter2.notifyDataSetChanged();
                     downFileName.add(saveBitmap(bitmap,baseDir,2));
                 }
@@ -327,7 +327,8 @@ public class WardrobeFragment extends Fragment  {
                             upFileName.get(upFileName.size()-1));
                     Bitmap bitmap =ClothesEstimater.getScaleBitmap(pic.getAbsolutePath());
                     if(bitmap!=null) {
-                        WardrobeFragment.photoList1.add(bitmap);
+                        bitmap2File(bitmap,pic);
+                        wardrobeAdapter1.photoList.add(bitmap);
                         wardrobeAdapter1.notifyDataSetChanged();
                     }
                 }
@@ -342,8 +343,9 @@ public class WardrobeFragment extends Fragment  {
                     Log.d("wardrobe", "onActivityResult: "+
                             downFileName.get(downFileName.size()-1));
                     Bitmap bitmap =ClothesEstimater.getScaleBitmap(pic.getAbsolutePath());
-                    if(bitmap!=null) {
-                        WardrobeFragment.photoList2.add(bitmap);
+                    if(bitmap!=null){
+                        bitmap2File(bitmap,pic);
+                        wardrobeAdapter2.photoList.add(bitmap);
                         wardrobeAdapter2.notifyDataSetChanged();
                     }
                 }
@@ -363,13 +365,13 @@ public class WardrobeFragment extends Fragment  {
                 getResources().openRawResource(R.drawable.cm);
         Bitmap mBitmap = BitmapFactory.decodeStream(is);
         @SuppressLint("ResourceType") InputStream is1 = MainActivity.getInstance().
-                getResources().openRawResource(R.drawable.unlogin);
+                getResources().openRawResource(R.drawable.cm);
         Bitmap mBitmap1 = BitmapFactory.decodeStream(is1);
         @SuppressLint("ResourceType") InputStream is2 = MainActivity.getInstance().
-                getResources().openRawResource(R.drawable.match1);
+                getResources().openRawResource(R.drawable.cm);
         Bitmap mBitmap2 = BitmapFactory.decodeStream(is2);
         @SuppressLint("ResourceType") InputStream is3 = MainActivity.getInstance().
-                getResources().openRawResource(R.drawable.wardrobe1);
+                getResources().openRawResource(R.drawable.cm);
         Bitmap mBitmap3 = BitmapFactory.decodeStream(is3);
 //        for(int i=0;i<66;i++) {
 //
@@ -616,6 +618,18 @@ public class WardrobeFragment extends Fragment  {
      */
     public static String saveBitmap(Bitmap bitmap,File baseDir,int type) {
         File filePic=creatImageFile(baseDir,type);
+        bitmap2File(bitmap,filePic);
+        Log.i("tag", "saveBitmap success: " + filePic.getParentFile().getPath());
+        return filePic.getName();
+    }
+
+    /**
+     * 抽离实现，负责将一个给定的bitmap保存进给定文件里
+     * @param bitmap 给定的bitmap
+     * @param filePic 给定的文件
+     * @return 成功与否，成功为true，失败为false
+     */
+    public static boolean bitmap2File(Bitmap bitmap,File filePic){
         try {
             Log.d("wardrobe", "saveBitmap: savePath"+filePic.getAbsolutePath());
             FileOutputStream fos = new FileOutputStream(filePic);
@@ -624,10 +638,9 @@ public class WardrobeFragment extends Fragment  {
             fos.close();
         } catch (IOException e) {
             Log.e("tag", "saveBitmap: " + e.getMessage());
-            return null;
+            return false;
         }
-        Log.i("tag", "saveBitmap success: " + filePic.getParentFile().getPath());
-        return filePic.getName();
+        return true;
     }
     public static File creatImageFile(File baseDir,int type){
         String savePath=null;

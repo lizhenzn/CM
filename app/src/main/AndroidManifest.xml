@@ -14,7 +14,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher_round"
+        android:icon="@drawable/cm"
         android:label="@string/app_name"
         android:roundIcon="@drawable/cm"
         android:supportsRtl="true"
@@ -45,7 +45,6 @@
         <activity android:name=".friend.ContantActivity" />
         <activity android:name=".myInfo.RegisterActivity" />
         <activity android:name=".share.Comments" />
-        <activity android:name=".SendShare" />
         <activity android:name=".match.SendShare"/>
 
 
