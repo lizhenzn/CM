@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/accuse_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:text="举报" />
+
+
+
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:id="@+id/accuse_LL0"
+        app:layout_constraintTop_toBottomOf="@id/accuse_toolbar"
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="图片证据："
+            android:paddingLeft="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <LinearLayout
+            android:id="@+id/accuse_ll"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/accuse_iv1"
+                android:layout_margin="6dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/chat_add"
+                android:layout_width="99dp"
+                android:layout_height="99dp"/>
+            <ImageView
+                android:id="@+id/accuse_iv2"
+                android:layout_margin="6dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/chat_add"
+                android:visibility="gone"
+                android:layout_width="99dp"
+                android:layout_height="99dp"/>
+            <ImageView
+                android:id="@+id/accuse_iv3"
+                android:layout_margin="6dp"
+                android:src="@drawable/chat_add"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:layout_width="99dp"
+                android:layout_height="99dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+    <EditText
+        android:id="@+id/accuse_et"
+        android:hint="请输入举报理由"
+        app:layout_constraintTop_toBottomOf="@id/accuse_LL0"
+        android:layout_marginTop="20dp"
+        android:padding="10dp"
+        android:background="@drawable/editview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/accuse_btn"
+        android:text="提交"
+        android:textSize="66px"
+        android:background="#cfa"
+        app:layout_constraintTop_toBottomOf="@id/accuse_et"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+</android.support.constraint.ConstraintLayout>

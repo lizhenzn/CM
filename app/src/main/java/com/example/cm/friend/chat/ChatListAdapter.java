@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.example.cm.R;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.util.Connect;
+import com.example.cm.util.DateFormatUtil;
 import com.example.cm.util.MessageManager;
 
 import java.text.SimpleDateFormat;
@@ -98,12 +99,11 @@ public class ChatListAdapter extends BaseAdapter  {
         //viewHolder.headImage.setImageResource(cm);
         viewHolder.headImage.setImageBitmap(MessageManager.getFriendInfoList().get(position).getHeadBt());
         viewHolder.nameTV.setText(userName);
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("HH:mm");
         if(messageList.size()>=1) {
             viewHolder.mesTV.setText(messageList.get(messageList.size() - 1).getBody());  //设置为最后一条信息
             long time=messageList.get(messageList.size()-1).getDate();
             Log.d("时间", "getView: "+time);
-            String timeStr = simpleDateFormat.format(new Date(time));  //最后一条信息的时间
+            String timeStr = DateFormatUtil.getDateStr(time);  //最后一条信息的时间
             Log.e("", "getView: "+timeStr );
             viewHolder.timeTV.setText(timeStr);
         }

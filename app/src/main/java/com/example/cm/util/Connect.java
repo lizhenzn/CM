@@ -72,9 +72,8 @@ public class Connect {
             xmpptcpConnection = new XMPPTCPConnection(config);
             Log.d("XMPPTCP new 之后", ""+xmpptcpConnection);
             try {
-                Log.d("", "getXMPPTCPConnection: connect之前"+xmpptcpConnection);
                 xmpptcpConnection.connect();
-                return xmpptcpConnection;
+                //return xmpptcpConnection;
 
             } catch (SmackException e) {
                 e.printStackTrace();
@@ -93,7 +92,6 @@ public class Connect {
                 public void connected(XMPPConnection xmppConnection) {
                     Log.e("", "connected: 连接成功");
                 }
-
                 @Override
                 public void authenticated(XMPPConnection xmppConnection, boolean b) {
                     Log.e("", "authenticated: 登陆成功");
@@ -107,6 +105,17 @@ public class Connect {
 
                 @Override
                 public void connectionClosedOnError(Exception e) {
+                    Connect.isLogined=false;
+                    MessageManager.getSmackUserInfo().setNiC("点击登录");
+                    MainActivity.setDefaultSmackInfo();
+                    MessageManager.getDb().close();                 //关闭数据库
+                    MessageManager.getDataBaseHelp().close();
+                    getXMPPTCPConnection().removeConnectionListener(connectionListener);
+                    Log.e("", "signOut: 移除连接监听" );
+                    getXMPPTCPConnection().disconnect();  //断开连接
+                    roster=null;
+                    connectionListener=null;
+                    xmpptcpConnection=null;
                     Log.e("", "connectionClosedOnError: 连接异常断开");
                     if (e instanceof XMPPException) {
                         XMPPException.StreamErrorException xe = (XMPPException.StreamErrorException) e;
@@ -118,13 +127,7 @@ public class Connect {
                                 Log.e("", "connectionClosedOnError:别处登录冲突 ");
                                 //TODO 弹出框提示 强制下线
 
-                                MessageManager.getSmackUserInfo().setNiC("点击登录");
                                 //Connect.signOut();
-                                Connect.isLogined = false;
-                                setRoster(null);
-                                setXmpptcpConnection(null);
-                                MessageManager.getDb().close();
-                                MessageManager.getDataBaseHelp().close();
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -205,6 +208,7 @@ public class Connect {
                 @Override
                 public void reconnectionFailed(Exception e) {
                     Log.e("", "reconnectionFailed: 重连失败");
+                    signOut();
                 }
             };
             xmpptcpConnection.addConnectionListener(connectionListener);
@@ -362,6 +366,11 @@ public class Connect {
             Presence presence=new Presence(Presence.Type.unavailable);
             presence.setStatus("GONE");
             try {
+
+                isLogined=false;
+                MainActivity.setDefaultSmackInfo();
+                MessageManager.getDb().close();                 //关闭数据库
+                MessageManager.getDataBaseHelp().close();
                 getXMPPTCPConnection().sendStanza(presence);
                 getXMPPTCPConnection().removeConnectionListener(connectionListener);
                 Log.e("", "signOut: 移除连接监听" );
@@ -369,11 +378,6 @@ public class Connect {
                 roster=null;
                 connectionListener=null;
                 xmpptcpConnection=null;
-                connectionListener=null;
-                isLogined=false;
-                MainActivity.setDefaultSmackInfo();
-                MessageManager.getDb().close();                 //关闭数据库
-                MessageManager.getDataBaseHelp().close();
             } catch (SmackException.NotConnectedException e) {
                 e.printStackTrace();
             }
@@ -398,6 +402,7 @@ public class Connect {
                        }
                        VCardManager.setSelfInfo(xmpptcpConnection,"NICKNAME",user);
                        xmpptcpConnection.disconnect();//关闭连接
+                       setXmpptcpConnection(null);
                    } catch (SmackException.NoResponseException e) {
                        //Toast.makeText(context,"注册异常",Toast.LENGTH_SHORT).show();
                        e.printStackTrace();

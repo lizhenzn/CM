@@ -84,7 +84,16 @@ public class FriendInfoActivity extends AppCompatActivity {
                                     e.printStackTrace();
                                 }
                             }
-                        }).show();
+                        }).addSheetItem("举报", ActionSheetDialog.SheetItemColor.Red, new ActionSheetDialog.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(int which) {
+                        Log.e("", "onClick: 点击举报" );
+                        Intent intent=new Intent(FriendInfoActivity.this,AccuseFriendActivity.class);
+                        intent.putExtra("userName",userName);
+                        startActivity(intent);
+                    }
+                }).show();
+
             }
         });
         send_btn.setOnClickListener(new View.OnClickListener() {

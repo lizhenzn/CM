@@ -275,7 +275,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 if(absoluteRoad!=null) {            //选择图片
                     Log.d("选择的图片路径", "onActivityResult: " + absoluteRoad);
                     String imageStr = AlbumUtil.getImageStr(absoluteRoad);
-                    Log.d("图片字符串", "onActivityResult: " + imageStr);
                     if (imageStr == null)
                         imageStr = "";
                     try {

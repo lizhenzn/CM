@@ -268,6 +268,20 @@ public class MessageManager {
                 Log.d("", "initFriend:添加进通讯录   " + MessageManager.getContantFriendInfoList().size());
             }
         }
+        RosterEntry entry=Connect.getRoster().getEntry("administrator"+"@"+Connect.SERVERNAME);
+        if((entry==null)||(!entry.getType().equals(RosterPacket.ItemType.both))){
+            try {
+                Connect.getRoster().createEntry("administrator"+"@"+Connect.SERVERNAME,"administrator",new String[]{"Friends"});
+            } catch (SmackException.NotLoggedInException e) {
+                e.printStackTrace();
+            } catch (SmackException.NoResponseException e) {
+                e.printStackTrace();
+            } catch (XMPPException.XMPPErrorException e) {
+                e.printStackTrace();
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
+            }
+        }
         Connect.getRoster().addRosterListener(new RosterListener() {                                                //TODO 花名册监听
             @Override
             public void entriesAdded(Collection<String> collection) {

@@ -17,14 +17,14 @@ public class DateFormatUtil {
 public  static  String getDateStr(long time){
     String dateStr=null;
     SimpleDateFormat simpleDateFormat=null;
-    Date currentDate=new Date();
     Date date=new Date(time);
     if(DateUtils.isToday(time)){
-        simpleDateFormat=new SimpleDateFormat("今天 HH:mm");
+        date.getHours();
+        simpleDateFormat=new SimpleDateFormat("HH:mm");
     }else if(isYesterday(time)){
         simpleDateFormat=new SimpleDateFormat("昨天 HH:mm");
     }else{
-        simpleDateFormat=new SimpleDateFormat("MM.dd HH:mm");
+        simpleDateFormat=new SimpleDateFormat("MM-dd HH:mm");
     }
     dateStr=simpleDateFormat.format(date);
     return dateStr;
@@ -33,8 +33,12 @@ public  static  String getDateStr(long time){
 * @param time
 * @return boolean
 */
-public  static boolean isYesterday(long timr){
+public  static boolean isYesterday(long time){
     boolean isYesterday=false;
+    time=time+24*60*60*1000;//加一天如果判断是今天，则输入是昨天
+    if(DateUtils.isToday(time)){
+        isYesterday=true;
+    }
 
     return isYesterday;
 }
