@@ -205,8 +205,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             Date date = new Date();
                             chat.sendMessage(toJson(mesBody, "text", date.getTime()));
                             Log.e("", "onClick: "+date.getTime() );
-                            String dateStr= new SimpleDateFormat("MM.dd HH:mm").format(date);
-                            Log.e("发送时间", "onClick: Date"+ dateStr);
                             Message message = new Message();
                             message.setType(1);
                             message.setMessageType("text"); //文本消息

@@ -384,7 +384,6 @@ public class MessageManager {
                     }
 
 
-
                     Log.d("一 二", "processMessage: "+message.getFrom());
                     MessageManager.getFriendInfoList().add(friendInfo);
                     List<com.example.cm.friend.chat.Message> messageList=new ArrayList<>();
@@ -392,8 +391,6 @@ public class MessageManager {
                     MessageManager.getMessageMap().put(userFrom,messageList);        //map新加一个
                 }
 
-                //message.setFrom(message.getFrom().split("/")[0]);
-                //message.setBody(data);
             } catch (Exception e) {
                 e.printStackTrace();
             }

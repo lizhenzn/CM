@@ -31,7 +31,12 @@ public class VCardManager {
         //user=user+"@"+SERVERNAME;
         Bitmap bitmap=null;
         Log.d("获取头像测试", "getUserImage: ");
-        byte []bytes=getUserVcard(user).getAvatar();
+        byte []bytes=null;
+        VCard vCard=getUserVcard(user);
+        if(vCard!=null){
+            bytes=vCard.getAvatar();
+        }
+
         if(bytes==null){
             @SuppressLint("ResourceType") InputStream is1 = MainActivity.getInstance().getResources().openRawResource(R.drawable.unlogin);
              bitmap = BitmapFactory.decodeStream(is1);

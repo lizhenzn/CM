@@ -6,7 +6,6 @@ import android.util.Log;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static android.text.format.DateUtils.isToday;
 
 public class DateFormatUtil {
 /*
