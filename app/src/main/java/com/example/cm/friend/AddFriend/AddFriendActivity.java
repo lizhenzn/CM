@@ -1,7 +1,6 @@
-package com.example.cm.friend;
+package com.example.cm.friend.AddFriend;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -28,10 +27,9 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.search.ReportedData;
 import org.jivesoftware.smackx.search.UserSearchManager;
-import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 import org.jivesoftware.smackx.xdata.Form;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AddFriendActivity extends AppCompatActivity implements View.OnClickListener{
@@ -41,7 +39,9 @@ private ImageView headImage;
 private TextView userName_tv;
 private LinearLayout linearLayout;
 private AddFriendAdapter addFriendAdapter;
-private ListView addFriendLV;
+private SearchResultAdapter searchResultAdapter;
+private ArrayList<SearchResultItem> searchResultItems;
+private ListView addFriendLV,searchResultLV;
 private boolean work;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,19 +81,23 @@ private boolean work;
     }
     //初始化控件
     public void init(){
-        add_btn=(Button)findViewById(R.id.add_friend_btn);
-        add_btn.setOnClickListener(this);
+        searchResultItems=new ArrayList<>();
+        //add_btn=(Button)findViewById(R.id.add_friend_btn);
+        //add_btn.setOnClickListener(this);
         search_btn=(Button)findViewById(R.id.add_friend_search);
         search_btn.setOnClickListener(this);
-        headImage=(ImageView)findViewById(R.id.add_friend_headImage);
-        headImage.setOnClickListener(this);
+        //headImage=(ImageView)findViewById(R.id.add_friend_headImage);
+        //headImage.setOnClickListener(this);
         userName_et=(EditText)findViewById(R.id.add_friend_et);
-        userName_tv=(TextView)findViewById(R.id.add_friend_userTV);
-        userName_tv.setOnClickListener(this);
-        linearLayout=(LinearLayout)findViewById(R.id.add_friend_detail_LL);
+        //userName_tv=(TextView)findViewById(R.id.add_friend_userTV);
+        //userName_tv.setOnClickListener(this);
+        //linearLayout=(LinearLayout)findViewById(R.id.add_friend_detail_LL);
         addFriendAdapter=new AddFriendAdapter(this);
+        searchResultAdapter=new SearchResultAdapter(searchResultItems,this);
         addFriendLV=(ListView)findViewById(R.id.add_friend_lv);
+        searchResultLV=findViewById(R.id.search_result_lv);
         addFriendLV.setAdapter(addFriendAdapter);
+        searchResultLV.setAdapter(searchResultAdapter);
         work=true;
 
     }
@@ -101,45 +105,9 @@ private boolean work;
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.add_friend_btn:{//发送添加请求
-                boolean contain=false;
-                    for(int j=0;j<MessageManager.getContantFriendInfoList().size();j++){
-                        if(MessageManager.getContantFriendInfoList().get(j).getUserName().equals(userName_tv.getText())){
-                            contain=true;
-                            break;
-                        }
-                    }
-
-                if(!contain) {
-                    String user=String.valueOf(userName_tv.getText());
-                    AddFriendItem addFriendItem = new AddFriendItem();
-                    FriendInfo friendInfo = new FriendInfo();
-                    friendInfo.setUserName(user);
-                    friendInfo.setHeadBt(VCardManager.getUserImage(user));
-                    addFriendItem.setFriendInfo(friendInfo);
-                    addFriendItem.setReason("Hello,World!");
-                    addFriendItem.setResult("已发送验证");
-
-                    MessageManager.setAddFriendItemListChanged(true);
-
-                    try {
-                        while(!Connect.getRoster().isLoaded()){
-                            Connect.getRoster().reload();
-                        }
-                        Connect.getRoster().createEntry(user+"@"+Connect.SERVERNAME,user,new String[]{"Friends"});
-                        Log.e("ADD", "onClick: 申请发送成功");
-                    } catch (Exception e) {//SmackException.NotConnectedException
-                        e.printStackTrace();
-                        addFriendItem.setResult("申请发送异常，请重试");
-                        Toast.makeText(AddFriendActivity.this, "申请发送异常", Toast.LENGTH_SHORT).show();
-                    }
-                    MessageManager.getAddFriendItemList().add(addFriendItem);
-                }else{
-                    Toast.makeText(AddFriendActivity.this,"已有此好友",Toast.LENGTH_SHORT).show();
-                }
-            }break;
             case R.id.add_friend_search:{//查找此用户
                 if(Connect.isLogined) {
+                    searchResultItems.clear();//每次查找之前清理上次查询的结果
                     boolean have=false;
                     String userName = String.valueOf(userName_et.getText());
                     if(userName.equalsIgnoreCase("")) {
@@ -169,20 +137,20 @@ private boolean work;
                                 Toast.makeText(AddFriendActivity.this, "抱歉，没有这个用户", Toast.LENGTH_SHORT).show();
                             }*/
                             for(int i=0;i<it.size();i++){
+                                SearchResultItem resultItem=new SearchResultItem();
                                 List<String> user=it.get(i).getValues("UserName");
                                 String u=user.get(0);
+                                Bitmap bitmap=VCardManager.getUserImage(u);
+                                resultItem.setUser(u);
+                                resultItem.setBitmap(bitmap);
                                 Log.e("", "onClick: "+i+user );
-                                if(u.equals(userName)){
-                                    have=true;
-                                }
+                                searchResultItems.add(resultItem);
+                                have=true;
                             }
-                            if(have){
-                                Bitmap bitmap=VCardManager.getUserImage(userName);
-                                linearLayout.setVisibility(View.VISIBLE);
-                                headImage.setImageBitmap(bitmap);
-                                userName_tv.setText(userName);
+                            if(have) {
+                                searchResultAdapter.notifyDataSetChanged();
                             }else{
-                                Toast.makeText(AddFriendActivity.this, "抱歉，没有这个用户", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddFriendActivity.this, "抱歉，没有与此用户名相似的用户", Toast.LENGTH_SHORT).show();
                             }
                         }catch(Exception e){
                             e.printStackTrace();
@@ -194,12 +162,7 @@ private boolean work;
                     Toast.makeText(AddFriendActivity.this,"未登录...",Toast.LENGTH_SHORT).show();
                 }
             }break;
-            case R.id.add_friend_headImage:{//查看详情
 
-            }break;
-            case R.id.add_friend_userTV:{//查看详情
-
-            }break;
             default:break;
         }
         

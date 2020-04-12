@@ -9,9 +9,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.cm.MainActivity;
-import com.example.cm.friend.AddFriendItem;
+import com.example.cm.friend.AddFriend.AddFriendItem;
 import com.example.cm.friend.Cn2Spell;
-import com.example.cm.friend.ContantActivity;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.SmackUserInfo;
@@ -348,7 +347,7 @@ public class MessageManager {
                     //将接收到的字符串解析成bitmap
                     String encodeImageStr=jsonObject.getString("data");
                     Bitmap bitmap= AlbumUtil.byte2Bitmap(AlbumUtil.encodedStr2byte(encodeImageStr));
-                    String savePhotoRoad=AlbumUtil.saveHeadBitmap(null,bitmap);
+                    String savePhotoRoad=AlbumUtil.saveMessageBitmap(bitmap);
                     Log.d("保存接收到的图片路径", "processMessage: "+savePhotoRoad);
                     message1.setPhotoRoad(savePhotoRoad);
                     message1.setPhoto(bitmap);

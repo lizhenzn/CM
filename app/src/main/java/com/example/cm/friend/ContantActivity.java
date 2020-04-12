@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.example.cm.R;
+import com.example.cm.friend.AddFriend.AddFriendActivity;
 import com.example.cm.util.MessageManager;
 
 import java.util.Collections;
@@ -51,7 +52,7 @@ public class ContantActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addFriendQBadgeView.hide(true);//隐藏红点
-                Intent intent=new Intent(ContantActivity.this,AddFriendActivity.class);
+                Intent intent=new Intent(ContantActivity.this, AddFriendActivity.class);
                 startActivity(intent);
             }
         });

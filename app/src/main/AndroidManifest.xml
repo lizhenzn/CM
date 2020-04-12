@@ -41,7 +41,7 @@
         <activity android:name=".friend.FriendInfoActivity" />
         <activity android:name=".share.PresentShareItem" />
         <activity android:name=".friend.chat.ChatActivity" />
-        <activity android:name=".friend.AddFriendActivity" />
+        <activity android:name=".friend.AddFriend.AddFriendActivity" />
         <activity android:name=".friend.ContantActivity" />
         <activity android:name=".myInfo.RegisterActivity" />
         <activity android:name=".share.Comments" />

@@ -43,9 +43,10 @@ import org.jivesoftware.smack.chat.ChatManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
     private ListView chatItemLV;
@@ -202,7 +203,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if(Connect.isLogined) {
                         try {
                             Date date = new Date();
-                            chat.sendMessage(toJson(mesBody, "text", date.getTime()+28800));
+                            chat.sendMessage(toJson(mesBody, "text", date.getTime()));
+                            Log.e("", "onClick: "+date.getTime() );
+                            String dateStr= new SimpleDateFormat("MM.dd HH:mm").format(date);
+                            Log.e("发送时间", "onClick: Date"+ dateStr);
                             Message message = new Message();
                             message.setType(1);
                             message.setMessageType("text"); //文本消息

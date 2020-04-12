@@ -5,13 +5,19 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 
+import com.example.cm.MainActivity;
+import com.example.cm.R;
 import com.example.cm.friend.Cn2Spell;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,13 +115,11 @@ public class DataBase extends SQLiteOpenHelper {
                message.setMessageType(cursor.getString(cursor.getColumnIndex("messageType")));
                if(message.getMessageType().equalsIgnoreCase("photo")){
                    //TODO 异常则设置默认异常图片
-                   message.setPhoto(BitmapFactory.decodeFile(photoRoad));
+                   message.setPhoto(AlbumUtil.getBitmapByPath(photoRoad));
                }else{
                    message.setPhoto(null);
                }
-               //message.setDate(cursor.getShort(cursor.getColumnIndex("date")));
                //添加进整体聊天记录
-                Log.e("读取的数据库消息", "getMessageHashMap: "+message.getFrom()+"  "+message.getTo()+"  "+message.getBody() );
                messageList.add(message);
             }while (cursor.moveToNext());
         }
@@ -178,7 +182,8 @@ public class DataBase extends SQLiteOpenHelper {
                 friendInfo.setPinyin(pinyin);
                 friendInfo.setFirstLetter(firstLetter);
                 String headBtRoad=cursor.getString(cursor.getColumnIndex("headBtRoad"));
-                friendInfo.setHeadBt(BitmapFactory.decodeFile(headBtRoad));
+                Bitmap bitmap=AlbumUtil.getBitmapByPath(headBtRoad);
+                friendInfo.setHeadBt(bitmap);
                 Log.d("", "getGroupInfoList: 设置好友头像成功"+headBtRoad);
                 friendInfo.setSex(cursor.getString(cursor.getColumnIndex("sex")));
                 friendInfo.setChated(cursor.getInt(cursor.getColumnIndex("chated")));
@@ -186,10 +191,11 @@ public class DataBase extends SQLiteOpenHelper {
                     MessageManager.getFriendInfoList().add(friendInfo);           //加入会话列表
                     MessageManager.getMessageMap().put(friendInfo.getUserName(),getMessageListByName(friendInfo.getUserName()));//同时添加进对应的聊天信息
                 }
+
                 friendInfoList.add(friendInfo);
             }while(cursor.moveToNext());
         }
-
+        Log.e("", "getContantFriendInfoList: "+"数据库读取完好友信息" );
         return friendInfoList;
     }
     /*
@@ -210,12 +216,11 @@ public class DataBase extends SQLiteOpenHelper {
                 String photoRoad=cursor.getString(cursor.getColumnIndex("photoRoad"));
                 message.setPhoto(BitmapFactory.decodeFile(photoRoad));
                 message.setDate(cursor.getLong(cursor.getColumnIndex("date")));
-
-                if(photoRoad.length()>0){
-                    message.setPhotoRoad(photoRoad);
-                    message.setPhoto(BitmapFactory.decodeFile(photoRoad));
+                String messageType=cursor.getString(cursor.getColumnIndex("messageType"));
+                message.setMessageType(messageType);
+                if(messageType.equals("photo")){
+                    message.setPhoto(AlbumUtil.getBitmapByPath(photoRoad));
                 }
-                message.setMessageType(cursor.getString(cursor.getColumnIndex("messageType")));
                 //message.setDate(cursor.getShort(cursor.getColumnIndex("date")));
                 //添加进整体聊天记录
                 messageList.add(message);

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.example.cm.R;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.util.Connect;
+import com.example.cm.util.DateFormatUtil;
 import com.example.cm.util.EmoticonsTextView;
 import com.example.cm.util.MessageManager;
 
@@ -60,6 +61,7 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
             }
             viewHolder.imageView=(ImageView)convertView.findViewById(R.id.chat_itemIV);
             viewHolder.nameTV=(EmoticonsTextView)convertView.findViewById(R.id.chat_itemName);
+            viewHolder.timeTV=convertView.findViewById(R.id.chat_item_time_tv);
             if(messageList.get(position).getMessageType().equals("text"))
                 viewHolder.mesTV=(EmoticonsTextView)convertView.findViewById(R.id.chat_itemMes);
             else
@@ -82,6 +84,16 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
         else {
             viewHolder.photoIV.setImageBitmap(messageList.get(position).getPhoto());
         }
+        long lastMesTime=0L;
+        long currentMesTime=messageList.get(position).getDate();
+        if(position>0){
+            lastMesTime=messageList.get(position-1).getDate();
+        }
+        String timeStr= DateFormatUtil.getDateStr(messageList.get(position).getDate());
+        viewHolder.timeTV.setText(timeStr);
+        if(DateFormatUtil.surpassTwoMinutes(lastMesTime,currentMesTime)){
+            viewHolder.timeTV.setVisibility(View.VISIBLE);
+        }
         return convertView;
     }
 
@@ -94,6 +106,7 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
         ImageView imageView;
         TextView nameTV;
         TextView mesTV;
+        TextView timeTV;
         ImageView photoIV;
     }
 }

@@ -21,6 +21,9 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.cm.MainActivity;
+import com.example.cm.R;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
@@ -37,7 +41,7 @@ public class AlbumUtil {
     public static final int REQUEST_CAMERA=8;
     public static final int OPEN_ALBUM=7;
     public static String FRIENDHEADFILEROAD="/data/data/com.example.cm/cache/friendHead";          //好友头像存储文件 本应用的cache中
-    private static String MESSAGEBITMAP="/sdcard/CM/messageBitmap";            //聊天信息图片存储文件
+    private static String MESSAGEBITMAP="/data/data/com.example.cm/cache/messageBitmap";            //聊天信息图片存储文件
     //申请访问存储权限 传入参数当前活动
     //检测是否有存储权限
     public static boolean checkStorage(Context context){
@@ -121,15 +125,9 @@ public class AlbumUtil {
     public static String saveHeadBitmap(String user,Bitmap bitmap){
         String fileRoad=null;
         String filename=null;
-        if(user==null){                //判断是头像图片还是聊天图片
-            Date date=new Date();
-            String dateStr=String.valueOf(date.getTime());
-            filename=dateStr+".jpg";
-            fileRoad=MESSAGEBITMAP;   //文件名加入时间戳，以确定文件不重复
-        }else{
-            fileRoad=FRIENDHEADFILEROAD+"/"+MessageManager.getSmackUserInfo().getUserName();
-            filename=user+"head.jpg";
-        }
+        fileRoad=FRIENDHEADFILEROAD+"/"+MessageManager.getSmackUserInfo().getUserName();
+        filename=user+"head.jpg";
+
         String sdStatus= Environment.getExternalStorageState();
         if(!sdStatus.equals(Environment.MEDIA_MOUNTED)) {//检测SD是否可用
             Log.d("", "saveHeadBitmap: SD卡不可用");
@@ -138,36 +136,72 @@ public class AlbumUtil {
         FileOutputStream b=null;
         File file=new File(fileRoad,filename);          //创建保存头像的文件
         if(!file.exists()){                      //文件不存在就创建
-           // file.mkdirs();
             try {
+                if(file.getParentFile()!=null&&!file.getParentFile().exists()){
+                    file.getParentFile().mkdirs();
+                }
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }else{                                    //存在就已经保存过，直接返回
             Log.d("", "saveHeadBitmap: 存在"+file.getAbsolutePath());
-            return file.getAbsolutePath();
-
+            if(file.delete()) {
+                try {
+                    Log.e("", "saveHeadBitmap: 删除存在的好友头像成功" );
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         try{
             b=new FileOutputStream(file,false);
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,b);//把数据写入文件
             b.flush();
             b.close();
+            Log.e("", "saveHeadBitmap: 保存图片位置"+file.getAbsolutePath() );
             return file.getAbsolutePath();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }/*finally {
-            try{
-                b.flush();
-                b.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file.getAbsolutePath();
+    }
+    /*
+    * @param bitmap
+    * @return path
+    * */
+    public  static String saveMessageBitmap(Bitmap bitmap){
+        String path=null;
+        String fileRoad=MESSAGEBITMAP+"/"+MessageManager.getSmackUserInfo().getUserName();
+        String fileName=new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())+".jpg";
+        Log.e("", "saveMessageBitmap: "+fileName );
+        File file=new File(fileRoad,fileName);
+        if(!file.exists()){
+            try {
+                if(file.getParentFile()!=null&&!file.getParentFile().exists()){
+                    file.getParentFile().mkdirs();
+                }
+                file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }*/ catch (IOException e) {
+        }
+        try {
+            FileOutputStream b=null;
+            b=new FileOutputStream(file,false);
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,b);//把数据写入文件
+            b.flush();
+            b.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        Log.e("", "saveHeadBitmap: 保存图片位置"+file.getAbsolutePath() );
+        path=file.getAbsolutePath();
+
+        return path;
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static String getImageStr(String absoluteRoad){
@@ -208,6 +242,26 @@ public class AlbumUtil {
         if(bytes.length!=0){
             bitmap=BitmapFactory.decodeByteArray(bytes,0,bytes.length);
         }
+        return bitmap;
+    }
+    /*
+    * @param path 图片路径
+    * @return bitmap bitmap图
+    * */
+    public static Bitmap getBitmapByPath(String path){
+        Bitmap bitmap=null;
+        if(path!=null){
+            File file=new File(path);
+            if(file.exists()) {
+                Uri filePath = Uri.fromFile(file);
+                bitmap = BitmapFactory.decodeFile(filePath.getPath());
+            }else{
+                bitmap=BitmapFactory.decodeResource(MainActivity.getInstance().getResources(), R.drawable.photo_load_error);
+            }
+        }else{
+            bitmap=BitmapFactory.decodeResource(MainActivity.getInstance().getResources(), R.drawable.photo_load_error);
+        }
+
         return bitmap;
     }
 

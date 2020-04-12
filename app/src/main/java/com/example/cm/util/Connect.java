@@ -3,22 +3,13 @@ package com.example.cm.util;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Build;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
-import android.support.annotation.MainThread;
 import android.support.annotation.RequiresApi;
-import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -26,13 +17,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
-import com.example.cm.friend.AddFriendItem;
-import com.example.cm.friend.Cn2Spell;
-import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.VCardManager;
 
 
@@ -40,65 +27,27 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 
 
 import org.jivesoftware.smack.ConnectionListener;
-import org.jivesoftware.smack.PacketCollector;
-import org.jivesoftware.smack.ReconnectionManager;
-import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.chat.Chat;
-import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.chat.ChatManagerListener;
-import org.jivesoftware.smack.chat.ChatMessageListener;
-import org.jivesoftware.smack.filter.AndFilter;
 
 
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketIDFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.filter.StanzaTypeFilter;
-
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Stanza;
 
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smack.roster.Roster;
 
-import org.jivesoftware.smack.roster.RosterEntry;
-
-import org.jivesoftware.smack.roster.RosterListener;
-import org.jivesoftware.smack.roster.packet.RosterPacket;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
-import org.jivesoftware.smackx.iqregister.packet.Registration;
-import org.jivesoftware.smackx.offline.OfflineMessageManager;
 
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 
 
-
-import org.json.JSONObject;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import javax.net.ssl.SNIServerName;
-
-import static android.support.v4.content.ContextCompat.getSystemService;
 
 
 public class Connect {
@@ -310,7 +259,6 @@ public class Connect {
 
                 getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);//设置手动处理好友请求
 
-                //1 同一人，则不获取好友信息 2 不同，先关闭数据库，然后创建数据库，再获取好友信息,还要删除好友列表和会话列表信息 3 之前没登陆过，创建数据库，获取好友信息
                 MessageManager.setDataBaseHelp(userName);
                 MessageManager.getDataBaseHelp().deleteAllFriendInfo();//删除所有好友信息，随后更新
                 MessageManager.clearAllList();//清理所有的list

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/search_friend_headImage"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/cm" />
+
+    <TextView
+        android:id="@+id/search_friend_userTV"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:hint="用户名" />
+
+    <Button
+        android:id="@+id/search_friend_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="33dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="10dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/button"
+        android:text="添加" />
+
+</LinearLayout>

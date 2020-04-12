@@ -2,19 +2,15 @@ package com.example.cm.service;
 
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
-import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.cm.friend.AddFriendItem;
+import com.example.cm.friend.AddFriend.AddFriendItem;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.VCardManager;
-import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
@@ -30,10 +26,6 @@ import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PacketListenerService extends Service {
     private  MyBinder binder=new MyBinder();

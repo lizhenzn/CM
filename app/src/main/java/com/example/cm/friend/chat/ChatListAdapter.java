@@ -98,21 +98,20 @@ public class ChatListAdapter extends BaseAdapter  {
         //viewHolder.headImage.setImageResource(cm);
         viewHolder.headImage.setImageBitmap(MessageManager.getFriendInfoList().get(position).getHeadBt());
         viewHolder.nameTV.setText(userName);
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("HH:MM");
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("HH:mm");
         if(messageList.size()>=1) {
             viewHolder.mesTV.setText(messageList.get(messageList.size() - 1).getBody());  //设置为最后一条信息
-            Log.d("时间", "getView: "+messageList.get(messageList.size() - 1).getDate());
-            String time = simpleDateFormat.format(new Date(messageList.get(messageList.size() - 1).getDate()));  //最后一条信息的时间
-            //String time=simpleDateFormat.format(new Date());
-            viewHolder.timeTV.setText(time);
+            long time=messageList.get(messageList.size()-1).getDate();
+            Log.d("时间", "getView: "+time);
+            String timeStr = simpleDateFormat.format(new Date(time));  //最后一条信息的时间
+            Log.e("", "getView: "+timeStr );
+            viewHolder.timeTV.setText(timeStr);
         }
         else
         {
             viewHolder.mesTV.setText(null);  //设置为最后一条信息//
             viewHolder.timeTV.setText("");
         }
-        //viewHolder.timeTV.setText(map.get("time")+"");
-
 
 
         return convertView;

@@ -1,4 +1,4 @@
-package com.example.cm.friend;
+package com.example.cm.friend.AddFriend;
 
 import com.example.cm.myInfo.FriendInfo;
 

@@ -1,4 +1,4 @@
-package com.example.cm.friend;
+package com.example.cm.friend.AddFriend;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,16 +7,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.cm.R;
-import com.example.cm.myInfo.FriendInfo;
-import com.example.cm.util.Connect;
+import com.example.cm.friend.AddFriend.AddFriendActivity;
 import com.example.cm.util.MessageManager;
-
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.packet.Presence;
 
 public class AddFriendAdapter extends BaseAdapter  {
     private  Context context;
