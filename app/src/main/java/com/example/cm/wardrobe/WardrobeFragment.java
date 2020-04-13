@@ -1,10 +1,8 @@
 package com.example.cm.wardrobe;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,14 +28,14 @@ import com.example.cm.R;
 import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.ClothesEstimater;
+import com.example.cm.util.Connect;
+import com.example.cm.util.MessageManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -45,15 +43,17 @@ import static android.app.Activity.RESULT_OK;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class WardrobeFragment extends Fragment  {
+
     private Context context;
     private View view;
     //private List<Integer> photoList1,photoList2; //展示的上衣、裤子和上面展示的的详情  R.drawable.cm资源为Integer类型
     //private static List<Integer> integerList;    //
     //private static List<List<Integer>> detailList1,detailList2;   //每个衣服对应的前后左右各个图片
     public static List<Bitmap> photoList1,photoList2; //展示的上衣、裤子和上面展示的的详情  R.drawable.cm资源为Integer类型
-    public static List<Bitmap> integerList;    //选中的某个衣服各个图片
-    public static List<List<Bitmap>> detailList1,detailList2;   //每个衣服对应的前后左右各个图片
+    //public static List<Bitmap> integerList;    //选中的某个衣服各个图片
+    //public static List<List<Bitmap>> detailList1,detailList2;   //每个衣服对应的前后左右各个图片
     public static List<String> upFileName,downFileName;
+    public static List<Integer> upSeason,downSeason;
     private RecyclerView wardrobeR1,wardrobeR2;
     private WardrobeAdapter wardrobeAdapter1,wardrobeAdapter2;
     private LinearLayout layout_up,layout_down,layout_up_control,layout_down_control;
@@ -63,16 +63,31 @@ public class WardrobeFragment extends Fragment  {
     private boolean upClothes,downClothes;
     private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4;
     public static final int  TYPE_UP=5,TYPE_DOWN=6;
+    public static final int SEASON_SPRING=7,SEASON_SUMMER=8,SEASON_FALL=9,SEASON_WINTER=10,SEASON_DEFAULT=11;
     private static File BASE_DIR=null;
+    private String prevUsername;
     //1:滑动上衣 2：滑动裤子
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //TODO 在加载这个模块就从服务器获取图片
         setToolbarText("衣柜");
-        initData();//initData
+//        if(Connect.isLogined){
+//            String str=MessageManager.getSharedPreferences().getString("userName",null);
+//            if(str!=null) {
+//                initData(str);prevUsername=str;
+//            }else{
+//                initData();
+//                prevUsername = null;
+//            }
+//        }else {
+//            initData();//initData
+//            prevUsername = null;
+//        }
         context=getActivity();
         upClothes=true;downClothes=false;
+        photoList1=new ArrayList<>();
+        photoList2=new ArrayList<>();
         //wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
         wardrobeAdapter1=new WardrobeAdapter(context,photoList1,1);
         wardrobeAdapter2=new WardrobeAdapter(context,photoList2,2);
@@ -82,6 +97,19 @@ public class WardrobeFragment extends Fragment  {
     public void onResume() {
         super.onResume();
         setToolbarText("衣柜");
+        Log.d("wardrobe", "onResume: wardrobe");
+        if(Connect.isLogined){
+            String str=MessageManager.getSharedPreferences().getString("userName",null);
+            Log.d("wardrobe", "onCreateView: username:"+str);
+            if(str!=null&&(prevUsername==null||!prevUsername.equals(str))){
+                initData(str);prevUsername=str;
+            }
+        }else if(prevUsername!=null){
+            Log.d("wardrobe", "enter reset");
+            initData();prevUsername=null;
+        }
+        wardrobeAdapter2.notifyDataSetChanged();
+        wardrobeAdapter1.notifyDataSetChanged();
     }
 
     @Override
@@ -101,8 +129,6 @@ public class WardrobeFragment extends Fragment  {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-
         view=View.inflate(context, R.layout.wardrobe,null);
         layout_up_control=view.findViewById(R.id.wardrobeUpControl);//控制上选单伸缩
         layout_down_control=view.findViewById(R.id.wardrobeDownControl);//控制下选单伸缩
@@ -196,6 +222,7 @@ public class WardrobeFragment extends Fragment  {
                                 if(takePhotoIntent.resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
                                     File picFile=creatImageFile(BASE_DIR,1);
                                     upFileName.add(picFile.getName());
+                                    upSeason.add(SEASON_DEFAULT);
                                     Uri imageUri=FileProvider.getUriForFile(getContext(),
                                             "com.example.cm",
                                             picFile);
@@ -248,6 +275,7 @@ public class WardrobeFragment extends Fragment  {
                                         resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
                                     File picFile=creatImageFile(BASE_DIR,2);
                                     downFileName.add(picFile.getName());
+                                    downSeason.add(SEASON_DEFAULT);
                                     Uri imageUri=FileProvider.getUriForFile(getContext(),
                                             "com.example.cm",
                                             picFile);
@@ -262,6 +290,9 @@ public class WardrobeFragment extends Fragment  {
                         }).show();
             }
         });
+        Log.d("wardrobe", "onCreateView: logined:"+Connect.isLogined);
+        Log.d("wardrobe", "onCreateView: prevusername:"+prevUsername);
+
         return  view;
     }
     /**
@@ -284,6 +315,7 @@ public class WardrobeFragment extends Fragment  {
         if(!AlbumUtil.checkStorage(getContext()))AlbumUtil.requestStorage(getContext());
         if(!AlbumUtil.checkStorage(getContext())){
             Toast.makeText(getContext(),"拒绝权限，无法加入衣柜",Toast.LENGTH_LONG).show();
+            return;
         }
         File baseDir=null;
         if (Environment.getExternalStorageState().equals(
@@ -301,7 +333,8 @@ public class WardrobeFragment extends Fragment  {
                     Bitmap bitmap = ClothesEstimater.getScaleBitmap(absoluteRoad);
                     wardrobeAdapter1.photoList.add(bitmap);
                     wardrobeAdapter1.notifyDataSetChanged();
-                    upFileName.add(saveBitmap(bitmap,baseDir,1));
+                    upFileName.add(saveBitmap(bitmap,BASE_DIR,1));
+                    upSeason.add(SEASON_DEFAULT);
                 }
            }break;
             case WardrobeFragment.ALBUM_DOWN:{
@@ -311,7 +344,8 @@ public class WardrobeFragment extends Fragment  {
                     Bitmap bitmap = ClothesEstimater.getScaleBitmap(absoluteRoad);
                     wardrobeAdapter2.photoList.add(bitmap);
                     wardrobeAdapter2.notifyDataSetChanged();
-                    downFileName.add(saveBitmap(bitmap,baseDir,2));
+                    downFileName.add(saveBitmap(bitmap,BASE_DIR,2));
+                    downSeason.add(SEASON_DEFAULT);
                 }
            }break;
             case WardrobeFragment.CAMERA_UP:{
@@ -352,27 +386,37 @@ public class WardrobeFragment extends Fragment  {
             }break;
         }
     }
-
     public static void initData(){
-        photoList1=new ArrayList<>();
-        photoList2=new ArrayList<>();
-        integerList=new ArrayList<>();
-        detailList1=new ArrayList<>();
-        detailList2=new ArrayList<>();
+        initData("default");
+    }
+    public static void initData(String username){
+        MainActivity.setClothes_up(-1);
+        MainActivity.setClothes_down(-1);
+        if(photoList2==null&&photoList1==null){
+            photoList1=new ArrayList<>();
+            photoList2=new ArrayList<>();
+        }
+        photoList1.clear();
+        photoList2.clear();
+//        integerList=new ArrayList<>();
+//        detailList1=new ArrayList<>();
+//        detailList2=new ArrayList<>();
         upFileName=new ArrayList<>();
         downFileName=new ArrayList<>();
-        @SuppressLint("ResourceType") InputStream is = MainActivity.getInstance().
-                getResources().openRawResource(R.drawable.cm);
-        Bitmap mBitmap = BitmapFactory.decodeStream(is);
-        @SuppressLint("ResourceType") InputStream is1 = MainActivity.getInstance().
-                getResources().openRawResource(R.drawable.cm);
-        Bitmap mBitmap1 = BitmapFactory.decodeStream(is1);
-        @SuppressLint("ResourceType") InputStream is2 = MainActivity.getInstance().
-                getResources().openRawResource(R.drawable.cm);
-        Bitmap mBitmap2 = BitmapFactory.decodeStream(is2);
-        @SuppressLint("ResourceType") InputStream is3 = MainActivity.getInstance().
-                getResources().openRawResource(R.drawable.cm);
-        Bitmap mBitmap3 = BitmapFactory.decodeStream(is3);
+        upSeason=new ArrayList<>();
+        downSeason=new ArrayList<>();
+//        @SuppressLint("ResourceType") InputStream is = MainActivity.getInstance().
+//                getResources().openRawResource(R.drawable.cm);
+//        Bitmap mBitmap = BitmapFactory.decodeStream(is);
+//        @SuppressLint("ResourceType") InputStream is1 = MainActivity.getInstance().
+//                getResources().openRawResource(R.drawable.cm);
+//        Bitmap mBitmap1 = BitmapFactory.decodeStream(is1);
+//        @SuppressLint("ResourceType") InputStream is2 = MainActivity.getInstance().
+//                getResources().openRawResource(R.drawable.cm);
+//        Bitmap mBitmap2 = BitmapFactory.decodeStream(is2);
+//        @SuppressLint("ResourceType") InputStream is3 = MainActivity.getInstance().
+//                getResources().openRawResource(R.drawable.cm);
+//        Bitmap mBitmap3 = BitmapFactory.decodeStream(is3);
 //        for(int i=0;i<66;i++) {
 //
 //            photoList1.add(mBitmap);
@@ -382,6 +426,7 @@ public class WardrobeFragment extends Fragment  {
             AlbumUtil.requestStorage(MainActivity.getInstance());
         if(!AlbumUtil.checkStorage(MainActivity.getInstance())){
             Toast.makeText(MainActivity.getInstance(),"拒绝权限，无法加载衣柜内容",Toast.LENGTH_LONG).show();
+            return;
         }
 
         if (Environment.getExternalStorageState().equals(
@@ -389,35 +434,81 @@ public class WardrobeFragment extends Fragment  {
             BASE_DIR=MainActivity.getInstance().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         } else {
             BASE_DIR=MainActivity.getInstance().getFilesDir();
-            if(BASE_DIR==null)Log.e("wardrobe",
-                    "load wardrobe failure : get storage dir failed");
+            if(BASE_DIR==null) {
+                Log.e("wardrobe",
+                        "load wardrobe failure : get storage dir failed");
+                return ;
+            }
         }
+        BASE_DIR=new File(BASE_DIR,username);
+        if(!BASE_DIR.exists())BASE_DIR.mkdirs();
         File picDir=new File(BASE_DIR,"upClothes");
-        if(!picDir.exists())picDir.mkdirs();
+        if(!picDir.exists()) {
+            picDir.mkdirs();
+            new File(picDir,"spring").mkdir();
+            new File(picDir,"summer").mkdir();
+            new File(picDir,"fall").mkdir();
+            new File(picDir,"winter").mkdir();
+        }
         Log.d("wardrobe", "initData: "+picDir.getAbsolutePath());
-        for(String fname:picDir.list()){
-            Bitmap bitmap=ClothesEstimater.getScaleBitmap(picDir.getAbsolutePath()
-                    +File.separator
-                    +fname);
-            photoList1.add(bitmap);
-            upFileName.add(fname);
+        for(File fname:picDir.listFiles()){
+            if(fname.isFile()) {
+                Bitmap bitmap = ClothesEstimater.getScaleBitmap(fname.getAbsolutePath());
+                photoList1.add(bitmap);
+                upFileName.add(fname.getName());
+                upSeason.add(SEASON_DEFAULT);
+            }
+            else if(fname.isDirectory()){
+                int season=SEASON_DEFAULT;
+                if(fname.getName().equals("spring"))season=SEASON_SPRING;
+                else if(fname.getName().equals("summer"))season=SEASON_SUMMER;
+                else if(fname.getName().equals("fall"))season=SEASON_FALL;
+                else if(fname.getName().equals("winter"))season=SEASON_WINTER;
+                for(File inner:fname.listFiles()){
+                    Bitmap bitmap = ClothesEstimater.getScaleBitmap(inner.getAbsolutePath());
+                    photoList1.add(bitmap);
+                    upFileName.add(fname.getName()+File.separatorChar+inner.getName());
+                    upSeason.add(season);
+                }
+            }
         }
         picDir=new File(BASE_DIR,"downClothes");
-        if(!picDir.exists())picDir.mkdirs();
-        for(String fname:picDir.list()){
-            Bitmap bitmap=ClothesEstimater.getScaleBitmap(picDir.getAbsolutePath()
-                    +File.separator
-                    +fname);
-            photoList2.add(bitmap);
-            downFileName.add(fname);
+        if(!picDir.exists()) {
+            picDir.mkdirs();
+            new File(picDir,"spring").mkdir();
+            new File(picDir,"summer").mkdir();
+            new File(picDir,"fall").mkdir();
+            new File(picDir,"winter").mkdir();
         }
-        for(int i=0;i<photoList1.size()+10;i++){
-            detailList1.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap,mBitmap1,mBitmap2,mBitmap3)));
+        for(File fname:picDir.listFiles()){
+            if(fname.isFile()) {
+                Bitmap bitmap = ClothesEstimater.getScaleBitmap(fname.getAbsolutePath());
+                photoList2.add(bitmap);
+                downFileName.add(fname.getName());
+                downSeason.add(SEASON_DEFAULT);
+            }
+            else if(fname.isDirectory()){
+                int season=SEASON_DEFAULT;
+                if(fname.getName().equals("spring"))season=SEASON_SPRING;
+                else if(fname.getName().equals("summer"))season=SEASON_SUMMER;
+                else if(fname.getName().equals("fall"))season=SEASON_FALL;
+                else if(fname.getName().equals("winter"))season=SEASON_WINTER;
+                for(File inner:fname.listFiles()){
+                    Bitmap bitmap = ClothesEstimater.getScaleBitmap(inner.getAbsolutePath());
+                    photoList2.add(bitmap);
+                    downFileName.add(fname.getName()+File.separatorChar+inner.getName());
+                    downSeason.add(season);
+                }
+            }
         }
-        for(int i=0;i<photoList2.size()+10;i++){
-            detailList2.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap3,mBitmap2,mBitmap1,mBitmap)));
 
-        }
+//        for(int i=0;i<photoList1.size()+10;i++){
+//            detailList1.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap,mBitmap1,mBitmap2,mBitmap3)));
+//        }
+//        for(int i=0;i<photoList2.size()+10;i++){
+//            detailList2.add(new ArrayList<Bitmap>(Arrays.asList(mBitmap3,mBitmap2,mBitmap1,mBitmap)));
+//
+//        }
 
     }
 
@@ -485,12 +576,10 @@ public class WardrobeFragment extends Fragment  {
                     if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
-                            Log.d("RecycleList:", "onClick: "+upFileName.get(position));
                         }else{    //下衣
                             MainActivity.setClothes_down(position);
-                            Log.d("RecycleList:", "onClick: "+downFileName.get(position));
                         }
-                    }
+                   }
 
                 }
             });
@@ -501,6 +590,139 @@ public class WardrobeFragment extends Fragment  {
                             builder()
                             .setCancelable(true)
                             .setCanceledOnTouchOutside(true)
+                            .addSheetItem("标为春季服装",
+                                    ActionSheetDialog.SheetItemColor.Red
+                                    , new ActionSheetDialog.OnSheetItemClickListener() {
+                                        @Override
+                                        public void onClick(int which) {
+                                            int pos=finalViewHolder.getAdapterPosition();
+                                            File prev=null,target=null;
+                                            if(type==1){
+                                                prev=new File(BASE_DIR,"upClothes"
+                                                        +File.separatorChar+upFileName.get(pos));
+                                                target=new File(BASE_DIR,"upClothes");
+                                            }else if(type==2) {
+                                                prev = new File(BASE_DIR, "downClothes"
+                                                        +File.separatorChar+downFileName.get(pos));
+                                                target=new File(BASE_DIR,"downClothes");
+                                            }
+                                            if(prev!=null&&target!=null){
+                                                target=new File(target,"spring"
+                                                        +File.separatorChar
+                                                        +prev.getName());
+                                                if(prev.renameTo(target)==false)
+                                                    Log.d("wardrobe", "onClick: movefailed");
+                                                else if(type==1) {
+                                                    upSeason.set(pos,SEASON_SPRING);
+                                                    upFileName.set(pos,"spring"+File.separatorChar+target.getName());
+                                                }
+                                                else if(type==2) {
+                                                    downSeason.set(pos,SEASON_SPRING);
+                                                    downFileName.set(pos,"spring"+File.separatorChar+target.getName());
+                                                }
+                                            }
+                                        }
+                                    })
+                            .addSheetItem("标为夏季服装",
+                                    ActionSheetDialog.SheetItemColor.Red
+                                    , new ActionSheetDialog.OnSheetItemClickListener() {
+                                        @Override
+                                        public void onClick(int which) {
+                                            int pos=finalViewHolder.getAdapterPosition();
+                                            File prev=null,target=null;
+                                            if(type==1){
+                                                prev=new File(BASE_DIR,"upClothes"
+                                                        +File.separatorChar+upFileName.get(pos));
+                                                target=new File(BASE_DIR,"upClothes");
+                                            }else if(type==2) {
+                                                prev = new File(BASE_DIR, "downClothes"
+                                                        +File.separatorChar+downFileName.get(pos));
+                                                target=new File(BASE_DIR,"downClothes");
+                                            }
+                                            if(prev!=null&&target!=null){
+                                                target=new File(target,"summer"
+                                                        +File.separatorChar
+                                                        +prev.getName());
+                                                if(prev.renameTo(target)==false)
+                                                    Log.d("wardrobe", "onClick: movefailed");
+                                                else if(type==1) {
+                                                    upSeason.set(pos,SEASON_SUMMER);
+                                                    upFileName.set(pos,"summer"+File.separatorChar+target.getName());
+                                                }
+                                                else if(type==2) {
+                                                    downSeason.set(pos,SEASON_SUMMER);
+                                                    downFileName.set(pos,"summer"+File.separatorChar+target.getName());
+                                                }
+                                            }
+                                        }
+                                    })
+                            .addSheetItem("标为秋季服装",
+                                    ActionSheetDialog.SheetItemColor.Red
+                                    , new ActionSheetDialog.OnSheetItemClickListener() {
+                                        @Override
+                                        public void onClick(int which) {
+                                            int pos=finalViewHolder.getAdapterPosition();
+                                            File prev=null,target=null;
+                                            if(type==1){
+                                                prev=new File(BASE_DIR,"upClothes"
+                                                        +File.separatorChar+upFileName.get(pos));
+                                                target=new File(BASE_DIR,"upClothes");
+                                            }else if(type==2) {
+                                                prev = new File(BASE_DIR, "downClothes"
+                                                        +File.separatorChar+downFileName.get(pos));
+                                                target=new File(BASE_DIR,"downClothes");
+                                            }
+                                            if(prev!=null&&target!=null){
+                                                target=new File(target,"fall"
+                                                        +File.separatorChar
+                                                        +prev.getName());
+                                                if(prev.renameTo(target)==false)
+                                                    Log.d("wardrobe", "onClick: movefailed");
+                                                else if(type==1) {
+                                                    upSeason.set(pos,SEASON_FALL);
+                                                    upFileName.set(pos,"fall"+File.separatorChar+target.getName());
+                                                }
+                                                else if(type==2) {
+                                                    downSeason.set(pos,SEASON_FALL);
+                                                    downFileName.set(pos,"fall"+File.separatorChar+target.getName());
+                                                }
+                                            }
+                                        }
+                                    })
+                            .addSheetItem("标为冬季服装",
+                                    ActionSheetDialog.SheetItemColor.Red
+                                    , new ActionSheetDialog.OnSheetItemClickListener() {
+                                        @Override
+                                        public void onClick(int which) {
+                                            int pos=finalViewHolder.getAdapterPosition();
+                                            File prev=null,target=null;
+                                            if(type==1){
+                                                prev=new File(BASE_DIR,"upClothes"
+                                                        +File.separatorChar+upFileName.get(pos));
+                                                target=new File(BASE_DIR,"upClothes");
+                                            }else if(type==2) {
+                                                prev = new File(BASE_DIR, "downClothes"
+                                                        +File.separatorChar+downFileName.get(pos));
+                                                target=new File(BASE_DIR,"downClothes");
+                                            }
+                                            if(prev!=null&&target!=null){
+                                                target=new File(target,"winter"
+                                                        +File.separatorChar
+                                                        +prev.getName());
+                                                if(prev.renameTo(target)==false)
+                                                    Log.d("wardrobe", "onClick: movefailed");
+                                                else if(type==1) {
+                                                    upSeason.set(pos,SEASON_WINTER);
+                                                    upFileName.set(pos,"winter"+File.separatorChar+target.getName());
+
+                                                }
+                                                else if(type==2) {
+                                                    downSeason.set(pos,SEASON_WINTER);
+                                                    downFileName.set(pos,"winter"+File.separatorChar+target.getName());
+                                                }
+                                            }
+                                        }
+                                    })
                             .addSheetItem("删除",
                                     ActionSheetDialog.SheetItemColor.Blue
                                     , new ActionSheetDialog.OnSheetItemClickListener() {
@@ -515,8 +737,11 @@ public class WardrobeFragment extends Fragment  {
                                                         "upClothes"+
                                                                 File.separatorChar+
                                                                 upFileName.get(pos));
-                                                if (f.exists())f.delete();
-                                                upFileName.remove(pos);
+                                                if (f.exists()) {
+                                                    f.delete();
+                                                    upFileName.remove(pos);
+                                                    upSeason.remove(pos);
+                                                }
                                                 notifyDataSetChanged();
                                             }else if(type==2){
                                                 photoList2.remove(pos);
@@ -524,8 +749,11 @@ public class WardrobeFragment extends Fragment  {
                                                         "downClothes"+
                                                                 File.separatorChar+
                                                                 downFileName.get(pos));
-                                                if (f.exists())f.delete();
-                                                downFileName.remove(pos);
+                                                if (f.exists()) {
+                                                    f.delete();
+                                                    downFileName.remove(pos);
+                                                    downSeason.remove(pos);
+                                                }
                                                 notifyDataSetChanged();
                                             }
                                         }
@@ -539,11 +767,11 @@ public class WardrobeFragment extends Fragment  {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
             viewHolder.imageView.setImageBitmap(photoList.get(position));
-            if(type==1){
-                integerList=detailList1.get(position);
-            }else if(type==2){
-                integerList=detailList2.get(position);
-            }
+//            if(type==1){
+//                integerList=detailList1.get(position);
+//            }else if(type==2){
+//                integerList=detailList2.get(position);
+//            }
             //wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
             //viewPager.setAdapter(wardrobeVPAdapter);
         }
@@ -661,7 +889,6 @@ public class WardrobeFragment extends Fragment  {
         }
         return filePic;
     }
-
     /**
      * 给定偏移量和类型取得绝对路径
      * @param pos 偏移量
@@ -669,10 +896,11 @@ public class WardrobeFragment extends Fragment  {
      * @return 绝对路径,出错则返回null
      */
     public static String getImgRealPath(int pos,int type,Context context){
-        File baseDir=null;
+        File baseDir=BASE_DIR;
         File imgDir=null;
-        if(hasSdcard())baseDir=context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        else baseDir=context.getFilesDir();
+//        if(hasSdcard())baseDir=context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        else baseDir=context.getFilesDir();
+        baseDir=BASE_DIR;
         if(type==TYPE_UP) {
             imgDir = new File(baseDir, "upClothes"+
                     File.separatorChar+
@@ -683,7 +911,10 @@ public class WardrobeFragment extends Fragment  {
                     File.separatorChar+
                             downFileName.get(pos));
         }
-        if(imgDir!=null)return imgDir.getAbsolutePath();
+        if(imgDir!=null){
+            Log.d("wardrobe", "getImgRealPath: "+imgDir.getAbsolutePath());
+            return imgDir.getAbsolutePath();
+        }
         else return null;
     }
 }
