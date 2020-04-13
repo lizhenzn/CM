@@ -1,5 +1,6 @@
 package com.example.cm.friend;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -39,6 +40,7 @@ private ImageView accuseIV1,accuseIV2,accuseIV3;
 private Button submitBtn;
 private String userName;
 private String[] bitmapStrs;
+private ProgressDialog progressDialog;
 private int bitmapCount;
 private int currentBitmap;
     @Override
@@ -68,6 +70,7 @@ private int currentBitmap;
         bitmapCount=0;
         currentBitmap=-1;
         userName=getIntent().getStringExtra("userName");
+        progressDialog=new ProgressDialog(this);
     }
 
     @Override
@@ -75,21 +78,50 @@ private int currentBitmap;
         switch (view.getId()){
             case R.id.accuse_btn:{
                 if(Connect.isLogined) {
-                    try {
+
                         String accuse = accuseET.getText().toString();
                         if(bitmapCount==0){
                             Toast.makeText(this,"图片证明不能为空",Toast.LENGTH_SHORT).show();
                         }else {
-                            ChatManager chatManager = ChatManager.getInstanceFor(Connect.getXMPPTCPConnection());
-                            Chat chat = chatManager.createChat("administrator" + "@" + Connect.SERVERNAME);
-                            chat.sendMessage(toJson("举报：" + userName +"\n理由："+ accuse, "text", new Date().getTime()));
-                            for(int i=0;i<bitmapCount;i++){
-                                chat.sendMessage(toJson(bitmapStrs[i],"photo",new Date().getTime()));
-                            }
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AccuseFriendActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            progressDialog.setTitle("");
+                                            progressDialog.setCancelable(false);
+                                            progressDialog.setMessage("发送中...");
+                                            progressDialog.show();
+                                        }
+                                    });
+                                    try {
+                                        ChatManager chatManager = ChatManager.getInstanceFor(Connect.getXMPPTCPConnection());
+                                        Chat chat = chatManager.createChat("administrator" + "@" + Connect.SERVERNAME);
+                                        chat.sendMessage(toJson("举报：" + userName +"\n理由："+ accuse, "text", new Date().getTime()));
+                                        for(int i=0;i<bitmapCount;i++){
+                                            chat.sendMessage(toJson(bitmapStrs[i],"photo",new Date().getTime()));
+                                            //Thread.sleep(200);
+                                        }
+                                    } catch (SmackException.NotConnectedException e) {
+                                        e.printStackTrace();
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }finally {
+                                        AccuseFriendActivity.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(AccuseFriendActivity.this,"发送成功",Toast.LENGTH_SHORT).show();
+                                                progressDialog.dismiss();
+                                            }
+                                        });
+
+                                    }
+                                }
+                            }).start();
+
                         }
-                    } catch (SmackException.NotConnectedException e) {
-                        e.printStackTrace();
-                    }
+
                 }else{
                     Toast.makeText(this,"未登录",Toast.LENGTH_SHORT).show();
                 }

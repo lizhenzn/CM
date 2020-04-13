@@ -73,10 +73,10 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
 
         viewHolder.imageView.setOnClickListener(this);
         if(messageList.get(position).getType()==1) {
-            viewHolder.nameTV.setText(messageList.get(position).getFrom());
+            viewHolder.nameTV.setText(MessageManager.getSmackUserInfo().getNiC());
             viewHolder.imageView.setImageBitmap(MessageManager.getSmackUserInfo().getHeadBt());
         }else{
-            viewHolder.nameTV.setText(messageList.get(position).getFrom());
+            viewHolder.nameTV.setText(friendInfo.getNoteName());
             viewHolder.imageView.setImageBitmap(friendInfo.getHeadBt());
         }
         if(messageList.get(position).getMessageType().equals("text"))

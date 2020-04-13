@@ -60,7 +60,7 @@ public class SortAdapter extends BaseAdapter {
             viewHolder.catalog.setVisibility(View.GONE);
         }
 
-        viewHolder.name.setText(this.list.get(position).getUserName());
+        viewHolder.name.setText(this.list.get(position).getNoteName());
         viewHolder.headIV.setImageBitmap(this.list.get(position).getHeadBt());
 
         return view;

@@ -12,6 +12,7 @@ import java.io.InputStream;
 public class FriendInfo implements Comparable<FriendInfo>{
     String userName;   //用户名Jid
     String nicName;    //昵称
+    String noteName;   //备注
     Bitmap headBt;     //头像
     String headBtRoad; //头像保存路径
     int chated;      //是否在会话列表 0不在 1在
@@ -23,6 +24,7 @@ public class FriendInfo implements Comparable<FriendInfo>{
         this.chated=0; //默认为0
         userName="";
         nicName="点击登录";
+        noteName="";
         @SuppressLint("ResourceType") InputStream is1 = MainActivity.getInstance().getResources().openRawResource(R.drawable.unlogin);
         headBt = BitmapFactory.decodeStream(is1);
         sex="secrecy";
@@ -45,6 +47,14 @@ public class FriendInfo implements Comparable<FriendInfo>{
 
     public void setNicName(String nicName) {
         this.nicName = nicName;
+    }
+
+    public String getNoteName() {
+        return noteName;
+    }
+
+    public void setNoteName(String noteName) {
+        this.noteName = noteName;
     }
 
     public Bitmap getHeadBt() {

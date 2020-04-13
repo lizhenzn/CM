@@ -26,7 +26,6 @@ private Button friendBtn;
         friendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(),"233333",Toast.LENGTH_LONG).show();
                 Intent intent=new Intent(getContext(),ContantActivity.class);
                 startActivity(intent);
                 ((Activity)MainActivity.getInstance()).overridePendingTransition(R.anim.bottom_in,R.anim.bottom_silent);

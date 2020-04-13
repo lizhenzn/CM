@@ -93,12 +93,13 @@ public class ChatListAdapter extends BaseAdapter  {
        // params.width=displayMetrics.widthPixels;
            //设置会话列表信息显示各个好友最后一条信息时间、内容
         String userName= MessageManager.getFriendInfoList().get(position).getUserName();
+        String noteName= MessageManager.getFriendInfoList().get(position).getNoteName();
         List<Message> messageList=MessageManager.getMessageMap().get(userName);            //对应friendName的聊天信息列表
         //viewHolder.headImage.setImageDrawable(context.getResources().getDrawable(Integer.parseInt(map.get(Connect.friendInfoList.get(position).get("friendName").getHeadBt())));
         //viewHolder.headImage.setImageBitmap(map.get(Connect.friendInfoList.get(position).get("friendInfo").getHeadBt()));
         //viewHolder.headImage.setImageResource(cm);
         viewHolder.headImage.setImageBitmap(MessageManager.getFriendInfoList().get(position).getHeadBt());
-        viewHolder.nameTV.setText(userName);
+        viewHolder.nameTV.setText(noteName);
         if(messageList.size()>=1) {
             viewHolder.mesTV.setText(messageList.get(messageList.size() - 1).getBody());  //设置为最后一条信息
             long time=messageList.get(messageList.size()-1).getDate();
