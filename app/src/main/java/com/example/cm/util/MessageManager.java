@@ -391,8 +391,6 @@ public class MessageManager {
                             message1.setPhoto(bitmap);
                         }
                     }).start();
-
-
                 }
                 message1.setFrom(userFrom);
                 message1.setTo(message.getTo().split("@")[0]);
