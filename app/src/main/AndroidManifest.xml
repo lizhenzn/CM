@@ -18,7 +18,8 @@
         android:roundIcon="@drawable/cm"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".friend.AccuseFriendActivity"></activity>
+        <activity android:name=".friend.ChangeFriendNoteActivity"></activity>
+        <activity android:name=".friend.AccuseFriendActivity" />
         <activity android:name=".myInfo.ChangePasswordActivity" />
         <activity android:name=".myInfo.EditEmailActivity" />
 

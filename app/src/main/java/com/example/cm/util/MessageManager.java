@@ -129,7 +129,7 @@ public class MessageManager {
     }
 
     public static void setDataBaseHelp(String userName) {
-        dataBaseHelp=new DataBase(MainActivity.getInstance(),"DataBaseOf"+userName+".db",null,1,userName);
+        dataBaseHelp=new DataBase(MainActivity.getInstance(),"DataBaseOf"+userName+".db",null,2);
         db=dataBaseHelp.getWritableDatabase();
     }
 
@@ -159,6 +159,7 @@ public class MessageManager {
             FriendInfo friendInfo=new FriendInfo();
             friendInfo.setUserName(userName1);
             friendInfo.setNicName(userName1);
+            friendInfo.setNoteName(userName1);
             friendInfo.setPinyin(Cn2Spell.getPinYin(userName1));
             friendInfo.setFirstLetter(Cn2Spell.getPinYinFirstLetter(userName1));
             friendInfo.setSex(VCardManager.getUserVcard(userName.split("@")[0]).getField("gender"));
@@ -233,13 +234,20 @@ public class MessageManager {
                 Log.e("", "initFriend: 双方互相订阅" );
                 FriendInfo friendInfo = new FriendInfo();
                 String user = entry.getUser().split("@")[0];
+                String note=entry.getName();
                 VCard vCard=VCardManager.getUserVcard(user);
                 friendInfo.setUserName(user);
+                Log.e("", "initFriend: 备注："+note );
+                if(note!=null) {
+                    friendInfo.setNoteName(note);
+                }else{
+                    friendInfo.setNoteName(user);
+                }
                 if(vCard.getNickName()==null){
                     friendInfo.setNicName(user);
                 }
                 friendInfo.setNicName(vCard.getNickName());
-                String pinyin = Cn2Spell.getPinYin(user); // 根据姓名获取拼音
+                String pinyin = Cn2Spell.getPinYin(friendInfo.getNoteName()); // 根据姓名获取拼音
                 String firstLetter = pinyin.substring(0, 1).toUpperCase(); // 获取拼音首字母并转成大写
                 if (!firstLetter.matches("[A-Z]")) { // 如果不在A-Z中则默认为“#”
                     firstLetter = "#";

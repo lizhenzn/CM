@@ -57,7 +57,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public static ChatAdapter chatAdapter;
     private EmoAdapter emoAdapter;
     private ImageButton emoIB,addIB;
-    private String userName;
+    private String userName,noteName;
     private FriendInfo friendInfo;
     public  static boolean isSend;
     private boolean work;
@@ -115,15 +115,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         emoRecy=(RecyclerView)findViewById(R.id.recycler_emo);
         inputET=(EmoticonsEditText)findViewById(R.id.inputET);
         sendBtn=(Button)findViewById(R.id.send);
-        chatFriendTV=(TextView)findViewById(R.id.chat_friendNM);
         emoIB=(ImageButton)findViewById(R.id.emoIB);
         addIB=(ImageButton)findViewById(R.id.addIB);
         sendBtn.setOnClickListener(this);
         emoIB.setOnClickListener(this);
         addIB.setOnClickListener(this);
-        chatFriendTV.setText(userName);
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
+        noteName=intent.getStringExtra("noteName");
         Log.d("聊天界面friendName", "init: "+userName);
         for(int i=0;i<MessageManager.getContantFriendInfoList().size();i++){//赋值给正在聊天的人
             if(MessageManager.getContantFriendInfoList().get(i).getUserName().equals(userName)){
@@ -132,7 +131,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
 
         }
-        user_tv.setText(userName);
+        user_tv.setText(noteName);
         if(MessageManager.getMessageMap().get(userName).size()>=1)
             chatItemLV.smoothScrollToPosition(MessageManager.getMessageMap().get(userName).size()-1);
 

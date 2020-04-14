@@ -31,10 +31,10 @@ import java.util.List;
 public class FriendInfoActivity extends AppCompatActivity {
    private Button send_btn;
    private TextView setting_btn;
-   private String userName;
+   private String userName,noteName;
    private int position;
    private ImageView friend_headIV;
-   private TextView userTV,nicTV,sexTV;
+   private TextView userTV,nicTV,sexTV,noteTV;
    private FriendInfo curFriendInfo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +92,15 @@ public class FriendInfoActivity extends AppCompatActivity {
                         intent.putExtra("userName",userName);
                         startActivity(intent);
                     }
+                }).addSheetItem("修改备注", ActionSheetDialog.SheetItemColor.Red, new ActionSheetDialog.OnSheetItemClickListener() {
+                    @Override
+                    public void onClick(int which) {
+                        Log.e("", "onClick: 点击修改备注" );
+                        Intent intent=new Intent(FriendInfoActivity.this,ChangeFriendNoteActivity.class);
+                        intent.putExtra("userName",userName);
+                        intent.putExtra("position",position);
+                        startActivity(intent);
+                    }
                 }).show();
 
             }
@@ -101,10 +110,8 @@ public class FriendInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //判断会话列表有没有此好友
                 boolean contain=false;
-                FriendInfo friendInfo;
                 MessageManager.getContantFriendInfoList().get(position).setChated(1); //设置为在聊天列表
-                friendInfo=MessageManager.getContantFriendInfoList().get(position);
-                String userName=friendInfo.getUserName();
+                String userName=curFriendInfo.getUserName();
                 for(int i=0;i<MessageManager.getFriendInfoList().size();i++){
                     if(MessageManager.getFriendInfoList().get(i).getUserName().equals(userName)){     //会话列表包含此好友
                         //list.get(i).get(message.getFrom()).add(message1);
@@ -116,15 +123,15 @@ public class FriendInfoActivity extends AppCompatActivity {
                 if(!contain){  //会话列表不包含此好友
                     MessageManager.getDataBaseHelp().changeChatState(userName,1);            //改变数据库中聊天状态
                     //friendInfo.setHeadBt(message.getBody());
-                    MessageManager.getFriendInfoList().add(MessageManager.getFriendInfoList().size(),friendInfo);//
+                    MessageManager.getFriendInfoList().add(MessageManager.getFriendInfoList().size(),curFriendInfo);//
                     List<Message> messageList=new ArrayList<>();
                     ////messageList.add(message1);
                     MessageManager.getMessageMap().put(userName,messageList);
                     Log.d("ContantClick点击的好友条目名", "onChildClick: "+userName);
                 }
-                //String userName= Connect.groupInfoList.get(groupPosition).getFriendInfoList().get(childPosition).getUserName();
                 Intent intent=new Intent(FriendInfoActivity.this, ChatActivity.class);
                 intent.putExtra("userName",userName);
+                intent.putExtra("noteName",noteName);
                 startActivity(intent);
 
             }
@@ -133,16 +140,19 @@ public class FriendInfoActivity extends AppCompatActivity {
     public void init(){
         send_btn=(Button)findViewById(R.id.friend_detail_send_btn);
         setting_btn=(TextView)findViewById(R.id.friend_detail_setting);
+        noteTV=findViewById(R.id.friend_detail_note_tv);
         userTV=(TextView)findViewById(R.id.friend_detail_user_tv);
         nicTV=(TextView)findViewById(R.id.friend_detail_nic_tv);
         sexTV=(TextView)findViewById(R.id.friend_detail_sex_tv);
         friend_headIV=(ImageView)findViewById(R.id.friend_detail_iv);
         Intent intent=getIntent();
-        userName=intent.getStringExtra("userName");
         position=intent.getIntExtra("position",0);
         curFriendInfo=MessageManager.getContantFriendInfoList().get(position);
+        userName=curFriendInfo.getUserName();
+        noteName=curFriendInfo.getNoteName();
         friend_headIV.setImageBitmap(curFriendInfo.getHeadBt());
-        userTV.setText("帐号:"+curFriendInfo.getUserName());
+        noteTV.setText("备注:"+noteName);
+        userTV.setText("帐号:"+userName);
         nicTV.setText("用户名："+curFriendInfo.getNicName());
         String sex="保密";
         if(curFriendInfo.getSex().equalsIgnoreCase("male")){
@@ -160,5 +170,11 @@ public class FriendInfoActivity extends AppCompatActivity {
             default:break;
         }
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        noteTV.setText("备注："+curFriendInfo.getNoteName());
     }
 }

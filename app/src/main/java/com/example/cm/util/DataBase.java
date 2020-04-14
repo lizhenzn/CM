@@ -24,11 +24,11 @@ import java.util.List;
 
 public class DataBase extends SQLiteOpenHelper {
     private Context mContext;
-    private  String user;
     private  final String CREATE_TABLE_FRIENDINFO="create table FriendInfoTable"+"("//user==null//TODO
             +"userName varchar(24) Primary Key Not Null,"
             +"nicName varchar(24),"
-            +"sex varchar(12) Not Null default '保密',"
+            +"noteName varchar(24),"
+            +"sex varchar(12) Not Null default 'secrecy',"
             +"email varchar(20),"
             +"headBtRoad varchar(36),"
             +"chated int"
@@ -42,10 +42,9 @@ public class DataBase extends SQLiteOpenHelper {
             +"photoRoad varchar(36),"
             +"date Varchar(36)"
             +");";
-    public DataBase(Context context,String name,SQLiteDatabase.CursorFactory factory, int version,String user) {
+    public DataBase(Context context,String name,SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         mContext=context;
-        this.user=user;
     }
 
     @Override
@@ -71,6 +70,7 @@ public class DataBase extends SQLiteOpenHelper {
         ContentValues values=new ContentValues();
         values.put("userName",friendInfo.getUserName());
         values.put("nicName",friendInfo.getNicName());
+        values.put("noteName",friendInfo.getNoteName());
         values.put("sex",friendInfo.getSex());
         values.put("email",friendInfo.getEmail());
         values.put("headBtRoad",friendInfo.getHeadBtRoad());
@@ -172,12 +172,17 @@ public class DataBase extends SQLiteOpenHelper {
             do{
                 FriendInfo friendInfo=new FriendInfo();
                 String userName=cursor.getString(cursor.getColumnIndex("userName"));
-                String pinyin = Cn2Spell.getPinYin(userName); // 根据姓名获取拼音
+                String noteName=cursor.getString(cursor.getColumnIndex("noteName"));
+                if(noteName==null){
+                    noteName=userName;
+                }
+                String pinyin = Cn2Spell.getPinYin(noteName); // 根据姓名获取拼音
                 String firstLetter = pinyin.substring(0, 1).toUpperCase(); // 获取拼音首字母并转成大写
                 if (!firstLetter.matches("[A-Z]")) { // 如果不在A-Z中则默认为“#”
                     firstLetter = "#";
                 }
-                friendInfo.setUserName(cursor.getString(cursor.getColumnIndex("userName")));
+                friendInfo.setUserName(userName);
+                friendInfo.setNoteName(noteName);
                 friendInfo.setNicName(cursor.getString(cursor.getColumnIndex("nicName")));
                 friendInfo.setPinyin(pinyin);
                 friendInfo.setFirstLetter(firstLetter);
@@ -262,4 +267,15 @@ public class DataBase extends SQLiteOpenHelper {
         MessageManager.getDb().execSQL("delete from FriendInfoTable where chated=0 or chated=1;");
         Log.d("", "deleteAllFriendInfo: 删除所有好友信息成功");
     }
+    /*
+    * @param userName
+    * @param noteName
+    * */
+    public void changeFriendNote(String userName,String noteName){
+        ContentValues value=new ContentValues();
+        value.put("noteName",noteName);
+        MessageManager.getDb().update("FriendInfoTable",value,"userName=?",new String[]{userName});
+        //MessageManager.getDb().execSQL("update FriendInfoTable set noteName="+noteName+"  where userName="+userName+";");
+    }
+
 }

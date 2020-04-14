@@ -68,7 +68,6 @@ public class FriendFragment extends Fragment  {
         //initChatList();
         chatListAdapter=new ChatListAdapter(getActivity());
         chatLV.setAdapter(chatListAdapter);
-        Log.d("test", "onCreateView: ");
         if(MessageManager.isHaveNewMessage()) {
             chatListAdapter.notifyDataSetChanged();
             MessageManager.setHaveNewMessage(false);
@@ -83,9 +82,8 @@ public class FriendFragment extends Fragment  {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent intent=new Intent(getActivity(), ChatActivity.class);
                         intent.putExtra("userName",MessageManager.getFriendInfoList().get(position).getUserName());
+                        intent.putExtra("noteName",MessageManager.getFriendInfoList().get(position).getNoteName());
                         startActivity(intent);
-                        Toast.makeText(getContext(),"点击  "+position,Toast.LENGTH_SHORT).show();
-                        Log.d("friend", "onItemClick: ");
                     }
                 });
 
@@ -107,7 +105,6 @@ public class FriendFragment extends Fragment  {
                 builder.setCancelable(true);
                 builder.setIcon(R.drawable.button);
                 builder.show();
-                Toast.makeText(getContext(),"点击  "+position,Toast.LENGTH_SHORT).show();
                 Log.d("friend", "onItemClick: ");
                 return true;
             }
