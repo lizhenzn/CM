@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.drawable.DrawableUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,24 +23,31 @@ import android.support.v7.widget.Toolbar;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.friend.AccuseFriendActivity;
+import com.example.cm.friend.ChangeFriendNoteActivity;
+import com.example.cm.friend.FriendInfoActivity;
 import com.example.cm.myInfo.FriendInfo;
+import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.EmoticonsEditText;
 import com.example.cm.util.MessageManager;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.json.JSONException;
@@ -53,9 +63,9 @@ import okhttp3.OkHttpClient;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
     private ListView chatItemLV;
+    private LinearLayout chat_LL;
     private RecyclerView emoRecy;
     private EmoticonsEditText inputET;
-    private TextView chatFriendTV;                 //聊天界面好友名
     private Button sendBtn;
     public static ChatAdapter chatAdapter;
     private EmoAdapter emoAdapter;
@@ -65,7 +75,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public  static boolean isSend;
     private boolean work;
     private Chat chat;
-    private TextView user_tv;  //正在聊天的人 顶部显示
+    private TextView user_tv,chatSetTV;  //正在聊天的人 顶部显示
+    private final int CHANGEBACK=9;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +124,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     //初始化控件
     public void init(){
         work=true;
+        chat_LL=findViewById(R.id.chat_LL);
+        chatSetTV=findViewById(R.id.chat_setting);
+        chatSetTV.setOnClickListener(this);
         chatItemLV=(ListView)findViewById(R.id.chat_itemLV);
         chatItemLV.setDivider(null);//分割线设置空
         emoRecy=(RecyclerView)findViewById(R.id.recycler_emo);
@@ -249,6 +263,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 
             }break;
+            case R.id.chat_setting:{
+                new ActionSheetDialog(ChatActivity.this)
+                        .builder()
+                        .setCanceledOnTouchOutside(true)
+                        .setCancelable(true)
+                        .addSheetItem("更改聊天背景", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
+                            @Override
+                            public void onClick(int which) {
+                                if (AlbumUtil.checkStorage(ChatActivity.this)) {
+                                    Intent intent = new Intent("android.intent.action.GET_CONTENT");
+                                    intent.setType("image/*");
+                                    startActivityForResult(intent, CHANGEBACK);
+                                } else {
+                                    AlbumUtil.requestStorage(ChatActivity.this);
+                                    //Toast.makeText(ChatActivity.this,"You denied the permission",Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }).show();
+
+            }break;
             default:break;
         }
 
@@ -280,7 +314,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     String[] tempPath=absoluteRoad.split("/");
                     String finalPath=tempPath[tempPath.length-1];
                     Log.e("", "onActivityResult: "+finalPath );
-
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -318,7 +351,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         isSend = true;
                 }
 
-            }break;
+            }
+            case CHANGEBACK:{
+                String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,ChatActivity.this);
+                if(absoluteRoad!=null) {            //选择图片
+                    DisplayMetrics dm = getResources().getDisplayMetrics();
+                    int heigth = dm.heightPixels;
+                    int width = dm.widthPixels;
+                    Drawable drawable=null;
+                    Bitmap bitmap=AlbumUtil.getBitmapByPath(absoluteRoad);
+                    bitmap=AlbumUtil.resizeBitmap(bitmap,width,heigth);
+                    drawable=new BitmapDrawable(bitmap);
+                    chat_LL.setBackground(drawable);
+                }
+                }break;
             default:break;
         }
     }
@@ -357,4 +403,5 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
         work=false;
     }
+
 }

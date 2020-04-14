@@ -2,7 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chat_LL"
     android:orientation="vertical"
+    android:background="@drawable/back"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".friend.chat.ChatActivity">
@@ -23,12 +25,23 @@
             android:text="friend"
             />
 
+        <TextView
+            android:id="@+id/chat_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置"
+            android:background="@drawable/button_search"
+            android:textSize="20sp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="end"
+            />
 
     </android.support.v7.widget.Toolbar>
     <ListView
         android:id="@+id/chat_itemLV"
-        android:background="@color/colorStatBar"
         android:layout_width="match_parent"
+        android:transcriptMode="normal"
         android:layout_height="0dp"
         android:layout_weight="1">
     </ListView>
@@ -36,7 +49,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="2dp"
         android:background="#F0F0F0"
         android:orientation="horizontal">
         <ImageButton
@@ -48,6 +61,7 @@
 
         <com.example.cm.util.EmoticonsEditText
             android:id="@+id/inputET"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

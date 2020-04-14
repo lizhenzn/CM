@@ -32,13 +32,13 @@ public class EmoAdapter extends RecyclerView.Adapter<EmoAdapter.ViewHolder> impl
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
         holder.itemView.setTag(position);
         holder.itemView.setOnClickListener(this);
         FaceTextUtils.FaceText text = FaceTextUtils.faceTexts.get(position);
         BitmapFactory.Options options = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),
-                context.getResources().getIdentifier(text.fileName, "drawable", context.getPackageName()), options);
+        /*Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),
+                context.getResources().getIdentifier(text.fileName, "drawable", context.getPackageName()), options);*/
+        Bitmap bitmap=BitmapFactory.decodeResource(context.getResources(),R.drawable.photo_load_error);
         holder.iv.setImageBitmap(bitmap);
     }
 

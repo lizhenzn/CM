@@ -1,6 +1,7 @@
 package com.example.cm.friend.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +23,12 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
     private List<Message> messageList;
     private Context context;
     private FriendInfo friendInfo;
-
+    private String userName;
     public ChatAdapter(Context context, List<Message> messageList, FriendInfo friendInfo){
         this.context=context;
         this.messageList=messageList;
         this.friendInfo=friendInfo;
+        userName=friendInfo.getUserName();
     }
     @Override
     public int getCount() {
@@ -83,6 +85,15 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
             viewHolder.mesTV.setText(messageList.get(position).getBody());
         else {
             viewHolder.photoIV.setImageBitmap(messageList.get(position).getPhoto());
+            viewHolder.photoIV.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent=new Intent(context,ImageDetail.class);
+                    intent.putExtra("userName",userName);
+                    intent.putExtra("position",position);
+                    context.startActivity(intent);
+                }
+            });
         }
         long lastMesTime=0L;
         long currentMesTime=messageList.get(position).getDate();
