@@ -117,6 +117,7 @@ public class WardrobeFragment extends Fragment  {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
             case AlbumUtil.REQUEST_CAMERA:
+                Log.d("wardrobe", "onRequestPermissionsResult: camera get");
         }
     }
 
@@ -290,9 +291,6 @@ public class WardrobeFragment extends Fragment  {
                         }).show();
             }
         });
-        Log.d("wardrobe", "onCreateView: logined:"+Connect.isLogined);
-        Log.d("wardrobe", "onCreateView: prevusername:"+prevUsername);
-
         return  view;
     }
     /**

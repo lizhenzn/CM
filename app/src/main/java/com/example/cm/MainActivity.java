@@ -31,7 +31,6 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.cm.friend.FriendFragment;
 import com.example.cm.myInfo.ChangePasswordActivity;
 import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
@@ -44,7 +43,9 @@ import com.example.cm.wardrobe.WardrobeFragment;
 
 import org.jivesoftware.smack.XMPPException;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import q.rorbin.badgeview.QBadgeView;
 
@@ -114,6 +115,19 @@ public class MainActivity extends AppCompatActivity{
                         Intent intent=new Intent(MainActivity.this, ChangePasswordActivity.class);
                         startActivity(intent);
                     }break;//修改密码
+                    case R.id.cleanCache:{//清除缓存
+                        long size=0;
+                        File f=getCacheDir();
+                        for(File temp:f.listFiles()){
+                            if(temp.isFile()){
+                                size+=temp.length();
+                                temp.delete();
+                            }
+                        }
+                        Toast.makeText(mainActivityContext,
+                                "已清除图片缓存"+formetFileSize(size),
+                                Toast.LENGTH_SHORT).show();
+                    }break;
                     default:
                         break;
 
@@ -426,5 +440,26 @@ public class MainActivity extends AppCompatActivity{
                 Toast.makeText(mainActivityContext, "再次按返回键退出", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    /**
+     * 静态方法，用于获得计算后的文件大小
+     * @param fileS 文件大小
+     * @return 格式化后的字符串
+     */
+    private static String formetFileSize(long fileS)
+    {
+        DecimalFormat df =new DecimalFormat("#.00");
+        String fileSizeString ="";
+        String wrongSize="0B";
+        if(fileS==0){
+            return wrongSize;
+        }
+        if(fileS <1024)fileSizeString = df.format((double) fileS) +"B";
+        else if(fileS <1048576) fileSizeString = df.format((double) fileS /1024) +"KB";
+        else if(fileS <1073741824) fileSizeString = df.format((double) fileS /1048576) +"MB";
+        else fileSizeString = df.format((double) fileS /1073741824) +"GB";
+        return fileSizeString;
+
     }
 }
