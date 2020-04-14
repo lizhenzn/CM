@@ -24,6 +24,7 @@ import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.roster.packet.RosterPacket;
 import org.jivesoftware.smackx.offline.OfflineMessageManager;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -44,7 +45,9 @@ public class MessageManager {
     private   static boolean addFriendItemListChanged;
     private static DataBase dataBaseHelp;
     private static SQLiteDatabase db;
+    private static Bitmap bitmap=null;
     private static boolean contantListChanged;
+    public final static String BASEURL="http://39.105.75.60/image-path/";         //远程图片资源路径公共前缀
     public static void initAllList(){//初始化所有的列表
         haveNewMessage=false;
         messageMap=new HashMap<>();
@@ -360,25 +363,41 @@ public class MessageManager {
                 Log.d("TAG接收************"+userFrom, message.getBody());
                 JSONObject jsonObject=new JSONObject(message.getBody());
                 message1.setMessageType(jsonObject.getString("type"));
+                Long time=jsonObject.getLong("date");
                 if(jsonObject.getString("type").equals("text")) {
                     message1.setBody(jsonObject.getString("data"));
                     message1.setPhotoRoad("");
                     message1.setPhoto(null);
                 }else{
-                    message1.setBody("[图片]");
-                    //将接收到的字符串解析成bitmap
-                    String encodeImageStr=jsonObject.getString("data");
-                    Bitmap bitmap= AlbumUtil.byte2Bitmap(AlbumUtil.encodedStr2byte(encodeImageStr));
-                    String savePhotoRoad=AlbumUtil.saveMessageBitmap(bitmap);
-                    Log.d("保存接收到的图片路径", "processMessage: "+savePhotoRoad);
-                    message1.setPhotoRoad(savePhotoRoad);
-                    message1.setPhoto(bitmap);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            message1.setBody("[图片]");
+                            //将接收到的字符串解析成bitmap
+                            //String encodeImageStr=jsonObject.getString("data");
+                            //Bitmap bitmap= AlbumUtil.byte2Bitmap(AlbumUtil.encodedStr2byte(encodeImageStr));
+                            try {
+                                bitmap=AlbumUtil.getBitmapByUrl(jsonObject.getString("data"),time);
+                                Thread.sleep(500);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            Log.e("图片加载成功", "run: " );
+                            String savePhotoRoad=AlbumUtil.saveMessageBitmap(bitmap);
+                            Log.d("保存接收到的图片路径", "processMessage: "+savePhotoRoad);
+                            message1.setPhotoRoad(savePhotoRoad);
+                            message1.setPhoto(bitmap);
+                        }
+                    }).start();
+
 
                 }
                 message1.setFrom(userFrom);
                 message1.setTo(message.getTo().split("@")[0]);
                 //message1.setDate((Date) jsonObject.get("date"));
-                message1.setDate(jsonObject.getLong("date"));
+                message1.setDate(time);
                 message1.setType(2);
                 MessageManager.getDataBaseHelp().addMessage(message1);                //添加进聊天数据库
                 MessageManager.setHaveNewMessage(true);

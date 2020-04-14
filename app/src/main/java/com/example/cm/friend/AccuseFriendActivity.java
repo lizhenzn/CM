@@ -34,12 +34,15 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
+import okhttp3.OkHttpClient;
+
 public class AccuseFriendActivity extends AppCompatActivity implements View.OnClickListener {
 private EditText accuseET;
 private ImageView accuseIV1,accuseIV2,accuseIV3;
 private Button submitBtn;
 private String userName;
 private String[] bitmapStrs;
+private String[] absoluteRoads;
 private ProgressDialog progressDialog;
 private int bitmapCount;
 private int currentBitmap;
@@ -67,6 +70,7 @@ private int currentBitmap;
         accuseIV3.setOnClickListener(this);
         submitBtn.setOnClickListener(this);
         bitmapStrs=new String[3];
+        absoluteRoads=new String[3];
         bitmapCount=0;
         currentBitmap=-1;
         userName=getIntent().getStringExtra("userName");
@@ -99,9 +103,14 @@ private int currentBitmap;
                                         ChatManager chatManager = ChatManager.getInstanceFor(Connect.getXMPPTCPConnection());
                                         Chat chat = chatManager.createChat("administrator" + "@" + Connect.SERVERNAME);
                                         chat.sendMessage(toJson("举报：" + userName +"\n理由："+ accuse, "text", new Date().getTime()));
+                                        OkHttpClient okHttpClient=new OkHttpClient();
+                                        for(int i=0;i<bitmapCount;i++){
+                                            main.ImgManager.ImageTrans(absoluteRoads[i],null,okHttpClient);
+                                            Thread.sleep(500);
+                                        }
+                                        Thread.sleep(1000);
                                         for(int i=0;i<bitmapCount;i++){
                                             chat.sendMessage(toJson(bitmapStrs[i],"photo",new Date().getTime()));
-                                            //Thread.sleep(200);
                                         }
                                     } catch (SmackException.NotConnectedException e) {
                                         e.printStackTrace();
@@ -162,20 +171,16 @@ private int currentBitmap;
                 String absoluteRoad = AlbumUtil.getImageAbsolutePath(data, AccuseFriendActivity.this);
                 if (absoluteRoad != null) {            //选择图片
                     Log.d("选择的图片路径", "onActivityResult: " + absoluteRoad);
-                    String imageStr = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        imageStr = AlbumUtil.getImageStr(absoluteRoad);
-                    }
-                    if (imageStr == null) {
-                        imageStr = "";
-                    }
+                    String[] tempPath=absoluteRoad.split("/");
+                    String finalPath=tempPath[tempPath.length-1];
                     Bitmap bitmap=AlbumUtil.getBitmapByPath(absoluteRoad);
                     switch (currentBitmap){
                         case 1:{
                             if(bitmapCount<1){
                                 bitmapCount++;
                             }
-                            bitmapStrs[0]=imageStr;
+                            bitmapStrs[0]=finalPath;
+                            absoluteRoads[0]=absoluteRoad;
                             accuseIV1.setImageBitmap(bitmap);
                             accuseIV2.setVisibility(View.VISIBLE);
                         }break;
@@ -183,7 +188,8 @@ private int currentBitmap;
                             if(bitmapCount<2){
                                 bitmapCount++;
                             }
-                            bitmapStrs[1]=imageStr;
+                            bitmapStrs[1]=finalPath;
+                            absoluteRoads[1]=absoluteRoad;
                             accuseIV2.setImageBitmap(bitmap);
                             accuseIV3.setVisibility(View.VISIBLE);
                         }break;
@@ -191,7 +197,8 @@ private int currentBitmap;
                             if(bitmapCount<3){
                                 bitmapCount++;
                             }
-                            bitmapStrs[2]=imageStr;
+                            bitmapStrs[2]=finalPath;
+                            absoluteRoads[2]=absoluteRoad;
                             accuseIV3.setImageBitmap(bitmap);
                         }
                     }

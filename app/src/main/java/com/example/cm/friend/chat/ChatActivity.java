@@ -47,6 +47,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import main.ImgManager;
+import okhttp3.OkHttpClient;
+
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
     private ListView chatItemLV;
@@ -273,31 +276,46 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,ChatActivity.this);
                 if(absoluteRoad!=null) {            //选择图片
                     Log.d("选择的图片路径", "onActivityResult: " + absoluteRoad);
-                    String imageStr = AlbumUtil.getImageStr(absoluteRoad);
-                    if (imageStr == null)
-                        imageStr = "";
-                    try {
-                        Date date = new Date();
-                        chat.sendMessage(toJson(imageStr, "photo", date.getTime()));
-                        Message message = new Message();
-                        message.setType(1);
-                        message.setMessageType("photo"); //图片信息
-                        message.setPhotoRoad(absoluteRoad);
-                        Bitmap bitmap = BitmapFactory.decodeFile(absoluteRoad);
-                        message.setPhoto(bitmap);
-                        message.setBody("[图片]");
-                        message.setFrom(Connect.getXMPPTCPConnection().getUser().split("@")[0]);
-                        message.setTo(userName.split("@")[0]);
-                        message.setDate(date.getTime());
-                        MessageManager.getDataBaseHelp().addMessage(message);  //数据库添加聊天信息
-                        MessageManager.getMessageMap().get(userName).add(message);     //添加信息
-                        //chatActivitymessageList.add(message);
+                    //String imageStr = AlbumUtil.getImageStr(absoluteRoad);
+                    String[] tempPath=absoluteRoad.split("/");
+                    String finalPath=tempPath[tempPath.length-1];
+                    Log.e("", "onActivityResult: "+finalPath );
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                OkHttpClient okHttpClient=new OkHttpClient();
+                                ImgManager.ImageTrans(absoluteRoad,null,okHttpClient);
+                                Log.e("", "run: 发送成功" );
+                                try {
+                                    Thread.sleep(1000);//休眠，不然对方下载会找不到文件
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                Date date = new Date();
+                                try {
+                                    chat.sendMessage(toJson(finalPath, "photo", date.getTime()));
+                                } catch (SmackException.NotConnectedException e) {
+                                    e.printStackTrace();
+                                }
+                                Message message = new Message();
+                                message.setType(1);
+                                message.setMessageType("photo"); //图片信息
+                                message.setPhotoRoad(absoluteRoad);
+                                Bitmap bitmap = BitmapFactory.decodeFile(absoluteRoad);
+                                message.setPhoto(bitmap);
+                                message.setBody("[图片]");
+                                message.setFrom(Connect.getXMPPTCPConnection().getUser().split("@")[0]);
+                                message.setTo(userName.split("@")[0]);
+                                message.setDate(date.getTime());
+                                MessageManager.getDataBaseHelp().addMessage(message);  //数据库添加聊天信息
+                                MessageManager.getMessageMap().get(userName).add(message);     //添加信息
+
+                            }
+                        }).start();
+
                         inputET.setText("");              //设置输入框为空
                         isSend = true;
-                    } catch (SmackException.NotConnectedException e) {
-                        e.printStackTrace();
-                        isSend = false;
-                    }
                 }
 
             }break;

@@ -33,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -208,10 +210,7 @@ public class AlbumUtil {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static String getImageStr(String absoluteRoad){
         String imageStr=null;
-        Bitmap bitmap=getBitmapByPath(absoluteRoad);
-        bitmap=imageZoom(bitmap);
-        String tempRoad=saveMessageBitmap(bitmap);
-        File file=new File(tempRoad);
+        File file=new File(absoluteRoad);
         try {
             InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
             byte[] data = new byte[inputStream.available()];
@@ -230,6 +229,7 @@ public class AlbumUtil {
             Log.d("", "getImageStr: 图片转换成字符串异常");
             return null;
         }finally {
+            Log.e("", "getImageStr: 图片字符串长度"+imageStr.length() );
             if(file.exists()){
                 file.delete();
             }
@@ -273,44 +273,28 @@ public class AlbumUtil {
 
         return bitmap;
     }
-    //Bitmap压缩到指定大小：
-    public static   Bitmap imageZoom(Bitmap bitmap) {
-    //图片允许最大空间 单位：KB
-        double maxSize =500.00;
-    //将bitmap放至数组中，意在bitmap的大小（与实际读取的原文件要大）
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] b = baos.toByteArray();
-    //将字节换成KB
-        double mid = b.length/1024;
-    //判断bitmap占用空间是否大于允许最大空间 如果大于则压缩 小于则不压缩
-        if (mid > maxSize) {
-    //获取bitmap大小 是允许最大大小的多少倍
-            double i = mid / maxSize;
-    //开始压缩 此处用到平方根 将宽带和高度压缩掉对应的平方根倍 （1.保持刻度和高度和原bitmap比率一致，压缩后也达到了最大大小占用空间的大小）
-            bitmap = zoomImage(bitmap, bitmap.getWidth() / Math.sqrt(i),
-                    bitmap.getHeight() / Math.sqrt(i));
+    /*
+    * @param finalPath
+    * @param time
+    * @return bitmap
+    * */
+    public static Bitmap getBitmapByUrl(String finalPath,long time){
+        Bitmap bitmap=null;
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyyMMdd");
+        Date date=new Date(time);
+        String dateStr=simpleDateFormat.format(date);
+        try {
+            URL url=new URL(MessageManager.BASEURL+dateStr+"/"+finalPath);
+            InputStream inputStream=url.openStream();
+            bitmap=BitmapFactory.decodeStream(inputStream);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return bitmap;
+        return  bitmap;
     }
 
-
-    private static Bitmap zoomImage(Bitmap bgimage, double newWidth,
-                                   double newHeight) {
-    // 获取这个图片的宽和高
-        float width = bgimage.getWidth();
-        float height = bgimage.getHeight();
-    // 创建操作图片用的matrix对象
-        Matrix matrix = new Matrix();
-    // 计算宽高缩放率
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-    // 缩放图片动作
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap bitmap = Bitmap.createBitmap(bgimage, 0, 0, (int) width,
-                (int) height, matrix, true);
-        return bitmap;
-    }
 
 
 }

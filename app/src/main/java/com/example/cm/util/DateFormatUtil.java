@@ -51,16 +51,12 @@ public  static boolean isYesterday(long time){
 public static boolean surpassTwoMinutes(long lastMesTime,long currentMesTime){
     boolean isSurpass=false;
     long rate= (long) 0.5;
-    Log.e("", "surpassTwoMinutes: "+lastMesTime );
-    Log.e("", "surpassTwoMinutes: "+currentMesTime );
     if(lastMesTime!=0){
         rate=(currentMesTime-3*60*1000)/lastMesTime;
     }
-    Log.e("", "surpassTwoMinutes: "+rate );
     if(lastMesTime==0L){
         isSurpass=true;
     }else if(rate>=1L){
-        Log.e("", "surpassTwoMinutes: "+(currentMesTime-2*60*1000)/lastMesTime );
         isSurpass=true;
     }
     return isSurpass;
