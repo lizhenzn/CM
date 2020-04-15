@@ -166,10 +166,6 @@ public class ShareFragment extends Fragment {
                         String userName=null;
                         userName=serverFunction.getUserName();
                         while(userName==null){ }
-                        Log.d(TAG, "run: username="+userName);
-                        Log.d(TAG, "ru.n: shareItem size:"+shareItemList.size());
-                        Log.d(TAG, "run: shareItem count:"+count);
-                        Log.d(TAG, "run: shareItem create:"+i);
                         shareItemList.set(shareItemList.size()-count+i,new ShareItem(post, VCardManager.getUserImage(userName),userName,serverFunction.getSmallUpImg(),
                                 serverFunction.getSmallDownImg(),serverFunction.getDescription(),R.drawable.givelike,R.drawable.comment));
                         isRefreshing=false;

@@ -54,63 +54,57 @@ public class PresentShareItem extends AppCompatActivity {
             }
         }).start();
 
-        ImageView comment = findViewById(R.id.comment);
-        comment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(PresentShareItem.this,Comments.class);
-                intent.putExtra("post",shareItem.getPostInfo());
-                startActivity(intent);
-            }
-        });
-        ImageView giveLike = findViewById(R.id.giveLike);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if(ServerFunction.getShareManager().hasLiked(shareItem.getPostInfo().getPost_id(), MessageManager.getSmackUserInfo().getUserName())){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            giveLike.setImageResource(R.drawable.like_click);
-                        }
-                    });
-                }
-            }
-        }).start();
-        giveLike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(ServerFunction.getShareManager().like(shareItem.getPostInfo(), MessageManager.getSmackUserInfo().getUserName()))
-                        {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    giveLike.setImageResource(R.drawable.like_click);
-                                    Toast.makeText(PresentShareItem.this,"点赞成功",Toast.LENGTH_SHORT).show();
-//                                    runOnUiThread(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//                                            //点赞数+1
-//                                            //likeNum.setText(shareItem.getPostInfo().getLike_num()+1+"");
-//                                        }
-//                                    });
-                                }
-                            });
-                        }
-                        else{
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(PresentShareItem.this,"您已经点过赞了",Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                }).start();
-            }
-        });
+//        ImageView comment = findViewById(R.id.comment);
+//        comment.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent=new Intent(PresentShareItem.this,Comments.class);
+//                intent.putExtra("post",shareItem.getPostInfo());
+//                startActivity(intent);
+//            }
+//        });
+
+//        ImageView giveLike = findViewById(R.id.giveLike);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                if(ServerFunction.getShareManager().hasLiked(shareItem.getPostInfo().getPost_id(), MessageManager.getSmackUserInfo().getUserName())){
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            giveLike.setImageResource(R.drawable.like_click);
+//                        }
+//                    });
+//                }
+//            }
+//        }).start();
+//        giveLike.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if(ServerFunction.getShareManager().like(shareItem.getPostInfo(), MessageManager.getSmackUserInfo().getUserName()))
+//                        {
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    giveLike.setImageResource(R.drawable.like_click);
+//                                    Toast.makeText(PresentShareItem.this,"点赞成功",Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+//                        }
+//                        else{
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Toast.makeText(PresentShareItem.this,"您已经点过赞了",Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+//                        }
+//                    }
+//                }).start();
+//            }
+//        });
     }
 }

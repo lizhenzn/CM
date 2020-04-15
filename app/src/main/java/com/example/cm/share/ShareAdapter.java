@@ -1,8 +1,11 @@
 package com.example.cm.share;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,12 +15,14 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.cm.MainActivity;
 import com.example.cm.R;
-
 import java.util.List;
-
 import de.hdodenhof.circleimageview.CircleImageView;
+import com.example.cm.util.MessageManager;
+import com.example.cm.util.ServerFunction;
 
 public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ShareItem> ShareItemList;
@@ -53,9 +58,9 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         ImageView ClothesUp;
         ImageView ClothesDown;
         TextView Description;
-        ImageButton GiveLike;
-        ImageButton Comment;
+        ImageView GiveLike;
         TextView LikeNum;
+        int like_num;//保存当前项点赞人数，便于点赞+1
 
         public RecyclerViewHolder(View view) {
             super(view);
@@ -65,7 +70,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ClothesDown = view.findViewById(R.id.clothes_down);
             Description = view.findViewById(R.id.description);
             GiveLike = view.findViewById(R.id.giveLike);
-            Comment = view.findViewById(R.id.comment);
+//            Comment = view.findViewById(R.id.comment);
             LikeNum = view.findViewById(R.id.like_num);
         }
 
@@ -106,18 +111,37 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        //普通广场消息项
         if (viewHolder instanceof RecyclerViewHolder) {
             ShareItem shareItem = ShareItemList.get(position);
             RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) viewHolder;
+            //加载中空白项
             if(shareItem.isBlankItemFlag()){
                 recyclerViewHolder.ClothesUp.setImageResource(R.drawable.ic_loading);
                 recyclerViewHolder.ClothesDown.setImageResource(R.drawable.ic_loading);
             }
+            //已加载消息项
             else{
-                recyclerViewHolder.LikeNum.setText(ShareItemList.get(position).getPostInfo().getLike_num()+"人觉得很赞");
+                recyclerViewHolder.like_num=ShareItemList.get(position).getPostInfo().getLike_num();
+                recyclerViewHolder.LikeNum.setText(recyclerViewHolder.like_num+"人觉得很赞");
                 recyclerViewHolder.ClothesUp.setImageURI(Uri.fromFile(shareItem.getClothesUp()));
                 recyclerViewHolder.ClothesDown.setImageURI(Uri.fromFile(shareItem.getClothesDown()));
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((MainActivity)context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(ServerFunction.getShareManager().hasLiked(shareItem.getPostInfo().getPost_id(), MessageManager.getSmackUserInfo().getUserName())){
+                                    recyclerViewHolder.GiveLike.setImageResource(R.drawable.like_click);
+                                }
+                            }
+                        });
+                    }
+                }).start();
             }
+
+            //广场单个消息项中的点击事件
             recyclerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -129,10 +153,34 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     v.getContext().startActivity(toPresentShareItem);
                 }
             });
+            recyclerViewHolder.GiveLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((MainActivity)context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (ServerFunction.getShareManager().like(shareItem.getPostInfo(), MessageManager.getSmackUserInfo().getUserName())) {
+                                        recyclerViewHolder.LikeNum.setText(recyclerViewHolder.like_num+1+"人觉得很赞");
+                                        recyclerViewHolder.GiveLike.setImageResource(R.drawable.like_click);
+                                        Toast.makeText(context, "点赞成功", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(context, "您已经点过赞了", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+                    }).start();
+                }
+            });
             recyclerViewHolder.HeadImage.setImageBitmap(shareItem.getHeadImage());
             recyclerViewHolder.UserName.setText(shareItem.getUserName());
             recyclerViewHolder.Description.setText("\u3000"+shareItem.getDescription());
-        } else if (viewHolder instanceof FootViewHolder) {
+        }
+        //加载到底的末尾子项
+        else if (viewHolder instanceof FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) viewHolder;
             switch (loadState) {
 
