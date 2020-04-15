@@ -128,6 +128,10 @@ public class MainActivity extends AppCompatActivity{
                                 "已清除图片缓存"+formetFileSize(size),
                                 Toast.LENGTH_SHORT).show();
                     }break;
+                    case R.id.navi_edit_selfInfo:{
+                        Intent intent=new Intent(MainActivity.this,MyInfoActivity.class);
+                        startActivity(intent);
+                    }break;
                     default:
                         break;
 
