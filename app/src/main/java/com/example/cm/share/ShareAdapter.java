@@ -129,14 +129,22 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        ((MainActivity)context).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(ServerFunction.getShareManager().hasLiked(shareItem.getPostInfo().getPost_id(), MessageManager.getSmackUserInfo().getUserName())){
+                        if(ServerFunction.getShareManager().hasLiked(shareItem.getPostInfo().getPost_id(), MessageManager.getSmackUserInfo().getUserName())){
+                            ((MainActivity)context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
                                     recyclerViewHolder.GiveLike.setImageResource(R.drawable.like_click);
                                 }
-                            }
-                        });
+                            });
+                        }
+                        else{
+                            ((MainActivity)context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recyclerViewHolder.GiveLike.setImageResource(R.drawable.like);
+                                }
+                            });
+                        }
                     }
                 }).start();
             }
@@ -159,18 +167,23 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            ((MainActivity)context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (ServerFunction.getShareManager().like(shareItem.getPostInfo(), MessageManager.getSmackUserInfo().getUserName())) {
+                            if (ServerFunction.getShareManager().like(shareItem.getPostInfo(), MessageManager.getSmackUserInfo().getUserName())) {
+                                ((MainActivity)context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
                                         recyclerViewHolder.LikeNum.setText(recyclerViewHolder.like_num+1+"人觉得很赞");
                                         recyclerViewHolder.GiveLike.setImageResource(R.drawable.like_click);
                                         Toast.makeText(context, "点赞成功", Toast.LENGTH_SHORT).show();
-                                    } else {
+                                    }
+                                });
+                            } else {
+                                ((MainActivity)context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
                                         Toast.makeText(context, "您已经点过赞了", Toast.LENGTH_SHORT).show();
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     }).start();
                 }
