@@ -38,18 +38,19 @@
           android:background="#0CC9FA" />
 
       <TextView
-          android:layout_width="328dp"
+          android:layout_width="wrap_content"
           android:layout_height="match_parent"
-          android:textStyle="bold"
+          android:layout_weight="5"
           android:gravity="center"
+          android:text="@string/UpControlText"
           android:textSize="30dp"
-          android:text="@string/UpControlText"/>
+          android:textStyle="bold" />
 
       <ImageView
           android:id="@+id/wardrobeUpPointer"
-          android:layout_width="62dp"
+          android:layout_width="wrap_content"
           android:layout_height="match_parent"
-          android:src="@drawable/ic_pointer_down_black_24dp"/>
+          android:src="@drawable/ic_pointer_down_black_24dp" />
     </LinearLayout>
     <LinearLayout
         android:id="@+id/wardrobeUpLayout"
@@ -88,16 +89,17 @@
           android:background="#0CC9FA" />
 
       <TextView
-          android:layout_width="328dp"
+          android:layout_width="wrap_content"
           android:layout_height="match_parent"
-          android:textStyle="bold"
+          android:layout_weight="5"
           android:gravity="center"
+          android:text="@string/DownControlText"
           android:textSize="30dp"
-          android:text="@string/DownControlText"/>
+          android:textStyle="bold" />
 
       <ImageView
           android:id="@+id/wardrobeDownPointer"
-          android:layout_width="62dp"
+          android:layout_width="65dp"
           android:layout_height="match_parent"
           android:src="@drawable/ic_pointer_right_black_24dp"/>
     </LinearLayout>

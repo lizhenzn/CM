@@ -155,23 +155,29 @@ public class WardrobeFragment extends Fragment  {
         wardrobeR2.setAdapter(wardrobeAdapter2);
         layout_up=view.findViewById(R.id.wardrobeUpLayout);
         if(!upClothes){layout_up.setVisibility(View.GONE);
-        upPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);}
+        upPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);
+        }
         else{layout_up.setVisibility(View.VISIBLE);
-        upPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);}
+        upPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);
+        }
         layout_down=view.findViewById(R.id.wardrobeDownLayout);
         if(!downClothes){layout_down.setVisibility(View.GONE);
-        downPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);}
+        downPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);
+        }
         else{layout_down.setVisibility(View.VISIBLE);
-        downPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp); }
+        downPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);
+        }
         layout_down_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(downClothes)
                 {layout_down.setVisibility(View.GONE);downClothes=false;
-                downPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);}
+                downPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);
+                }
                 else
                 {layout_down.setVisibility(View.VISIBLE);downClothes=true;
-                downPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);}
+                downPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);
+                }
             }
         });
         layout_up_control.setOnClickListener(new View.OnClickListener() {
@@ -388,8 +394,10 @@ public class WardrobeFragment extends Fragment  {
         initData("default");
     }
     public static void initData(String username){
-        MainActivity.setClothes_up(-1);
-        MainActivity.setClothes_down(-1);
+        if(!MainActivity.isChoose_flag()) {
+            MainActivity.setClothes_up(-1);
+            MainActivity.setClothes_down(-1);
+        }
         if(photoList2==null&&photoList1==null){
             photoList1=new ArrayList<>();
             photoList2=new ArrayList<>();
@@ -589,7 +597,7 @@ public class WardrobeFragment extends Fragment  {
                             .setCancelable(true)
                             .setCanceledOnTouchOutside(true)
                             .addSheetItem("标为春季服装",
-                                    ActionSheetDialog.SheetItemColor.Red
+                                    ActionSheetDialog.SheetItemColor.Blue
                                     , new ActionSheetDialog.OnSheetItemClickListener() {
                                         @Override
                                         public void onClick(int which) {
@@ -622,7 +630,7 @@ public class WardrobeFragment extends Fragment  {
                                         }
                                     })
                             .addSheetItem("标为夏季服装",
-                                    ActionSheetDialog.SheetItemColor.Red
+                                    ActionSheetDialog.SheetItemColor.Blue
                                     , new ActionSheetDialog.OnSheetItemClickListener() {
                                         @Override
                                         public void onClick(int which) {
@@ -655,7 +663,7 @@ public class WardrobeFragment extends Fragment  {
                                         }
                                     })
                             .addSheetItem("标为秋季服装",
-                                    ActionSheetDialog.SheetItemColor.Red
+                                    ActionSheetDialog.SheetItemColor.Blue
                                     , new ActionSheetDialog.OnSheetItemClickListener() {
                                         @Override
                                         public void onClick(int which) {
@@ -688,7 +696,7 @@ public class WardrobeFragment extends Fragment  {
                                         }
                                     })
                             .addSheetItem("标为冬季服装",
-                                    ActionSheetDialog.SheetItemColor.Red
+                                    ActionSheetDialog.SheetItemColor.Blue
                                     , new ActionSheetDialog.OnSheetItemClickListener() {
                                         @Override
                                         public void onClick(int which) {
@@ -722,7 +730,7 @@ public class WardrobeFragment extends Fragment  {
                                         }
                                     })
                             .addSheetItem("删除",
-                                    ActionSheetDialog.SheetItemColor.Blue
+                                    ActionSheetDialog.SheetItemColor.Red
                                     , new ActionSheetDialog.OnSheetItemClickListener() {
                                         @Override
                                         public void onClick(int which) {

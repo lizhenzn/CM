@@ -128,6 +128,10 @@ public class MainActivity extends AppCompatActivity{
                                 "已清除图片缓存"+formetFileSize(size),
                                 Toast.LENGTH_SHORT).show();
                     }break;
+                    case R.id.navi_edit_selfInfo:{
+                        Intent intent=new Intent(MainActivity.this,MyInfoActivity.class);
+                        startActivity(intent);
+                    }break;
                     default:
                         break;
 
@@ -228,7 +232,6 @@ public class MainActivity extends AppCompatActivity{
         nichengTV=(TextView)headerView.findViewById(R.id.nicheng);
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
-
         //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
         if(MessageManager.getSharedPreferences().contains("userName")){  //有此userName键值，说明登陆过
             MessageManager.getSmackUserInfo().setUserName(MessageManager.getSharedPreferences().getString("userName",""));

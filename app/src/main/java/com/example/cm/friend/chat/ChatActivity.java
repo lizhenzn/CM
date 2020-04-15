@@ -65,6 +65,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ListView chatItemLV;
     private LinearLayout chat_LL;
     private RecyclerView emoRecy;
+    private boolean changeBack;
     private EmoticonsEditText inputET;
     private Button sendBtn;
     public static ChatAdapter chatAdapter;
@@ -124,6 +125,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     //初始化控件
     public void init(){
         work=true;
+        changeBack=false;
         chat_LL=findViewById(R.id.chat_LL);
         chatSetTV=findViewById(R.id.chat_setting);
         chatSetTV.setOnClickListener(this);
@@ -272,6 +274,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onClick(int which) {
                                 if (AlbumUtil.checkStorage(ChatActivity.this)) {
+                                    changeBack=true;
                                     Intent intent = new Intent("android.intent.action.GET_CONTENT");
                                     intent.setType("image/*");
                                     startActivityForResult(intent, CHANGEBACK);
@@ -353,16 +356,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             }
             case CHANGEBACK:{
-                String absoluteRoad=AlbumUtil.getImageAbsolutePath(data,ChatActivity.this);
-                if(absoluteRoad!=null) {            //选择图片
-                    DisplayMetrics dm = getResources().getDisplayMetrics();
-                    int heigth = dm.heightPixels;
-                    int width = dm.widthPixels;
-                    Drawable drawable=null;
-                    Bitmap bitmap=AlbumUtil.getBitmapByPath(absoluteRoad);
-                    bitmap=AlbumUtil.resizeBitmap(bitmap,width,heigth);
-                    drawable=new BitmapDrawable(bitmap);
-                    chat_LL.setBackground(drawable);
+                if(changeBack) {
+                    String absoluteRoad = AlbumUtil.getImageAbsolutePath(data, ChatActivity.this);
+                    if (absoluteRoad != null) {            //选择图片
+                        Drawable drawable = null;
+                        Bitmap bitmap = AlbumUtil.getBitmapByPath(absoluteRoad);
+                        drawable = new BitmapDrawable(bitmap);
+                        chat_LL.setBackground(drawable);
+                        changeBack=false;
+                    }
                 }
                 }break;
             default:break;

@@ -297,21 +297,7 @@ public class AlbumUtil {
         return  bitmap;
     }
 
-    public static Bitmap resizeBitmap(Bitmap bitmap, int w, int h) {
-        if (bitmap != null) {
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-            float scaleWidth = ((float) w) / width;
-            float scaleHeight = ((float) h) / height;
-            Matrix matrix = new Matrix();
-            matrix.postScale(scaleWidth, scaleHeight);
-            Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, w,
-                    h, matrix, true);
-            return resizedBitmap;
-        } else {
-            return null;
-        }
-    }
+
 
 
 }
