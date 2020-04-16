@@ -1,5 +1,6 @@
 package com.example.cm.friend;
 
+import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
@@ -28,6 +30,7 @@ private int position;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_friend_note);
         Toolbar toolbar=(Toolbar)findViewById(R.id.changeFriendNote_toolbar);
+        ThemeColor.setTheme(ChangeFriendNoteActivity.this,toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){

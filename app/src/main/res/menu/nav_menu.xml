@@ -10,6 +10,12 @@
             android:icon="@drawable/cm"
             android:title="编辑信息"
             />
+        <item
+            android:id="@+id/navi_changeTheme"
+            android:icon="@drawable/cm"
+            android:title="更改主题"
+            />
+
     </group>
 
     <group

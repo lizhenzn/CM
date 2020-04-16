@@ -18,7 +18,8 @@
         android:roundIcon="@drawable/cm"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".friend.chat.ImageDetail"></activity>
+        <activity android:name=".theme.ThemeActivity"></activity>
+        <activity android:name=".friend.chat.ImageDetail" />
         <activity android:name=".friend.ChangeFriendNoteActivity" />
         <activity android:name=".friend.AccuseFriendActivity" />
         <activity android:name=".myInfo.ChangePasswordActivity" />
@@ -43,8 +44,6 @@
         <activity android:name=".friend.FriendInfoActivity" />
         <activity android:name=".share.PresentShareItem" />
         <activity android:name=".friend.chat.ChatActivity" />
-        <activity android:name=".friend.AddFriend.AddFriendActivity" />
-        <activity android:name=".friend.ContantActivity" />
         <activity android:name=".myInfo.RegisterActivity" />
         <activity android:name=".share.Comments" />
         <activity android:name=".match.SendShare" />

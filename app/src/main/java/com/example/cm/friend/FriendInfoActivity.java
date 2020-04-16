@@ -1,6 +1,7 @@
 package com.example.cm.friend;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.VCardManager;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
@@ -43,6 +45,7 @@ public class FriendInfoActivity extends AppCompatActivity {
 
         init();
         Toolbar toolbar=(Toolbar)findViewById(R.id.friendInfo_toolabr);
+        ThemeColor.setTheme(FriendInfoActivity.this,toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
@@ -145,6 +148,8 @@ public class FriendInfoActivity extends AppCompatActivity {
         nicTV=(TextView)findViewById(R.id.friend_detail_nic_tv);
         sexTV=(TextView)findViewById(R.id.friend_detail_sex_tv);
         friend_headIV=(ImageView)findViewById(R.id.friend_detail_iv);
+        setting_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
+        send_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         Intent intent=getIntent();
         position=intent.getIntExtra("position",0);
         curFriendInfo=MessageManager.getContantFriendInfoList().get(position);

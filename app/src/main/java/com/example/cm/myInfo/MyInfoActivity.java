@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
@@ -53,6 +54,9 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_info);
+        Toolbar toolbar=findViewById(R.id.myInfo_toolbar);
+        ThemeColor.setTheme(MyInfoActivity.this,toolbar);
+        setSupportActionBar(toolbar);
         initView();
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){

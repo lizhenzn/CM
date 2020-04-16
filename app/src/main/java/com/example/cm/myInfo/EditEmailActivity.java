@@ -1,5 +1,6 @@
 package com.example.cm.myInfo;
 
+import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
@@ -24,9 +26,11 @@ private EditText email_et;
 
         setContentView(R.layout.activity_edit_email);
         save_email_btn=(Button)findViewById(R.id.save_email_btn);
+        save_email_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         email_et=(EditText)findViewById(R.id.edit_email);
         save_email_btn.setOnClickListener(this);
         Toolbar toolbar=(Toolbar)findViewById(R.id.email_toolbar);
+        ThemeColor.setTheme(EditEmailActivity.this,toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){

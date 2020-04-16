@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -40,6 +41,7 @@ import com.example.cm.friend.AccuseFriendActivity;
 import com.example.cm.friend.ChangeFriendNoteActivity;
 import com.example.cm.friend.FriendInfoActivity;
 import com.example.cm.myInfo.FriendInfo;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
@@ -83,6 +85,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         Toolbar toolbar=(Toolbar)findViewById(R.id.chat_toolbar);
+        ThemeColor.setTheme(ChatActivity.this,toolbar);
         setSupportActionBar(toolbar);
         user_tv=(TextView)toolbar.findViewById(R.id.chat_friendNM);
         ActionBar actionBar=getSupportActionBar();
@@ -91,6 +94,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             actionBar.setDisplayShowTitleEnabled(false);
         }
         init();
+
         initData();
         work=true;
 
@@ -127,8 +131,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         work=true;
         changeBack=false;
         chat_LL=findViewById(R.id.chat_LL);
+        String backBitmapPath=MessageManager.getSharedPreferences().getString("currentBackBitmapPath",null);
+        if(backBitmapPath!=null){
+            Bitmap bitmap=AlbumUtil.getBitmapByPath(backBitmapPath);
+            Drawable drawable=new BitmapDrawable(bitmap);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                chat_LL.setBackground(drawable);
+            }
+        }
         chatSetTV=findViewById(R.id.chat_setting);
         chatSetTV.setOnClickListener(this);
+        chatSetTV.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         chatItemLV=(ListView)findViewById(R.id.chat_itemLV);
         chatItemLV.setDivider(null);//分割线设置空
         emoRecy=(RecyclerView)findViewById(R.id.recycler_emo);
@@ -361,6 +374,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (absoluteRoad != null) {            //选择图片
                         Drawable drawable = null;
                         Bitmap bitmap = AlbumUtil.getBitmapByPath(absoluteRoad);
+                        String savaRoad=AlbumUtil.saveMessageBitmap(bitmap);
+                        if(savaRoad!=null){
+                            MessageManager.getEditor().putString("currentBackBitmapPath",savaRoad);
+                            MessageManager.getEditor().commit();
+                        }
                         drawable = new BitmapDrawable(bitmap);
                         chat_LL.setBackground(drawable);
                         changeBack=false;

@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,6 +16,7 @@ import android.widget.ImageView;
 
 import com.example.cm.R;
 import com.example.cm.util.ActionSheetDialog;
+import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.MessageManager;
 
 import java.io.File;
@@ -25,6 +28,7 @@ public class ImageDetail extends AppCompatActivity {
 private ImageView imageDetailIV;
 private int position;
 private String userName;
+private String bitmapPath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,9 +39,15 @@ private String userName;
         init();
     }
     private void init(){
-        position=getIntent().getIntExtra("position",0);
-        userName=getIntent().getStringExtra("userName");
-        Bitmap bitmap= MessageManager.getMessageMap().get(userName).get(position).getPhoto();
+        bitmapPath=getIntent().getStringExtra("bitmapPath");
+        if(bitmapPath==null){
+            Log.e("", "init: 图片路径为空" );
+            this.finish();
+        }
+        //position=getIntent().getIntExtra("position",0);
+        //userName=getIntent().getStringExtra("userName");
+        //Bitmap bitmap= MessageManager.getMessageMap().get(userName).get(position).getPhoto();
+        Bitmap bitmap= AlbumUtil.getBitmapByPath(bitmapPath);
         imageDetailIV=findViewById(R.id.image_detail_IV);imageDetailIV.setImageBitmap(bitmap);
         imageDetailIV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,10 +67,10 @@ private String userName;
                             public void onClick(int which) {
                                 //TODO
                                 String fileName=new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())+".jpg";
-                                String path=MessageManager.getMessageMap().get(userName).get(position).getPhotoRoad();
-                                File file=new File(path);
+                                //String path=MessageManager.getMessageMap().get(userName).get(position).getPhotoRoad();
+                                File file=new File(bitmapPath);
                                 try {
-                                    MediaStore.Images.Media.insertImage(ImageDetail.this.getContentResolver(),path,fileName,null);
+                                    MediaStore.Images.Media.insertImage(ImageDetail.this.getContentResolver(),bitmapPath,fileName,null);
                                 } catch (FileNotFoundException e) {
                                     e.printStackTrace();
                                 }
