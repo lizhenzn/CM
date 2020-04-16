@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -25,6 +26,10 @@ import static com.example.cm.MainActivity.setToolbarText;
 public class MatchFragment extends Fragment {
     private Context context;
     private View view;
+    private ImageView clothes_up;
+    private ImageView clothes_down;
+    private ImageView clothes_up_model;
+    private ImageView clothes_down_model;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,20 +40,23 @@ public class MatchFragment extends Fragment {
 
     @Override
     public void onResume() {
-        //Log.d(TAG, "onResume: resume match");
+
+        //返回该碎片时显示已选取衣物
         super.onResume();
         setToolbarText("搭配");
         Log.d(TAG, "onResume: "+MainActivity.getClothes_up());
         if(MainActivity.getClothes_up()!=-1){
-            ImageView clothes_up = view.findViewById(R.id.clothes_up);
-            //.setImage
+            clothes_up = view.findViewById(R.id.clothes_up);
+            //设置上衣
             clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(MainActivity.getClothes_up()));
+            clothes_up_model.setImageBitmap(WardrobeFragment.photoList1.get(MainActivity.getClothes_up()));
         }
         Log.d(TAG, "onResume: "+MainActivity.getClothes_down());
         if(MainActivity.getClothes_down()!=-1){
-            ImageView clothes_down = view.findViewById(R.id.clothes_down);
-            //.setImage
+            clothes_down = view.findViewById(R.id.clothes_down);
+            //设置下衣
             clothes_down.setImageBitmap(WardrobeFragment.photoList2.get(MainActivity.getClothes_down()));
+            clothes_down_model.setImageBitmap(WardrobeFragment.photoList2.get(MainActivity.getClothes_down()));
         }
     }
 
@@ -59,9 +67,11 @@ public class MatchFragment extends Fragment {
         //Log.d(TAG, "onCreateView: create match fragment");
         context = getActivity();
         view = View.inflate(context, R.layout.match, null);
-        ImageView clothes_up = view.findViewById(R.id.clothes_up);
-        ImageView clothes_down = view.findViewById(R.id.clothes_down);
-        //上衣点击事件
+        clothes_up = view.findViewById(R.id.clothes_up);
+        clothes_down = view.findViewById(R.id.clothes_down);
+        clothes_up_model = view.findViewById(R.id.clothes_up_model);
+        clothes_down_model = view.findViewById(R.id.clothes_down_model);
+        //选择上衣点击事件
         clothes_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,7 +81,7 @@ public class MatchFragment extends Fragment {
                 MainActivity.setFragmentTabHostVisibility(false);
             }
         });
-        //下衣点击事件
+        //选择下衣点击事件
         clothes_down.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,7 +120,9 @@ public class MatchFragment extends Fragment {
                             MainActivity.setClothes_up(i);
                             MainActivity.setClothes_down(j);
                             clothes_up.setImageBitmap(WardrobeFragment.photoList1.get(i));
+                            clothes_up_model.setImageBitmap(WardrobeFragment.photoList1.get(i));
                             clothes_down.setImageBitmap(WardrobeFragment.photoList2.get(j));
+                            clothes_down_model.setImageBitmap(WardrobeFragment.photoList2.get(j));
                             return;
                         } else {
                             j = (j + 1) % clothes_down_count;
