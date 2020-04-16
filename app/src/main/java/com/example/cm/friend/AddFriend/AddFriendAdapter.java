@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cm.R;
-import com.example.cm.friend.AddFriend.AddFriendActivity;
+import com.example.cm.friend.fragment.NewFriendFragment;
 import com.example.cm.util.MessageManager;
 
 public class AddFriendAdapter extends BaseAdapter  {
@@ -63,7 +63,7 @@ public class AddFriendAdapter extends BaseAdapter  {
             @Override
             public void onClick(View v) {
                 MessageManager.getAddFriendItemList().get(position).setResult("已同意");
-               AddFriendActivity.agreeAddFriend(MessageManager.getAddFriendItemList().get(position).getFriendInfo().getUserName());
+               NewFriendFragment.agreeAddFriend(MessageManager.getAddFriendItemList().get(position).getFriendInfo().getUserName());
                MessageManager.setAddFriendItemListChanged(true);        //信息改变
             }
         });
@@ -71,7 +71,7 @@ public class AddFriendAdapter extends BaseAdapter  {
             @Override
             public void onClick(View v) {
                 MessageManager.getAddFriendItemList().get(position).setResult("已拒绝");
-                AddFriendActivity.rejectAddFriend(MessageManager.getAddFriendItemList().get(position).getFriendInfo().getUserName());
+                NewFriendFragment.rejectAddFriend(MessageManager.getAddFriendItemList().get(position).getFriendInfo().getUserName());
                 MessageManager.setAddFriendItemListChanged(true);           //信息改变
             }
         });

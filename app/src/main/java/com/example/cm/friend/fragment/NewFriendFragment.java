@@ -1,14 +1,15 @@
-package com.example.cm.friend.AddFriend;
+package com.example.cm.friend.fragment;
+
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,9 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
-import com.example.cm.myInfo.FriendInfo;
+import com.example.cm.friend.AddFriend.AddFriendAdapter;
+import com.example.cm.friend.AddFriend.SearchResultAdapter;
+import com.example.cm.friend.AddFriend.SearchResultItem;
 import com.example.cm.myInfo.VCardManager;
-import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
@@ -34,76 +36,83 @@ import org.jivesoftware.smackx.xdata.Form;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddFriendActivity extends AppCompatActivity implements View.OnClickListener{
-private Button add_btn,search_btn;
-private EditText userName_et;
-private ImageView headImage;
-private TextView userName_tv;
-private LinearLayout linearLayout;
-private AddFriendAdapter addFriendAdapter;
-private SearchResultAdapter searchResultAdapter;
-private ArrayList<SearchResultItem> searchResultItems;
-private ListView addFriendLV,searchResultLV;
-private boolean work;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_friend);
-        Toolbar toolbar=(Toolbar)findViewById(R.id.add_friend_toolabr);
-        ThemeColor.setTheme(AddFriendActivity.this,toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar=getSupportActionBar();
-        if(actionBar!=null){
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
-        }
-        //初始化控件
-        init();
-        search_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(work) {
-                    if (MessageManager.isAddFriendItemListChanged()) {
-                        AddFriendActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                addFriendAdapter.notifyDataSetChanged();
-                                MessageManager.setAddFriendItemListChanged(false);
-                            }
-                        });
-                        try{
-                            Thread.sleep(1000);
-                        }catch (InterruptedException e){
-                            e.printStackTrace();
-                        }
-                    }
-                }
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class NewFriendFragment extends Fragment implements View.OnClickListener {
+    private Button add_btn,search_btn;
+    private EditText userName_et;
+    private ImageView headImage;
+    private TextView userName_tv;
+    private LinearLayout linearLayout;
+    private AddFriendAdapter addFriendAdapter;
+    private SearchResultAdapter searchResultAdapter;
+    private ArrayList<SearchResultItem> searchResultItems;
+    private ListView addFriendLV,searchResultLV;
+    private boolean work;
 
-            }
-        }).start();
+    public NewFriendFragment() {
+        // Required empty public constructor
     }
-    //初始化控件
-    public void init(){
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view=View.inflate(getActivity(),R.layout.activity_add_friend,null);
         searchResultItems=new ArrayList<>();
-        //add_btn=(Button)findViewById(R.id.add_friend_btn);
-        //add_btn.setOnClickListener(this);
-        search_btn=(Button)findViewById(R.id.add_friend_search);
+        search_btn=(Button)view.findViewById(R.id.add_friend_search);
         search_btn.setOnClickListener(this);
-        //headImage=(ImageView)findViewById(R.id.add_friend_headImage);
-        //headImage.setOnClickListener(this);
-        userName_et=(EditText)findViewById(R.id.add_friend_et);
-        //userName_tv=(TextView)findViewById(R.id.add_friend_userTV);
-        //userName_tv.setOnClickListener(this);
-        //linearLayout=(LinearLayout)findViewById(R.id.add_friend_detail_LL);
-        addFriendAdapter=new AddFriendAdapter(this);
-        searchResultAdapter=new SearchResultAdapter(searchResultItems,this);
-        addFriendLV=(ListView)findViewById(R.id.add_friend_lv);
-        searchResultLV=findViewById(R.id.search_result_lv);
+        userName_et=(EditText)view.findViewById(R.id.add_friend_et);
+        addFriendAdapter=new AddFriendAdapter(getActivity());
+        searchResultAdapter=new SearchResultAdapter(searchResultItems,getActivity());
+        addFriendLV=(ListView)view.findViewById(R.id.add_friend_lv);
+        searchResultLV=view.findViewById(R.id.search_result_lv);
         addFriendLV.setAdapter(addFriendAdapter);
         searchResultLV.setAdapter(searchResultAdapter);
         work=true;
 
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        work=true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(work) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (MessageManager.isAddFriendItemListChanged()) {
+                                addFriendAdapter.notifyDataSetChanged();
+                                MessageManager.setAddFriendItemListChanged(false); ;
+                            }
+                        }
+                    });
+                    synchronized((Object)work){
+                        if(!work)break;
+                    }
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        work=false;
     }
 
     @Override
@@ -115,7 +124,7 @@ private boolean work;
                     boolean have=false;
                     String userName = String.valueOf(userName_et.getText());
                     if(userName.equalsIgnoreCase("")) {
-                        Toast.makeText(AddFriendActivity.this, "输入不能为空", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "输入不能为空", Toast.LENGTH_SHORT).show();
                     }
                     else{
                         //************//
@@ -144,7 +153,7 @@ private boolean work;
                                 SearchResultItem resultItem=new SearchResultItem();
                                 List<String> user=it.get(i).getValues("UserName");
                                 String u=user.get(0);
-                                Bitmap bitmap=VCardManager.getUserImage(u);
+                                Bitmap bitmap= VCardManager.getUserImage(u);
                                 resultItem.setUser(u);
                                 resultItem.setBitmap(bitmap);
                                 Log.e("", "onClick: "+i+user );
@@ -154,7 +163,7 @@ private boolean work;
                             if(have) {
                                 searchResultAdapter.notifyDataSetChanged();
                             }else{
-                                Toast.makeText(AddFriendActivity.this, "抱歉，没有与此用户名相似的用户", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "抱歉，没有与此用户名相似的用户", Toast.LENGTH_SHORT).show();
                             }
                         }catch(Exception e){
                             e.printStackTrace();
@@ -163,22 +172,12 @@ private boolean work;
 
                     }
                 }else{
-                    Toast.makeText(AddFriendActivity.this,"未登录...",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"未登录...",Toast.LENGTH_SHORT).show();
                 }
             }break;
 
             default:break;
         }
-        
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: AddFriendActivity.this.finish();break;
-            default:break;
-        }
-            return true;
 
     }
     //同意添加好友
@@ -218,11 +217,5 @@ private boolean work;
             return false;
         }
         return true;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        work=false;
     }
 }

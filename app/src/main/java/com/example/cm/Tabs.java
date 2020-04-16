@@ -1,6 +1,6 @@
 package com.example.cm;
 
-import com.example.cm.friend.FriendFragment;
+import com.example.cm.friend.fragment.FriendFragment;
 import com.example.cm.match.MatchFragment;
 import com.example.cm.share.ShareFragment;
 import com.example.cm.wardrobe.WardrobeFragment;
