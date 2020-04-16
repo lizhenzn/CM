@@ -35,12 +35,9 @@ public class MatchFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setToolbarText("搭配");
-
     }
-
     @Override
     public void onResume() {
-
         //返回该碎片时显示已选取衣物
         super.onResume();
         setToolbarText("搭配");
@@ -59,7 +56,6 @@ public class MatchFragment extends Fragment {
             clothes_down_model.setImageBitmap(WardrobeFragment.photoList2.get(MainActivity.getClothes_down()));
         }
     }
-
     private static final String TAG = "TEST";
     @Nullable
     @Override
