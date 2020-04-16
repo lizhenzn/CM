@@ -1,6 +1,7 @@
 package com.example.cm.friend.AddFriend;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.example.cm.R;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.VCardManager;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
@@ -48,6 +50,7 @@ private boolean work;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
         Toolbar toolbar=(Toolbar)findViewById(R.id.add_friend_toolabr);
+        ThemeColor.setTheme(AddFriendActivity.this,toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
@@ -56,6 +59,7 @@ private boolean work;
         }
         //初始化控件
         init();
+        search_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         new Thread(new Runnable() {
             @Override
             public void run() {

@@ -2,6 +2,7 @@ package com.example.cm.myInfo;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
@@ -27,6 +29,7 @@ private EditText niCheng_ed;
         String nic=intent.getStringExtra("user");
         niCheng_ed.setText(nic);
         Toolbar toolbar=(Toolbar)findViewById(R.id.niCheng_toolbar);
+        ThemeColor.setTheme(EditNiChengActivity.this,toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){

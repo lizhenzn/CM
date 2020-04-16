@@ -15,6 +15,7 @@ import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.SmackUserInfo;
 import com.example.cm.myInfo.VCardManager;
+import com.example.cm.theme.ThemeColor;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -50,6 +51,7 @@ public class MessageManager {
     public final static String BASEURL="http://39.105.75.60/image-path/";         //远程图片资源路径公共前缀
     public static void initAllList(){//初始化所有的列表
         haveNewMessage=false;
+        ThemeColor.changed=true;
         messageMap=new HashMap<>();
         friendInfoList=new ArrayList<>();
         contantFriendInfoList=new ArrayList<>();

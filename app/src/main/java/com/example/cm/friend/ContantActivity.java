@@ -1,6 +1,7 @@
 package com.example.cm.friend;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 
 import com.example.cm.R;
 import com.example.cm.friend.AddFriend.AddFriendActivity;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.MessageManager;
 
 import java.util.Collections;
@@ -34,6 +36,7 @@ public class ContantActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contant);
         Toolbar toolbar=(Toolbar)findViewById(R.id.contant_toolabr);
+        ThemeColor.setTheme(ContantActivity.this,toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){

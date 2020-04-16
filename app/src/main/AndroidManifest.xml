@@ -18,7 +18,8 @@
         android:roundIcon="@drawable/cm"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".friend.chat.ImageDetail"></activity>
+        <activity android:name=".theme.ThemeActivity"></activity>
+        <activity android:name=".friend.chat.ImageDetail" />
         <activity android:name=".friend.ChangeFriendNoteActivity" />
         <activity android:name=".friend.AccuseFriendActivity" />
         <activity android:name=".myInfo.ChangePasswordActivity" />

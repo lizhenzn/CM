@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="colorStr">
+        <item>#FFC0CB</item>
+        <item>#00FFFF</item>
+        <item>#010E01</item>
+        <item>#D81B60</item>
+        <item>#F21F62F0</item>
+        <item>#FF00FF</item>
+    </string-array>
+    <string-array name="colorName">
+        <item>少女粉</item>
+        <item>青青青</item>
+        <item>夜间模式</item>
+        <item>姨妈红</item>
+        <item>胖次蓝</item>
+        <item>基佬紫</item>
+    </string-array>
+</resources>

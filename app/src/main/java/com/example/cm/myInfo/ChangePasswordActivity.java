@@ -1,5 +1,6 @@
 package com.example.cm.myInfo;
 
+import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.Connect;
 
 import org.jivesoftware.smack.SmackException;
@@ -30,6 +32,7 @@ private Button change_btn;
         insurePassword_et=(EditText)findViewById(R.id.changePassword_et2);
         change_btn=(Button)findViewById(R.id.changePassword_btn);
         Toolbar toolbar=(Toolbar)findViewById(R.id.password_toolbar);
+        ThemeColor.setTheme(ChangePasswordActivity.this,toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){

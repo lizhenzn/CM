@@ -6,29 +6,32 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
 import java.io.File;
 
-public class LoginActivity extends Activity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     private Button loginBtn,pswEnBtn;
     private ImageView headIM_login;
     private EditText userET,pswET;
@@ -46,9 +49,17 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        Toolbar toolbar=(Toolbar)findViewById(R.id.login_toolbar);
+        ThemeColor.setTheme(LoginActivity.this,toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar=getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
         init();
-        android.app.ActionBar actionBar=getActionBar();
-        if(actionBar!=null)actionBar.setDisplayShowTitleEnabled(false);
+        //android.app.ActionBar actionBar=getActionBar();
+        //if(actionBar!=null)actionBar.setDisplayShowTitleEnabled(false);
     }
     //初始化控件
     public void init(){
@@ -231,5 +242,16 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             default:break;
         }
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{
+                this.finish();
+            }break;
+            default:break;
+        }
+        return  true;
     }
 }

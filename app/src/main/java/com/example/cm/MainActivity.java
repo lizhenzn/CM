@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,6 +37,8 @@ import com.example.cm.myInfo.LoginActivity;
 import com.example.cm.myInfo.MyInfoActivity;
 import com.example.cm.myInfo.VCardManager;
 import com.example.cm.service.PacketListenerService;
+import com.example.cm.theme.ThemeActivity;
+import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
@@ -59,7 +62,6 @@ public class MainActivity extends AppCompatActivity{
     private static TextView nichengTV;
     private static TextView titleTV;
     private static ImageView navi_head,head_home;
-    private static String path="/sdcard/Clothes/MyInfo/head";
     private final int LOGIN=1;
     private long backPressTime;
     private QBadgeView naviQBadgeView;
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity{
     private static Activity activity;
     public static Boolean isBinded;
     private static final String TAG = "MainActivity";
+    private View headerView;
 
     private static int clothes_up=-1;
     private static int clothes_down=-1;
@@ -90,13 +93,13 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        toolbar=(Toolbar)findViewById(R.id.toolabr);
+        setSupportActionBar(toolbar);
         init();
         initTabhost();
         setToolbarText("搭配");
         ActionBar actionBar=getSupportActionBar();
         if(actionBar!=null){
-            //actionBar.setDisplayHomeAsUpEnabled(true);
-            //actionBar.setHomeAsUpIndicator(R.mipmap.ic_launcher_round);
             actionBar.setDisplayShowTitleEnabled(false);
         }
         //测试代码片，可能存在严重不稳定情况，方法的静态化可能导致一系列问题
@@ -131,6 +134,11 @@ public class MainActivity extends AppCompatActivity{
                     case R.id.navi_edit_selfInfo:{
                         Intent intent=new Intent(MainActivity.this,MyInfoActivity.class);
                         startActivity(intent);
+                    }break;
+                    case R.id.navi_changeTheme:{
+                        Intent intent=new Intent(MainActivity.this, ThemeActivity.class);
+                        startActivity(intent);
+
                     }break;
                     default:
                         break;
@@ -181,6 +189,11 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        if((ThemeColor.changed)&&(ThemeColor.backColorStr!=null)) {
+            ThemeColor.setTheme(MainActivity.this,toolbar);
+            headerView.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
+            ThemeColor.changed=false;
+        }
         setInfo();
     }
 
@@ -215,6 +228,9 @@ public class MainActivity extends AppCompatActivity{
         mainActivityContext=MainActivity.this;
         activity=MainActivity.this.getParent();
         MessageManager.initAllList();
+        ThemeColor.backColorStr=MessageManager.getSharedPreferences().getString("currentBackStr",ThemeColor.defaultBackColorStr);
+        Log.e(TAG, "init: 颜色字符串:"+ThemeColor.backColorStr );
+
         Connect.init();             //初始化适配器列表
         if(!AlbumUtil.checkStorage(this)){
             AlbumUtil.requestStorage(this);        //申请存储读取权限
@@ -222,11 +238,15 @@ public class MainActivity extends AppCompatActivity{
         naviQBadgeView=new QBadgeView(this);
         //sharedPreferences=getSharedPreferences("myInfo",MODE_PRIVATE);
         //editor=sharedPreferences.edit();
-        toolbar=(Toolbar)findViewById(R.id.toolabr);
-        setSupportActionBar(toolbar);
+
         navigationView=(NavigationView)findViewById(R.id.navi);
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer);
-        View headerView= navigationView.inflateHeaderView(R.layout.navi_header);             //动态加载headerview，为了其中头像点击事件
+        headerView= navigationView.inflateHeaderView(R.layout.navi_header);             //动态加载headerview，为了其中头像点击事件
+
+        if(ThemeColor.backColorStr!=null) {
+            ThemeColor.setTheme(MainActivity.this,toolbar);
+            headerView.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
+        }
         navi_head=(ImageView)headerView.findViewById(R.id.navi_head);
         head_home=(ImageView)findViewById(R.id.head_home);
         nichengTV=(TextView)headerView.findViewById(R.id.nicheng);
@@ -402,6 +422,11 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
+        if((ThemeColor.changed)&&(ThemeColor.backColorStr!=null)) {
+            ThemeColor.setTheme(MainActivity.this,toolbar);
+            headerView.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
+            ThemeColor.changed=false;
+        }
         setInfo();
     }
 

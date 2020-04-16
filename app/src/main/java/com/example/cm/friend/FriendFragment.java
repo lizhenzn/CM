@@ -65,7 +65,6 @@ public class FriendFragment extends Fragment  {
 
 
 
-        //initChatList();
         chatListAdapter=new ChatListAdapter(getActivity());
         chatLV.setAdapter(chatListAdapter);
         if(MessageManager.isHaveNewMessage()) {
