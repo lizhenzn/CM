@@ -141,6 +141,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
         chatSetTV=findViewById(R.id.chat_setting);
         chatSetTV.setOnClickListener(this);
+        chatSetTV.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         chatItemLV=(ListView)findViewById(R.id.chat_itemLV);
         chatItemLV.setDivider(null);//分割线设置空
         emoRecy=(RecyclerView)findViewById(R.id.recycler_emo);

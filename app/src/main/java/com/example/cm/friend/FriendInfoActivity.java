@@ -148,6 +148,8 @@ public class FriendInfoActivity extends AppCompatActivity {
         nicTV=(TextView)findViewById(R.id.friend_detail_nic_tv);
         sexTV=(TextView)findViewById(R.id.friend_detail_sex_tv);
         friend_headIV=(ImageView)findViewById(R.id.friend_detail_iv);
+        setting_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
+        send_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         Intent intent=getIntent();
         position=intent.getIntExtra("position",0);
         curFriendInfo=MessageManager.getContantFriendInfoList().get(position);

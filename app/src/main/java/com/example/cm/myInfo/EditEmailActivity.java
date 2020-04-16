@@ -26,6 +26,7 @@ private EditText email_et;
 
         setContentView(R.layout.activity_edit_email);
         save_email_btn=(Button)findViewById(R.id.save_email_btn);
+        save_email_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         email_et=(EditText)findViewById(R.id.edit_email);
         save_email_btn.setOnClickListener(this);
         Toolbar toolbar=(Toolbar)findViewById(R.id.email_toolbar);

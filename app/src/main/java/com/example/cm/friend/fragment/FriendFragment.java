@@ -65,6 +65,9 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
         sessionTV=view.findViewById(R.id.session_tv);
         contantTV=view.findViewById(R.id.contant_tv);
         newFriendTV=view.findViewById(R.id.newFriend_tv);
+        sessionTV.setOnClickListener(this);
+        contantTV.setOnClickListener(this);
+        newFriendTV.setOnClickListener(this);
         viewPager=view.findViewById(R.id.viewPaper);
         viewPager.setOnPageChangeListener(new MyPagerChangeListener());
         fragmentlist.add(new SessionFragment());

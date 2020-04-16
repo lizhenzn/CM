@@ -89,8 +89,9 @@ public class ChatAdapter extends BaseAdapter implements View.OnClickListener {
                 @Override
                 public void onClick(View view) {
                     Intent intent=new Intent(context,ImageDetail.class);
-                    intent.putExtra("userName",userName);
-                    intent.putExtra("position",position);
+                    //intent.putExtra("userName",userName);
+                    //intent.putExtra("position",position);
+                    intent.putExtra("bitmapPath",MessageManager.getMessageMap().get(userName).get(position).getPhotoRoad());
                     context.startActivity(intent);
                 }
             });
