@@ -24,12 +24,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +43,6 @@ import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
-import com.example.cm.wardrobe.WardrobeFragment;
 
 import org.jivesoftware.smack.XMPPException;
 
@@ -64,6 +62,7 @@ public class MainActivity extends AppCompatActivity{
     private static TextView nichengTV;
     private static TextView titleTV;
     private static ImageView navi_head,head_home;
+    private RelativeLayout cmImageLayout;
     private final int LOGIN=1;
     private long backPressTime;
 
@@ -107,7 +106,7 @@ public class MainActivity extends AppCompatActivity{
             actionBar.setDisplayShowTitleEnabled(false);
         }
         //测试代码片，可能存在严重不稳定情况，方法的静态化可能导致一系列问题
-        WardrobeFragment.initData();
+        //WardrobeFragment.initData();
         //
         //navigationView.setCheckedItem(R.id.setting);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -253,11 +252,29 @@ public class MainActivity extends AppCompatActivity{
             ThemeColor.setTheme(MainActivity.this,toolbar);
             headerView.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         }
+        cmImageLayout=findViewById(R.id.cmImage);
         navi_head=(ImageView)headerView.findViewById(R.id.navi_head);
         head_home=(ImageView)findViewById(R.id.head_home);
         nichengTV=(TextView)headerView.findViewById(R.id.nicheng);
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3*1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        drawerLayout.setVisibility(View.VISIBLE);
+                        cmImageLayout.setVisibility(View.GONE);//3秒后切换
+                    }
+                });
+            }
+        }).start();
         //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
         if(MessageManager.getSharedPreferences().contains("userName")){  //有此userName键值，说明登陆过
             MessageManager.getSmackUserInfo().setUserName(MessageManager.getSharedPreferences().getString("userName",""));
