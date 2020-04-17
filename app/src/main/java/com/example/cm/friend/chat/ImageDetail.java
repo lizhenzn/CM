@@ -1,23 +1,19 @@
 package com.example.cm.friend.chat;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.v4.graphics.ColorUtils;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.example.cm.R;
 import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.AlbumUtil;
-import com.example.cm.util.MessageManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -79,7 +75,6 @@ private String bitmapPath;
                                 Uri uri = Uri.fromFile(file);
                                 intent.setData(uri);
                                 ImageDetail.this.sendBroadcast(intent);
-
                             }
                         }).show();
                 return true;
