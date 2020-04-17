@@ -12,8 +12,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.friend.AddFriend.AddFriendItem;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.Message;
 import com.example.cm.myInfo.FriendInfo;
@@ -42,7 +44,6 @@ public class FriendInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_info);
-
         init();
         Toolbar toolbar=(Toolbar)findViewById(R.id.friendInfo_toolabr);
         ThemeColor.setTheme(FriendInfoActivity.this,toolbar);
@@ -101,7 +102,7 @@ public class FriendInfoActivity extends AppCompatActivity {
                         Log.e("", "onClick: 点击修改备注" );
                         Intent intent=new Intent(FriendInfoActivity.this,ChangeFriendNoteActivity.class);
                         intent.putExtra("userName",userName);
-                        intent.putExtra("position",position);
+                        //intent.putExtra("position",position);
                         startActivity(intent);
                     }
                 }).show();
@@ -111,32 +112,53 @@ public class FriendInfoActivity extends AppCompatActivity {
         send_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //判断会话列表有没有此好友
-                boolean contain=false;
-                MessageManager.getContantFriendInfoList().get(position).setChated(1); //设置为在聊天列表
-                String userName=curFriendInfo.getUserName();
-                for(int i=0;i<MessageManager.getFriendInfoList().size();i++){
-                    if(MessageManager.getFriendInfoList().get(i).getUserName().equals(userName)){     //会话列表包含此好友
-                        //list.get(i).get(message.getFrom()).add(message1);
-                        contain=true;
-                        Log.d("ContantClick点击的好友条目名", "onChildClick: "+userName);
-                        break;
+                if (send_btn.getText().equals("发消息")) {
+                    //判断会话列表有没有此好友
+                    boolean contain = false;
+                    curFriendInfo.setChated(1);//设置为在聊天列表
+                    String userName = curFriendInfo.getUserName();
+                    for (int i = 0; i < MessageManager.getFriendInfoList().size(); i++) {
+                        if (MessageManager.getFriendInfoList().get(i).getUserName().equals(userName)) {     //会话列表包含此好友
+                            //list.get(i).get(message.getFrom()).add(message1);
+                            contain = true;
+                            Log.d("ContantClick点击的好友条目名", "onChildClick: " + userName);
+                            break;
+                        }
                     }
-                }
-                if(!contain){  //会话列表不包含此好友
-                    MessageManager.getDataBaseHelp().changeChatState(userName,1);            //改变数据库中聊天状态
-                    //friendInfo.setHeadBt(message.getBody());
-                    MessageManager.getFriendInfoList().add(MessageManager.getFriendInfoList().size(),curFriendInfo);//
-                    List<Message> messageList=new ArrayList<>();
-                    ////messageList.add(message1);
-                    MessageManager.getMessageMap().put(userName,messageList);
-                    Log.d("ContantClick点击的好友条目名", "onChildClick: "+userName);
-                }
-                Intent intent=new Intent(FriendInfoActivity.this, ChatActivity.class);
-                intent.putExtra("userName",userName);
-                intent.putExtra("noteName",noteName);
-                startActivity(intent);
+                    if (!contain) {  //会话列表不包含此好友
+                        MessageManager.getDataBaseHelp().changeChatState(userName, 1);            //改变数据库中聊天状态
+                        //friendInfo.setHeadBt(message.getBody());
+                        MessageManager.getFriendInfoList().add(MessageManager.getFriendInfoList().size(), curFriendInfo);//
+                        List<Message> messageList = new ArrayList<>();
+                        ////messageList.add(message1);
+                        MessageManager.getMessageMap().put(userName, messageList);
+                        Log.d("ContantClick点击的好友条目名", "onChildClick: " + userName);
+                    }
+                    Intent intent = new Intent(FriendInfoActivity.this, ChatActivity.class);
+                    intent.putExtra("userName", userName);
+                    intent.putExtra("noteName", noteName);
+                    startActivity(intent);
 
+                }else{  //此事时添加好友按钮
+                    AddFriendItem addFriendItem = new AddFriendItem();
+                    addFriendItem.setFriendInfo(curFriendInfo);
+                    addFriendItem.setReason("Hello,World!");
+                    addFriendItem.setResult("已发送验证");
+                    MessageManager.setAddFriendItemListChanged(true);
+
+                    try {
+                        while(!Connect.getRoster().isLoaded()){
+                            Connect.getRoster().reload();
+                        }
+                        Connect.getRoster().createEntry(userName+"@"+Connect.SERVERNAME,userName,new String[]{"Friends"});
+                        Log.e("ADD", "onClick: 申请发送成功");
+                    } catch (Exception e) {//SmackException.NotConnectedException
+                        e.printStackTrace();
+                        addFriendItem.setResult("申请发送异常，请重试");
+                        Toast.makeText(FriendInfoActivity.this, "申请发送异常", Toast.LENGTH_SHORT).show();
+                    }
+                    MessageManager.getAddFriendItemList().add(addFriendItem);
+                }
             }
         });
     }
@@ -151,8 +173,13 @@ public class FriendInfoActivity extends AppCompatActivity {
         setting_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         send_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         Intent intent=getIntent();
-        position=intent.getIntExtra("position",0);
-        curFriendInfo=MessageManager.getContantFriendInfoList().get(position);
+        userName=intent.getStringExtra("userName");
+        curFriendInfo=MessageManager.getFriendInfoFromContantList(userName);
+        position=intent.getIntExtra("position",-1);
+        if(curFriendInfo==null) {  //联系人界面调用，有此好友
+            curFriendInfo=VCardManager.getFriendInfo(userName);
+            send_btn.setText("添加好友");
+        }
         userName=curFriendInfo.getUserName();
         noteName=curFriendInfo.getNoteName();
         friend_headIV.setImageBitmap(curFriendInfo.getHeadBt());

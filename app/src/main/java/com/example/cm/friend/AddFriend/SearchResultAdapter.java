@@ -2,6 +2,7 @@ package com.example.cm.friend.AddFriend;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
+import com.example.cm.friend.FriendInfoActivity;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.VCardManager;
 import com.example.cm.util.Connect;
@@ -57,7 +59,25 @@ public class SearchResultAdapter extends BaseAdapter {
             viewHolder= (ViewHolder) convertView.getTag();
         }
         viewHolder.headBitmapIV.setImageBitmap(searchResultItems.get(position).getBitmap());
+        viewHolder.headBitmapIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String user=searchResultItems.get(position).getUser();
+                Intent intent=new Intent(context, FriendInfoActivity.class);
+                intent.putExtra("userName",user);
+                context.startActivity(intent);
+            }
+        });
         viewHolder.userNameTV.setText(searchResultItems.get(position).getUser());
+        viewHolder.userNameTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String user=searchResultItems.get(position).getUser();
+                Intent intent=new Intent(context, FriendInfoActivity.class);
+                intent.putExtra("userName",user);
+                context.startActivity(intent);
+            }
+        });
         viewHolder.addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,13 +93,10 @@ public class SearchResultAdapter extends BaseAdapter {
                     if(!contain) {
                         String user=searchResultItems.get(position).getUser();
                         AddFriendItem addFriendItem = new AddFriendItem();
-                        FriendInfo friendInfo = new FriendInfo();
-                        friendInfo.setUserName(user);
-                        friendInfo.setHeadBt(VCardManager.getUserImage(user));
+                        FriendInfo friendInfo =VCardManager.getFriendInfo(user);
                         addFriendItem.setFriendInfo(friendInfo);
                         addFriendItem.setReason("Hello,World!");
                         addFriendItem.setResult("已发送验证");
-
                         MessageManager.setAddFriendItemListChanged(true);
 
                         try {

@@ -22,7 +22,6 @@
             <TextView
                 android:id="@+id/session_tv"
                 android:text="会话"
-                android:clickable="true"
                 android:background="@drawable/editview"
                 android:gravity="center"
                 android:textSize="18sp"
@@ -32,7 +31,6 @@
             <TextView
                 android:id="@+id/contant_tv"
                 android:text="好友"
-                android:clickable="true"
                 android:background="@drawable/editview"
                 android:gravity="center"
                 android:textSize="18sp"
@@ -42,7 +40,6 @@
             <TextView
                 android:id="@+id/newFriend_tv"
                 android:text="新朋友"
-                android:clickable="true"
                 android:background="@drawable/editview"
                 android:textSize="18sp"
                 android:gravity="center"

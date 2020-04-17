@@ -24,10 +24,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity{
     private static ImageView navi_head,head_home;
     private final int LOGIN=1;
     private long backPressTime;
-    private QBadgeView naviQBadgeView;
+
     private static ServiceConnection serviceConnection;   //用于连接服务通信
     private static PacketListenerService.MyBinder binder;   //服务中Binder
     private static Context mainActivityContext;   //主活动的Context
@@ -72,11 +74,13 @@ public class MainActivity extends AppCompatActivity{
     public static Boolean isBinded;
     private static final String TAG = "MainActivity";
     private View headerView;
+    private boolean work;
 
     private static int clothes_up=-1;
     private static int clothes_down=-1;
     private static boolean choose_flag=false;
     private static FragmentTabHost fragmentTabHost;
+    public static QBadgeView naviQBadgeView;
     public static int getClothes_up(){
         return clothes_up;
     }
@@ -195,6 +199,7 @@ public class MainActivity extends AppCompatActivity{
             ThemeColor.changed=false;
         }
         setInfo();
+
     }
 
     @Override   //标题栏按钮按键
@@ -224,6 +229,7 @@ public class MainActivity extends AppCompatActivity{
 
     //初始化各控件
     public void init(){
+        work=true;
         isBinded=false;
         mainActivityContext=MainActivity.this;
         activity=MainActivity.this.getParent();
@@ -333,9 +339,8 @@ public class MainActivity extends AppCompatActivity{
             tab_iv.setImageDrawable(drawable);
             tab_tv.setText(tabs1.getName());
             if(tabs1.getName().equals("会话")) {
-                naviQBadgeView.bindTarget(tab_tv);
+                naviQBadgeView.bindTarget(tab_iv);
             }
-            naviQBadgeView.setBadgeText("");
             tabSpec.setIndicator(indicator);
             fragmentTabHost.addTab(tabSpec,tabs1.getaClass(),null);
         }

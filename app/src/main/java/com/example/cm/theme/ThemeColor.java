@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 public class ThemeColor {
     public static boolean changed;
     public static String backColorStr;
-    public final static String defaultBackColorStr="#FFC0CB";//默认的背景颜色字符串 少女粉
+    public final static String defaultBackColorStr="#FF6666";//默认的背景颜色字符串 少女粉
     private String colorStr;
     private String colorName;
 

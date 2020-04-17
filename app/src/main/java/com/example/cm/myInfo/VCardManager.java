@@ -148,5 +148,37 @@ public class VCardManager {
         }
         return isSucceed;
     }
+    /*
+    * 从服务器得到好友信息
+    * @param userName
+    * @return friendInfo
+    * */
+    public static FriendInfo getFriendInfo(String userName){
+        FriendInfo friendInfo=null;
+        VCard vCard=getUserVcard(userName);
+        if(vCard!=null){
+            friendInfo=new FriendInfo();
+            friendInfo.setUserName(userName);
+            if(vCard.getNickName()==null){
+                friendInfo.setNicName(userName);
+            }
+            friendInfo.setNicName(vCard.getNickName());
+            friendInfo.setNoteName(userName);
+            String sex = vCard.getField("gender");
+            if (sex == null) {
+                sex = "secrecy";
+            }
+            friendInfo.setSex(sex);
+            String email = vCard.getField("email");
+            if (email == null) {
+                email = "";
+            }
+            friendInfo.setEmail(email);
+            Log.e("", "initFriend: gender :" + sex + "   email:" + email);
+            Bitmap bitmap = VCardManager.getUserImage(userName);
+            friendInfo.setHeadBt(bitmap);  //设置头像
+        }
+        return friendInfo;
+    }
 
 }
