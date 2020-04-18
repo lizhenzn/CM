@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -18,10 +19,12 @@ import android.widget.Toast;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
+import com.example.cm.friend.chat.ImageDetail;
 import com.example.cm.myInfo.VCardManager;
 import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +38,8 @@ public class PresentShareItem extends AppCompatActivity {
     private ArrayList<RemarkInfo> remarks;
     private CommentAdapter commentAdapter;
     private RecyclerView recyclerView;
+    private String clothes_up_path;
+    private String clothes_down_path;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,15 +67,35 @@ public class PresentShareItem extends AppCompatActivity {
                     public void run() {
                         //likeNum.setText(shareItem.getPostInfo().getLike_num()+"");
                         //userName.setText(shareItem.getUserName());
-                        clothesUp.setImageURI(Uri.fromFile(ServerFunction.getUpImg(shareItem.getPostInfo())));
-                        clothesDown.setImageURI(Uri.fromFile(ServerFunction.getDownImg(shareItem.getPostInfo())));
+                        File clothesUpFile=ServerFunction.getUpImg(shareItem.getPostInfo());
+                        File clothesDownFile=ServerFunction.getDownImg(shareItem.getPostInfo());
+                        clothes_up_path=clothesUpFile.toString();
+                        clothes_down_path=clothesDownFile.toString();
+                        clothesUp.setImageURI(Uri.fromFile(clothesUpFile));
+                        clothesDown.setImageURI(Uri.fromFile(clothesDownFile));
                         description.setText(shareItem.getDescription());
-
                     }
                 });
             }
         }).start();
-
+        //上衣图片点击事件
+        clothesUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(PresentShareItem.this, ImageDetail.class);
+                intent.putExtra("bitmapPath",clothes_up_path);
+                startActivity(intent);
+            }
+        });
+        //下衣图片点击事件
+        clothesDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(PresentShareItem.this, ImageDetail.class);
+                intent.putExtra("bitmapPath",clothes_down_path);
+                startActivity(intent);
+            }
+        });
 //        ImageView comment = findViewById(R.id.comment);
 //        comment.setOnClickListener(new View.OnClickListener() {
 //            @Override

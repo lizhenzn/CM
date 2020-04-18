@@ -23,6 +23,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import com.example.cm.friend.FriendInfoActivity;
+import com.example.cm.friend.chat.ImageDetail;
 import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
@@ -150,7 +151,6 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     }
                 }).start();
             }
-
             //广场单个消息项中的点击事件
             recyclerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -163,6 +163,24 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     v.getContext().startActivity(toPresentShareItem);
                 }
             });
+//            //上衣图片点击事件
+//            recyclerViewHolder.ClothesUp.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent intent=new Intent(context, ImageDetail.class);
+//                    intent.putExtra("bitmapPath",shareItem.getClothesUp().toString());
+//                    context.startActivity(intent);
+//                }
+//            });
+//            //下衣图片点击事件
+//            recyclerViewHolder.ClothesDown.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent intent=new Intent(context, ImageDetail.class);
+//                    intent.putExtra("bitmapPath",shareItem.getClothesDown().toString());
+//                    context.startActivity(intent);
+//                }
+//            });
             //点赞按钮点击事件
             recyclerViewHolder.GiveLike.setOnClickListener(new View.OnClickListener() {
                 @Override
