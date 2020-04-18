@@ -159,9 +159,7 @@ public class ShareFragment extends Fragment {
                         serverFunction.refresh();
                     serverFunction.loadPostList();
                     for (int i = 0; i < count; i++) {
-                        Log.d(TAG, "run: "+i);
                         while(!serverFunction.getShareManager().transfer_flags[i]){ }
-                        Log.d(TAG, "run: quite while");
                         PostInfo post=serverFunction.getPost();
                         String userName=null;
                         userName=serverFunction.getUserName();

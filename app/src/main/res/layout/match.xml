@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/change_clothes"
@@ -12,6 +14,7 @@
         app:layout_constraintLeft_toRightOf="@id/model"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:id="@+id/clothes_up"
             android:layout_width="100dp"
@@ -21,6 +24,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/clothes_down"
             android:layout_width="100dp"
@@ -31,6 +35,7 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/clothes_up" />
     </android.support.constraint.ConstraintLayout>
+
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/model"
@@ -41,6 +46,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/change_clothes"
         app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:id="@+id/clothes_up_model"
             android:layout_width="100dp"
@@ -49,27 +55,34 @@
             app:layout_constraintBottom_toTopOf="@id/clothes_down_model"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="50dp"
+            />
+
         <ImageView
             android:id="@+id/clothes_down_model"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/clothes_down"
+            android:layout_marginBottom="180dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/clothes_up_model" />
+            app:layout_constraintTop_toBottomOf="@id/clothes_up_model"
+            />
     </android.support.constraint.ConstraintLayout>
+
     <ImageView
         android:id="@+id/smart_match"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:textSize="20dp"
         android:src="@drawable/ic_ai_match"
+        android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/change_clothes" />
+
     <ImageView
         android:id="@+id/send_share"
         android:layout_width="100dp"

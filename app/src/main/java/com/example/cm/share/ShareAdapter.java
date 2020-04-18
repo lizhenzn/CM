@@ -21,6 +21,8 @@ import com.example.cm.MainActivity;
 import com.example.cm.R;
 import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import com.example.cm.friend.FriendInfoActivity;
 import com.example.cm.util.MessageManager;
 import com.example.cm.util.ServerFunction;
 
@@ -161,6 +163,7 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     v.getContext().startActivity(toPresentShareItem);
                 }
             });
+            //点赞按钮点击事件
             recyclerViewHolder.GiveLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -189,6 +192,15 @@ public class ShareAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             });
             recyclerViewHolder.HeadImage.setImageBitmap(shareItem.getHeadImage());
+            //头像点击事件
+            recyclerViewHolder.HeadImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(context, FriendInfoActivity.class);
+                    intent.putExtra("userName",shareItem.getUserName());
+                    context.startActivity(intent);
+                }
+            });
             recyclerViewHolder.UserName.setText(shareItem.getUserName());
             recyclerViewHolder.Description.setText("\u3000"+shareItem.getDescription());
         }
