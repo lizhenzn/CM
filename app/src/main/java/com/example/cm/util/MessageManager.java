@@ -439,4 +439,19 @@ public class MessageManager {
             }
         }
     }
+    /*
+    * 联系人列表是否包含此好友
+    * @param userName
+    * @return friendInfo
+    * */
+    public  static FriendInfo getFriendInfoFromContantList(String userName){
+        FriendInfo friendInfo=null;
+        for(int i=0;i<contantFriendInfoList.size();i++){
+            if(contantFriendInfoList.get(i).getUserName().equals(userName)){
+                friendInfo=contantFriendInfoList.get(i);
+                break;
+            }
+        }
+        return friendInfo;
+    }
 }

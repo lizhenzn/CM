@@ -30,13 +30,18 @@ import com.example.cm.util.MessageManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import q.rorbin.badgeview.QBadgeView;
+
+import static com.example.cm.MainActivity.naviQBadgeView;
 import static com.example.cm.MainActivity.setToolbarText;
 
 public class FriendFragment extends Fragment  implements View.OnClickListener {
+    private boolean work;
     private ViewPager viewPager;
     private FriendPagerAdapter friendPagerAdapter;
     private List<Fragment> fragmentlist;
     private TextView sessionTV,contantTV,newFriendTV;
+    private QBadgeView sessionQBadgeView,newFriendQBadgeView;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +52,7 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        work=true;
            FragmentManager fragmentManager;
 
     {
@@ -57,17 +62,20 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
         ft.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions();
     }
-        sessionTV=getActivity().findViewById(R.id.session_tv);
-        contantTV=getActivity().findViewById(R.id.contant_tv);
-        newFriendTV=getActivity().findViewById(R.id.newFriend_tv);
+    sessionQBadgeView=new QBadgeView(getActivity());
+        newFriendQBadgeView=new QBadgeView(getActivity());
+
     fragmentlist=new ArrayList<>();
     View view=View.inflate(getActivity(),R.layout.friend,null);
         sessionTV=view.findViewById(R.id.session_tv);
         contantTV=view.findViewById(R.id.contant_tv);
         newFriendTV=view.findViewById(R.id.newFriend_tv);
+
         sessionTV.setOnClickListener(this);
         contantTV.setOnClickListener(this);
         newFriendTV.setOnClickListener(this);
+        sessionQBadgeView.bindTarget(sessionTV);
+        newFriendQBadgeView.bindTarget(newFriendTV);
         viewPager=view.findViewById(R.id.viewPaper);
         viewPager.setOnPageChangeListener(new MyPagerChangeListener());
         fragmentlist.add(new SessionFragment());
@@ -109,14 +117,17 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
             case R.id.session_tv:{
                 viewPager.setCurrentItem(0);
                 setChoosed(0);
+                Log.e("", "onClick: 点击会话" );
             }break;
             case R.id.contant_tv:{
                 viewPager.setCurrentItem(1);
                 setChoosed(1);
+                Log.e("", "onClick: 点击好友" );
             }break;
             case R.id.newFriend_tv:{
                 viewPager.setCurrentItem(2);
                 setChoosed(2);
+                Log.e("", "onClick: 点击新朋友" );
             }break;
             default:break;
         }
@@ -165,4 +176,34 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(work){
+                    if(MessageManager.isHaveNewMessage()){
+                        sessionQBadgeView.setBadgeText("");
+                        naviQBadgeView.setBadgeText("");
+                    }
+                    if(MessageManager.isAddFriendItemListChanged()){
+                        newFriendQBadgeView.setBadgeText("");
+                        naviQBadgeView.setBadgeText("");
+                    }
+                }
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        work=false;
+    }
 }

@@ -2,18 +2,24 @@
 <resources>
     <string-array name="colorStr">
         <item>#FFC0CB</item>
-        <item>#00FFFF</item>
-        <item>#010E01</item>
+        <item>#FF6666</item>
         <item>#D81B60</item>
         <item>#F21F62F0</item>
-        <item>#FF00FF</item>
+        <item>#0099FF</item>
+        <item>#99CC00</item>
+        <item>#FFCC00</item>
+        <item>#660066</item>
+        <item>#010E01</item>
     </string-array>
     <string-array name="colorName">
         <item>少女粉</item>
-        <item>青青青</item>
-        <item>夜间模式</item>
+        <item>湘妃粉</item>
         <item>姨妈红</item>
         <item>胖次蓝</item>
+        <item>翡翠蓝</item>
+        <item>草苗绿</item>
+        <item>咸蛋黄</item>
         <item>基佬紫</item>
+        <item>暗夜黑</item>
     </string-array>
 </resources>

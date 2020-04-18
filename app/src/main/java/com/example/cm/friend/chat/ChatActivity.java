@@ -61,6 +61,7 @@ import java.util.Date;
 
 import main.ImgManager;
 import okhttp3.OkHttpClient;
+import q.rorbin.badgeview.QBadgeView;
 
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {

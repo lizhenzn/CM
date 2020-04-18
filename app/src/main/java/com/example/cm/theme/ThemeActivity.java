@@ -1,9 +1,8 @@
 package com.example.cm.theme;
 
-import android.content.res.Resources;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -28,7 +27,6 @@ private     Toolbar toolbar;
         if(actionBar!=null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
-
         }
         ThemeColor.setTheme(ThemeActivity.this,toolbar);
         init();

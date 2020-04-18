@@ -1,70 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true">
+    android:background="@drawable/clothes_list"
+    android:orientation="vertical">
 
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical">
-
-    <!--<android.support.v4.view.ViewPager-->
-        <!--android:id="@+id/wardrobeVP"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="350dp"-->
-        <!--android:layout_weight="1"></android.support.v4.view.ViewPager>-->
-    <ImageView
-        android:id="@+id/wardrobeVP"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/clothes_up"/>
-    <LinearLayout
-        android:id="@+id/wardrobeUpControl"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:elevation="4dp"
-        android:background="@color/colorGray">
-
-      <ImageView
-          android:layout_width="5dp"
-          android:layout_height="32dp"
-          android:layout_marginLeft="10dp"
-          android:layout_marginTop="10dp"
-          android:background="#0CC9FA" />
-
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:layout_weight="5"
-          android:gravity="center"
-          android:text="@string/UpControlText"
-          android:textSize="30dp"
-          android:textStyle="bold" />
-
-      <ImageView
-          android:id="@+id/wardrobeUpPointer"
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:src="@drawable/ic_pointer_down_black_24dp" />
-    </LinearLayout>
     <LinearLayout
         android:id="@+id/wardrobeUpLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="130dp"
+        android:layout_above="@+id/wardrobeDownLayout"
+
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="100dp"
         android:orientation="horizontal">
 
-      <android.support.v7.widget.RecyclerView
-          android:id="@+id/wardrobeR1"
-          android:layout_width="286dp"
-          android:layout_height="match_parent"
-          android:layout_weight="3">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wardrobeR1"
+            android:layout_width="286dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3">
 
-      </android.support.v7.widget.RecyclerView>
+        </android.support.v7.widget.RecyclerView>
 
         <ImageView
             android:id="@+id/wardrobeUpAdd"
@@ -74,49 +39,28 @@
             android:src="@drawable/chat_add" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/wardrobeDownControl"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:elevation="2dp"
-        android:background="@color/colorGray">
-      <ImageView
-          android:layout_width="5dp"
-          android:layout_height="32dp"
-          android:layout_marginLeft="10dp"
-          android:layout_marginTop="10dp"
-          android:background="#0CC9FA" />
-
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:layout_weight="5"
-          android:gravity="center"
-          android:text="@string/DownControlText"
-          android:textSize="30dp"
-          android:textStyle="bold" />
-
-      <ImageView
-          android:id="@+id/wardrobeDownPointer"
-          android:layout_width="65dp"
-          android:layout_height="match_parent"
-          android:src="@drawable/ic_pointer_right_black_24dp"/>
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/wardrobeDownLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="350dp"
+        android:layout_height="130dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="130dp"
         android:orientation="horizontal">
-      <!--设置自动动画效果-->
-      <android.support.v7.widget.RecyclerView
-          android:id="@+id/wardrobeR2"
-          android:layout_width="290dp"
-          android:layout_height="match_parent"
-          android:layout_weight="3">
+        <!--设置自动动画效果-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wardrobeR2"
+            android:layout_width="290dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3">
 
-      </android.support.v7.widget.RecyclerView>
+        </android.support.v7.widget.RecyclerView>
 
         <ImageView
             android:id="@+id/wardrobeDownAdd"
@@ -125,5 +69,4 @@
             android:layout_weight="1"
             android:src="@drawable/chat_add" />
     </LinearLayout>
-  </LinearLayout>
-</ScrollView>
+</RelativeLayout>

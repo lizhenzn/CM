@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +43,6 @@ import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
-import com.example.cm.wardrobe.WardrobeFragment;
 
 import org.jivesoftware.smack.XMPPException;
 
@@ -62,9 +62,10 @@ public class MainActivity extends AppCompatActivity{
     private static TextView nichengTV;
     private static TextView titleTV;
     private static ImageView navi_head,head_home;
+    private RelativeLayout cmImageLayout;
     private final int LOGIN=1;
     private long backPressTime;
-    private QBadgeView naviQBadgeView;
+
     private static ServiceConnection serviceConnection;   //用于连接服务通信
     private static PacketListenerService.MyBinder binder;   //服务中Binder
     private static Context mainActivityContext;   //主活动的Context
@@ -72,11 +73,13 @@ public class MainActivity extends AppCompatActivity{
     public static Boolean isBinded;
     private static final String TAG = "MainActivity";
     private View headerView;
+    private boolean work;
 
     private static int clothes_up=-1;
     private static int clothes_down=-1;
     private static boolean choose_flag=false;
     private static FragmentTabHost fragmentTabHost;
+    public static QBadgeView naviQBadgeView;
     public static int getClothes_up(){
         return clothes_up;
     }
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity{
             actionBar.setDisplayShowTitleEnabled(false);
         }
         //测试代码片，可能存在严重不稳定情况，方法的静态化可能导致一系列问题
-        WardrobeFragment.initData();
+        //WardrobeFragment.initData();
         //
         //navigationView.setCheckedItem(R.id.setting);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -195,6 +198,7 @@ public class MainActivity extends AppCompatActivity{
             ThemeColor.changed=false;
         }
         setInfo();
+
     }
 
     @Override   //标题栏按钮按键
@@ -224,6 +228,7 @@ public class MainActivity extends AppCompatActivity{
 
     //初始化各控件
     public void init(){
+        work=true;
         isBinded=false;
         mainActivityContext=MainActivity.this;
         activity=MainActivity.this.getParent();
@@ -247,11 +252,29 @@ public class MainActivity extends AppCompatActivity{
             ThemeColor.setTheme(MainActivity.this,toolbar);
             headerView.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         }
+        cmImageLayout=findViewById(R.id.cmImage);
         navi_head=(ImageView)headerView.findViewById(R.id.navi_head);
         head_home=(ImageView)findViewById(R.id.head_home);
         nichengTV=(TextView)headerView.findViewById(R.id.nicheng);
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3*1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        drawerLayout.setVisibility(View.VISIBLE);
+                        cmImageLayout.setVisibility(View.GONE);//3秒后切换
+                    }
+                });
+            }
+        }).start();
         //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
         if(MessageManager.getSharedPreferences().contains("userName")){  //有此userName键值，说明登陆过
             MessageManager.getSmackUserInfo().setUserName(MessageManager.getSharedPreferences().getString("userName",""));
@@ -333,9 +356,8 @@ public class MainActivity extends AppCompatActivity{
             tab_iv.setImageDrawable(drawable);
             tab_tv.setText(tabs1.getName());
             if(tabs1.getName().equals("会话")) {
-                naviQBadgeView.bindTarget(tab_tv);
+                naviQBadgeView.bindTarget(tab_iv);
             }
-            naviQBadgeView.setBadgeText("");
             tabSpec.setIndicator(indicator);
             fragmentTabHost.addTab(tabSpec,tabs1.getaClass(),null);
         }

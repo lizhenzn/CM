@@ -20,11 +20,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.cm.MainActivity;
 import com.example.cm.R;
+import com.example.cm.friend.chat.ImageDetail;
 import com.example.cm.util.ActionSheetDialog;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.ClothesEstimater;
@@ -56,11 +56,9 @@ public class WardrobeFragment extends Fragment  {
     public static List<Integer> upSeason,downSeason;
     private RecyclerView wardrobeR1,wardrobeR2;
     private WardrobeAdapter wardrobeAdapter1,wardrobeAdapter2;
-    private LinearLayout layout_up,layout_down,layout_up_control,layout_down_control;
-    private ImageView upAdd,downAdd,upPointer,downPointer,VUPage;
+    private ImageView upAdd,downAdd;
     //private static ViewPager viewPager;
     //private  static  WardrobeVPAdapter wardrobeVPAdapter;
-    private boolean upClothes,downClothes;
     private static final int ALBUM_UP=1,ALBUM_DOWN=2,CAMERA_UP=3,CAMERA_DOWN=4;
     public static final int  TYPE_UP=5,TYPE_DOWN=6;
     public static final int SEASON_SPRING=7,SEASON_SUMMER=8,SEASON_FALL=9,SEASON_WINTER=10,SEASON_DEFAULT=11;
@@ -72,6 +70,7 @@ public class WardrobeFragment extends Fragment  {
         super.onCreate(savedInstanceState);
         //TODO 在加载这个模块就从服务器获取图片
         setToolbarText("衣柜");
+        initData();
 //        if(Connect.isLogined){
 //            String str=MessageManager.getSharedPreferences().getString("userName",null);
 //            if(str!=null) {
@@ -85,7 +84,6 @@ public class WardrobeFragment extends Fragment  {
 //            prevUsername = null;
 //        }
         context=getActivity();
-        upClothes=true;downClothes=false;
         photoList1=new ArrayList<>();
         photoList2=new ArrayList<>();
         //wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
@@ -131,20 +129,13 @@ public class WardrobeFragment extends Fragment  {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view=View.inflate(context, R.layout.wardrobe,null);
-        layout_up_control=view.findViewById(R.id.wardrobeUpControl);//控制上选单伸缩
-        layout_down_control=view.findViewById(R.id.wardrobeDownControl);//控制下选单伸缩
         //viewPager=(ViewPager)view.findViewById(R.id.wardrobeVP);
         //viewPager.setPageTransformer(true,new Transform());
-        VUPage=view.findViewById(R.id.wardrobeVP);
-        wardrobeAdapter1.bindViewPage(VUPage);
-        wardrobeAdapter2.bindViewPage(VUPage);
         //viewPager.setAdapter(wardrobeVPAdapter);
         wardrobeR1=(RecyclerView)view.findViewById(R.id.wardrobeR1);
         wardrobeR2=(RecyclerView)view.findViewById(R.id.wardrobeR2);
         upAdd=view.findViewById(R.id.wardrobeUpAdd);
         downAdd=view.findViewById(R.id.wardrobeDownAdd);
-        upPointer=view.findViewById(R.id.wardrobeUpPointer);
-        downPointer=view.findViewById(R.id.wardrobeDownPointer);
         LinearLayoutManager linearLayoutManager1=new LinearLayoutManager(context);
         LinearLayoutManager linearLayoutManager2=new LinearLayoutManager(context);
         linearLayoutManager1.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -153,45 +144,6 @@ public class WardrobeFragment extends Fragment  {
         wardrobeR2.setLayoutManager(linearLayoutManager2);
         wardrobeR1.setAdapter(wardrobeAdapter1);
         wardrobeR2.setAdapter(wardrobeAdapter2);
-        layout_up=view.findViewById(R.id.wardrobeUpLayout);
-        if(!upClothes){layout_up.setVisibility(View.GONE);
-        upPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);
-        }
-        else{layout_up.setVisibility(View.VISIBLE);
-        upPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);
-        }
-        layout_down=view.findViewById(R.id.wardrobeDownLayout);
-        if(!downClothes){layout_down.setVisibility(View.GONE);
-        downPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);
-        }
-        else{layout_down.setVisibility(View.VISIBLE);
-        downPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);
-        }
-        layout_down_control.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(downClothes)
-                {layout_down.setVisibility(View.GONE);downClothes=false;
-                downPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);
-                }
-                else
-                {layout_down.setVisibility(View.VISIBLE);downClothes=true;
-                downPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);
-                }
-            }
-        });
-        layout_up_control.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                layout_up.setVisibility(View.GONE);
-                if(upClothes)
-                {layout_up.setVisibility(View.GONE);upClothes=false;
-                upPointer.setImageResource(R.drawable.ic_pointer_right_black_24dp);}
-                else
-                {layout_up.setVisibility(View.VISIBLE);upClothes=true;
-                upPointer.setImageResource(R.drawable.ic_pointer_down_black_24dp);}
-            }
-        });
         upAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -219,28 +171,23 @@ public class WardrobeFragment extends Fragment  {
                                 Log.d("addTest", "点击拍照——上");
                                 if(!AlbumUtil.checkCamera(getContext()))
                                     AlbumUtil.requestCamera(getContext());
-                                if(!AlbumUtil.checkCamera(getContext())){
-                                    Toast.makeText(getContext(),
-                                            "拒绝相机权限，拍照失败",
-                                            Toast.LENGTH_SHORT).show();
-                                    return;
+                                else {
+                                    Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
+                                    if (takePhotoIntent.resolveActivity(getActivity().getPackageManager()) != null) {//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
+                                        File picFile = creatImageFile(BASE_DIR, 1);
+                                        upFileName.add(picFile.getName());
+                                        upSeason.add(SEASON_DEFAULT);
+                                        Uri imageUri = FileProvider.getUriForFile(getContext(),
+                                                "com.example.cm",
+                                                picFile);
+                                        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                                        startActivityForResult(takePhotoIntent, WardrobeFragment.CAMERA_UP);//启动相机
+                                    } else {
+                                        Toast.makeText(getContext(),
+                                                "没有相机，无法完成操作",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                                Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
-                                if(takePhotoIntent.resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
-                                    File picFile=creatImageFile(BASE_DIR,1);
-                                    upFileName.add(picFile.getName());
-                                    upSeason.add(SEASON_DEFAULT);
-                                    Uri imageUri=FileProvider.getUriForFile(getContext(),
-                                            "com.example.cm",
-                                            picFile);
-                                    takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
-                                    startActivityForResult(takePhotoIntent,WardrobeFragment.CAMERA_UP);//启动相机
-                                }else{
-                                    Toast.makeText(getContext(),
-                                            "没有相机，无法完成操作",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-
                             }
                         }).show();
             }
@@ -271,30 +218,27 @@ public class WardrobeFragment extends Fragment  {
                             public void onClick(int which) {
                                 if(!AlbumUtil.checkCamera(getContext()))
                                     AlbumUtil.requestCamera(getContext());
-                                if(!AlbumUtil.checkCamera(getContext())){
-                                    Toast.makeText(getContext(),
-                                            "拒绝相机权限，拍照失败",
-                                            Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                                Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
-                                if(takePhotoIntent.
-                                        resolveActivity(getActivity().getPackageManager())!=null){//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
-                                    File picFile=creatImageFile(BASE_DIR,2);
-                                    downFileName.add(picFile.getName());
-                                    downSeason.add(SEASON_DEFAULT);
-                                    Uri imageUri=FileProvider.getUriForFile(getContext(),
-                                            "com.example.cm",
-                                            picFile);
-                                    takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
-                                    startActivityForResult(takePhotoIntent,WardrobeFragment.CAMERA_DOWN);//启动相机
-                                }else{
-                                    Toast.makeText(getContext(),
-                                            "没有相机，无法完成操作",
-                                            Toast.LENGTH_SHORT).show();
+                                else {
+                                    Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//用来打开相机的Intent
+                                    if (takePhotoIntent.
+                                            resolveActivity(getActivity().getPackageManager()) != null) {//这句作用是如果没有相机则该应用不会闪退，要是不加这句则当系统没有相机应用的时候该应用会闪退
+                                        File picFile = creatImageFile(BASE_DIR, 2);
+                                        downFileName.add(picFile.getName());
+                                        downSeason.add(SEASON_DEFAULT);
+                                        Uri imageUri = FileProvider.getUriForFile(getContext(),
+                                                "com.example.cm",
+                                                picFile);
+                                        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                                        startActivityForResult(takePhotoIntent, WardrobeFragment.CAMERA_DOWN);//启动相机
+                                    } else {
+                                        Toast.makeText(getContext(),
+                                                "没有相机，无法完成操作",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             }
                         }).show();
+
             }
         });
         return  view;
@@ -303,6 +247,8 @@ public class WardrobeFragment extends Fragment  {
      * 判断sdcard是否被挂载
      */
     public static boolean hasSdcard() {
+        if(!Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) Log.d("wardrobe", "hasSdcard: false");
         return Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED);
     }
@@ -338,6 +284,7 @@ public class WardrobeFragment extends Fragment  {
                     wardrobeAdapter1.photoList.add(bitmap);
                     wardrobeAdapter1.notifyDataSetChanged();
                     upFileName.add(saveBitmap(bitmap,BASE_DIR,1));
+                    Log.d("wardrobe", "onActivityResult: "+BASE_DIR);
                     upSeason.add(SEASON_DEFAULT);
                 }
            }break;
@@ -363,6 +310,7 @@ public class WardrobeFragment extends Fragment  {
                             upFileName.get(upFileName.size()-1));
                     Log.d("wardrobe", "onActivityResult: "+
                             upFileName.get(upFileName.size()-1));
+                    Log.d("wardrobe", "onActivityResult: "+pic.getAbsolutePath());
                     Bitmap bitmap =ClothesEstimater.getScaleBitmap(pic.getAbsolutePath());
                     if(bitmap!=null) {
                         bitmap2File(bitmap,pic);
@@ -439,14 +387,15 @@ public class WardrobeFragment extends Fragment  {
                 Environment.MEDIA_MOUNTED)) {
             BASE_DIR=MainActivity.getInstance().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         } else {
-            BASE_DIR=MainActivity.getInstance().getFilesDir();
-            if(BASE_DIR==null) {
+            BASE_DIR = MainActivity.getInstance().getFilesDir();
+            if (BASE_DIR == null) {
                 Log.e("wardrobe",
                         "load wardrobe failure : get storage dir failed");
-                return ;
+                return;
             }
         }
         BASE_DIR=new File(BASE_DIR,username);
+        Log.d("wardrobe", "BASE_DIR: "+BASE_DIR);
         if(!BASE_DIR.exists())BASE_DIR.mkdirs();
         File picDir=new File(BASE_DIR,"upClothes");
         if(!picDir.exists()) {
@@ -552,13 +501,11 @@ public class WardrobeFragment extends Fragment  {
     public static class WardrobeAdapter extends RecyclerView.Adapter<WardrobeAdapter.ViewHolder> {
         private List<Bitmap> photoList;
         private  Context context;
-        private ImageView VUPage;
         int type;
         public WardrobeAdapter(Context context,List<Bitmap> photoList,int type){
             this.context=context;
             this.photoList=photoList;
             this.type=type;
-            this.VUPage=VUPage;
         }
         public static interface OnItemClickListener {
             void onItemClick(View view);
@@ -578,14 +525,24 @@ public class WardrobeFragment extends Fragment  {
                 @Override
                 public void onClick(View v) {
                     int position= finalViewHolder.getAdapterPosition();
-                    VUPage.setImageBitmap(photoList.get(position));
+                    String path=BASE_DIR.getAbsolutePath();
+                    if(type==1){
+                        path+=File.separatorChar+"upClothes"+
+                                File.separatorChar+upFileName.get(position);
+                    }else if(type==2) {
+                        path += File.separatorChar + "downClothes" +
+                                File.separatorChar + downFileName.get(position);
+                    }
+                    Intent intent=new Intent(context, ImageDetail.class);
+                    intent.putExtra("bitmapPath",path);
+                    context.startActivity(intent);
                     if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
                         }else{    //下衣
                             MainActivity.setClothes_down(position);
                         }
-                   }
+                    }
 
                 }
             });
@@ -805,9 +762,6 @@ public class WardrobeFragment extends Fragment  {
                 super(itemView);
                 imageView=itemView.findViewById(R.id.wardrobeR_IV);
             }
-        }
-        public void bindViewPage(ImageView VUPage){
-            this.VUPage=VUPage;
         }
     }
 
