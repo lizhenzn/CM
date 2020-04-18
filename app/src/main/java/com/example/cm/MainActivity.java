@@ -43,6 +43,7 @@ import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.AlbumUtil;
 import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
+import com.example.cm.wardrobe.WardrobeFragment;
 
 import org.jivesoftware.smack.XMPPException;
 
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity{
             actionBar.setDisplayShowTitleEnabled(false);
         }
         //测试代码片，可能存在严重不稳定情况，方法的静态化可能导致一系列问题
-        //WardrobeFragment.initData();
+        WardrobeFragment.initData();
         //
         //navigationView.setCheckedItem(R.id.setting);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -262,7 +263,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void run() {
                 try {
-                    Thread.sleep(3*1000);
+                    Thread.sleep(2*1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

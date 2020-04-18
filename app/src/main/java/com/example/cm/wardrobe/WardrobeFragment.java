@@ -84,11 +84,11 @@ public class WardrobeFragment extends Fragment  {
 //            prevUsername = null;
 //        }
         context=getActivity();
-        photoList1=new ArrayList<>();
-        photoList2=new ArrayList<>();
         //wardrobeVPAdapter=new WardrobeVPAdapter(context,integerList);
         wardrobeAdapter1=new WardrobeAdapter(context,photoList1,1);
         wardrobeAdapter2=new WardrobeAdapter(context,photoList2,2);
+        wardrobeAdapter1.notifyDataSetChanged();
+        wardrobeAdapter2.notifyDataSetChanged();
     }
 
     @Override
@@ -408,8 +408,10 @@ public class WardrobeFragment extends Fragment  {
         Log.d("wardrobe", "initData: "+picDir.getAbsolutePath());
         for(File fname:picDir.listFiles()){
             if(fname.isFile()) {
+                Log.d("wardrobe", "initData: "+fname.getAbsolutePath());
                 Bitmap bitmap = ClothesEstimater.getScaleBitmap(fname.getAbsolutePath());
-                photoList1.add(bitmap);
+                Log.d("wardrobe", "initData: added"+photoList1.add(bitmap));
+
                 upFileName.add(fname.getName());
                 upSeason.add(SEASON_DEFAULT);
             }
@@ -437,6 +439,7 @@ public class WardrobeFragment extends Fragment  {
         }
         for(File fname:picDir.listFiles()){
             if(fname.isFile()) {
+                Log.d("wardrobe", "initData: "+fname.getAbsolutePath());
                 Bitmap bitmap = ClothesEstimater.getScaleBitmap(fname.getAbsolutePath());
                 photoList2.add(bitmap);
                 downFileName.add(fname.getName());
@@ -525,23 +528,24 @@ public class WardrobeFragment extends Fragment  {
                 @Override
                 public void onClick(View v) {
                     int position= finalViewHolder.getAdapterPosition();
-                    String path=BASE_DIR.getAbsolutePath();
-                    if(type==1){
-                        path+=File.separatorChar+"upClothes"+
-                                File.separatorChar+upFileName.get(position);
-                    }else if(type==2) {
-                        path += File.separatorChar + "downClothes" +
-                                File.separatorChar + downFileName.get(position);
-                    }
-                    Intent intent=new Intent(context, ImageDetail.class);
-                    intent.putExtra("bitmapPath",path);
-                    context.startActivity(intent);
                     if(MainActivity.isChoose_flag()){
                         if(type==1){  //上衣
                             MainActivity.setClothes_up(position);
                         }else{    //下衣
                             MainActivity.setClothes_down(position);
                         }
+                    }else{
+                        String path=BASE_DIR.getAbsolutePath();
+                        if(type==1){
+                            path+=File.separatorChar+"upClothes"+
+                                    File.separatorChar+upFileName.get(position);
+                        }else if(type==2) {
+                            path += File.separatorChar + "downClothes" +
+                                    File.separatorChar + downFileName.get(position);
+                        }
+                        Intent intent=new Intent(context, ImageDetail.class);
+                        intent.putExtra("bitmapPath",path);
+                        context.startActivity(intent);
                     }
 
                 }
@@ -549,178 +553,189 @@ public class WardrobeFragment extends Fragment  {
             viewHolder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    new ActionSheetDialog(context).
-                            builder()
-                            .setCancelable(true)
-                            .setCanceledOnTouchOutside(true)
-                            .addSheetItem("标为春季服装",
-                                    ActionSheetDialog.SheetItemColor.Blue
-                                    , new ActionSheetDialog.OnSheetItemClickListener() {
-                                        @Override
-                                        public void onClick(int which) {
-                                            int pos=finalViewHolder.getAdapterPosition();
-                                            File prev=null,target=null;
-                                            if(type==1){
-                                                prev=new File(BASE_DIR,"upClothes"
-                                                        +File.separatorChar+upFileName.get(pos));
-                                                target=new File(BASE_DIR,"upClothes");
-                                            }else if(type==2) {
-                                                prev = new File(BASE_DIR, "downClothes"
-                                                        +File.separatorChar+downFileName.get(pos));
-                                                target=new File(BASE_DIR,"downClothes");
-                                            }
-                                            if(prev!=null&&target!=null){
-                                                target=new File(target,"spring"
-                                                        +File.separatorChar
-                                                        +prev.getName());
-                                                if(prev.renameTo(target)==false)
-                                                    Log.d("wardrobe", "onClick: movefailed");
-                                                else if(type==1) {
-                                                    upSeason.set(pos,SEASON_SPRING);
-                                                    upFileName.set(pos,"spring"+File.separatorChar+target.getName());
+                    if(MainActivity.isChoose_flag()){
+                        int pos = finalViewHolder.getAdapterPosition();
+                        String path=BASE_DIR.getAbsolutePath();
+                        if(type==1){
+                            path+=File.separatorChar+"upClothes"+
+                                    File.separatorChar+upFileName.get(pos);
+                        }else if(type==2) {
+                            path += File.separatorChar + "downClothes" +
+                                    File.separatorChar + downFileName.get(pos);
+                        }
+                        Intent intent=new Intent(context, ImageDetail.class);
+                        intent.putExtra("bitmapPath",path);
+                        context.startActivity(intent);
+                    }else {
+                        new ActionSheetDialog(context).
+                                builder()
+                                .setCancelable(true)
+                                .setCanceledOnTouchOutside(true)
+                                .addSheetItem("标为春季服装",
+                                        ActionSheetDialog.SheetItemColor.Blue
+                                        , new ActionSheetDialog.OnSheetItemClickListener() {
+                                            @Override
+                                            public void onClick(int which) {
+                                                int pos = finalViewHolder.getAdapterPosition();
+                                                File prev = null, target = null;
+                                                if (type == 1) {
+                                                    prev = new File(BASE_DIR, "upClothes"
+                                                            + File.separatorChar + upFileName.get(pos));
+                                                    target = new File(BASE_DIR, "upClothes");
+                                                } else if (type == 2) {
+                                                    prev = new File(BASE_DIR, "downClothes"
+                                                            + File.separatorChar + downFileName.get(pos));
+                                                    target = new File(BASE_DIR, "downClothes");
                                                 }
-                                                else if(type==2) {
-                                                    downSeason.set(pos,SEASON_SPRING);
-                                                    downFileName.set(pos,"spring"+File.separatorChar+target.getName());
-                                                }
-                                            }
-                                        }
-                                    })
-                            .addSheetItem("标为夏季服装",
-                                    ActionSheetDialog.SheetItemColor.Blue
-                                    , new ActionSheetDialog.OnSheetItemClickListener() {
-                                        @Override
-                                        public void onClick(int which) {
-                                            int pos=finalViewHolder.getAdapterPosition();
-                                            File prev=null,target=null;
-                                            if(type==1){
-                                                prev=new File(BASE_DIR,"upClothes"
-                                                        +File.separatorChar+upFileName.get(pos));
-                                                target=new File(BASE_DIR,"upClothes");
-                                            }else if(type==2) {
-                                                prev = new File(BASE_DIR, "downClothes"
-                                                        +File.separatorChar+downFileName.get(pos));
-                                                target=new File(BASE_DIR,"downClothes");
-                                            }
-                                            if(prev!=null&&target!=null){
-                                                target=new File(target,"summer"
-                                                        +File.separatorChar
-                                                        +prev.getName());
-                                                if(prev.renameTo(target)==false)
-                                                    Log.d("wardrobe", "onClick: movefailed");
-                                                else if(type==1) {
-                                                    upSeason.set(pos,SEASON_SUMMER);
-                                                    upFileName.set(pos,"summer"+File.separatorChar+target.getName());
-                                                }
-                                                else if(type==2) {
-                                                    downSeason.set(pos,SEASON_SUMMER);
-                                                    downFileName.set(pos,"summer"+File.separatorChar+target.getName());
+                                                if (prev != null && target != null) {
+                                                    target = new File(target, "spring"
+                                                            + File.separatorChar
+                                                            + prev.getName());
+                                                    if (prev.renameTo(target) == false)
+                                                        Log.d("wardrobe", "onClick: movefailed");
+                                                    else if (type == 1) {
+                                                        upSeason.set(pos, SEASON_SPRING);
+                                                        upFileName.set(pos, "spring" + File.separatorChar + target.getName());
+                                                    } else if (type == 2) {
+                                                        downSeason.set(pos, SEASON_SPRING);
+                                                        downFileName.set(pos, "spring" + File.separatorChar + target.getName());
+                                                    }
                                                 }
                                             }
-                                        }
-                                    })
-                            .addSheetItem("标为秋季服装",
-                                    ActionSheetDialog.SheetItemColor.Blue
-                                    , new ActionSheetDialog.OnSheetItemClickListener() {
-                                        @Override
-                                        public void onClick(int which) {
-                                            int pos=finalViewHolder.getAdapterPosition();
-                                            File prev=null,target=null;
-                                            if(type==1){
-                                                prev=new File(BASE_DIR,"upClothes"
-                                                        +File.separatorChar+upFileName.get(pos));
-                                                target=new File(BASE_DIR,"upClothes");
-                                            }else if(type==2) {
-                                                prev = new File(BASE_DIR, "downClothes"
-                                                        +File.separatorChar+downFileName.get(pos));
-                                                target=new File(BASE_DIR,"downClothes");
-                                            }
-                                            if(prev!=null&&target!=null){
-                                                target=new File(target,"fall"
-                                                        +File.separatorChar
-                                                        +prev.getName());
-                                                if(prev.renameTo(target)==false)
-                                                    Log.d("wardrobe", "onClick: movefailed");
-                                                else if(type==1) {
-                                                    upSeason.set(pos,SEASON_FALL);
-                                                    upFileName.set(pos,"fall"+File.separatorChar+target.getName());
+                                        })
+                                .addSheetItem("标为夏季服装",
+                                        ActionSheetDialog.SheetItemColor.Blue
+                                        , new ActionSheetDialog.OnSheetItemClickListener() {
+                                            @Override
+                                            public void onClick(int which) {
+                                                int pos = finalViewHolder.getAdapterPosition();
+                                                File prev = null, target = null;
+                                                if (type == 1) {
+                                                    prev = new File(BASE_DIR, "upClothes"
+                                                            + File.separatorChar + upFileName.get(pos));
+                                                    target = new File(BASE_DIR, "upClothes");
+                                                } else if (type == 2) {
+                                                    prev = new File(BASE_DIR, "downClothes"
+                                                            + File.separatorChar + downFileName.get(pos));
+                                                    target = new File(BASE_DIR, "downClothes");
                                                 }
-                                                else if(type==2) {
-                                                    downSeason.set(pos,SEASON_FALL);
-                                                    downFileName.set(pos,"fall"+File.separatorChar+target.getName());
+                                                if (prev != null && target != null) {
+                                                    target = new File(target, "summer"
+                                                            + File.separatorChar
+                                                            + prev.getName());
+                                                    if (prev.renameTo(target) == false)
+                                                        Log.d("wardrobe", "onClick: movefailed");
+                                                    else if (type == 1) {
+                                                        upSeason.set(pos, SEASON_SUMMER);
+                                                        upFileName.set(pos, "summer" + File.separatorChar + target.getName());
+                                                    } else if (type == 2) {
+                                                        downSeason.set(pos, SEASON_SUMMER);
+                                                        downFileName.set(pos, "summer" + File.separatorChar + target.getName());
+                                                    }
                                                 }
                                             }
-                                        }
-                                    })
-                            .addSheetItem("标为冬季服装",
-                                    ActionSheetDialog.SheetItemColor.Blue
-                                    , new ActionSheetDialog.OnSheetItemClickListener() {
-                                        @Override
-                                        public void onClick(int which) {
-                                            int pos=finalViewHolder.getAdapterPosition();
-                                            File prev=null,target=null;
-                                            if(type==1){
-                                                prev=new File(BASE_DIR,"upClothes"
-                                                        +File.separatorChar+upFileName.get(pos));
-                                                target=new File(BASE_DIR,"upClothes");
-                                            }else if(type==2) {
-                                                prev = new File(BASE_DIR, "downClothes"
-                                                        +File.separatorChar+downFileName.get(pos));
-                                                target=new File(BASE_DIR,"downClothes");
+                                        })
+                                .addSheetItem("标为秋季服装",
+                                        ActionSheetDialog.SheetItemColor.Blue
+                                        , new ActionSheetDialog.OnSheetItemClickListener() {
+                                            @Override
+                                            public void onClick(int which) {
+                                                int pos = finalViewHolder.getAdapterPosition();
+                                                File prev = null, target = null;
+                                                if (type == 1) {
+                                                    prev = new File(BASE_DIR, "upClothes"
+                                                            + File.separatorChar + upFileName.get(pos));
+                                                    target = new File(BASE_DIR, "upClothes");
+                                                } else if (type == 2) {
+                                                    prev = new File(BASE_DIR, "downClothes"
+                                                            + File.separatorChar + downFileName.get(pos));
+                                                    target = new File(BASE_DIR, "downClothes");
+                                                }
+                                                if (prev != null && target != null) {
+                                                    target = new File(target, "fall"
+                                                            + File.separatorChar
+                                                            + prev.getName());
+                                                    if (prev.renameTo(target) == false)
+                                                        Log.d("wardrobe", "onClick: movefailed");
+                                                    else if (type == 1) {
+                                                        upSeason.set(pos, SEASON_FALL);
+                                                        upFileName.set(pos, "fall" + File.separatorChar + target.getName());
+                                                    } else if (type == 2) {
+                                                        downSeason.set(pos, SEASON_FALL);
+                                                        downFileName.set(pos, "fall" + File.separatorChar + target.getName());
+                                                    }
+                                                }
                                             }
-                                            if(prev!=null&&target!=null){
-                                                target=new File(target,"winter"
-                                                        +File.separatorChar
-                                                        +prev.getName());
-                                                if(prev.renameTo(target)==false)
-                                                    Log.d("wardrobe", "onClick: movefailed");
-                                                else if(type==1) {
-                                                    upSeason.set(pos,SEASON_WINTER);
-                                                    upFileName.set(pos,"winter"+File.separatorChar+target.getName());
+                                        })
+                                .addSheetItem("标为冬季服装",
+                                        ActionSheetDialog.SheetItemColor.Blue
+                                        , new ActionSheetDialog.OnSheetItemClickListener() {
+                                            @Override
+                                            public void onClick(int which) {
+                                                int pos = finalViewHolder.getAdapterPosition();
+                                                File prev = null, target = null;
+                                                if (type == 1) {
+                                                    prev = new File(BASE_DIR, "upClothes"
+                                                            + File.separatorChar + upFileName.get(pos));
+                                                    target = new File(BASE_DIR, "upClothes");
+                                                } else if (type == 2) {
+                                                    prev = new File(BASE_DIR, "downClothes"
+                                                            + File.separatorChar + downFileName.get(pos));
+                                                    target = new File(BASE_DIR, "downClothes");
+                                                }
+                                                if (prev != null && target != null) {
+                                                    target = new File(target, "winter"
+                                                            + File.separatorChar
+                                                            + prev.getName());
+                                                    if (prev.renameTo(target) == false)
+                                                        Log.d("wardrobe", "onClick: movefailed");
+                                                    else if (type == 1) {
+                                                        upSeason.set(pos, SEASON_WINTER);
+                                                        upFileName.set(pos, "winter" + File.separatorChar + target.getName());
 
-                                                }
-                                                else if(type==2) {
-                                                    downSeason.set(pos,SEASON_WINTER);
-                                                    downFileName.set(pos,"winter"+File.separatorChar+target.getName());
+                                                    } else if (type == 2) {
+                                                        downSeason.set(pos, SEASON_WINTER);
+                                                        downFileName.set(pos, "winter" + File.separatorChar + target.getName());
+                                                    }
                                                 }
                                             }
-                                        }
-                                    })
-                            .addSheetItem("删除",
-                                    ActionSheetDialog.SheetItemColor.Red
-                                    , new ActionSheetDialog.OnSheetItemClickListener() {
-                                        @Override
-                                        public void onClick(int which) {
-                                            MainActivity.setClothes_down(-1);
-                                            MainActivity.setClothes_up(-1);
-                                            int pos=finalViewHolder.getAdapterPosition();
-                                            if(type==1){
-                                                photoList1.remove(pos);
-                                                File f=new File(BASE_DIR,
-                                                        "upClothes"+
-                                                                File.separatorChar+
-                                                                upFileName.get(pos));
-                                                if (f.exists()) {
-                                                    f.delete();
-                                                    upFileName.remove(pos);
-                                                    upSeason.remove(pos);
+                                        })
+                                .addSheetItem("删除",
+                                        ActionSheetDialog.SheetItemColor.Red
+                                        , new ActionSheetDialog.OnSheetItemClickListener() {
+                                            @Override
+                                            public void onClick(int which) {
+                                                MainActivity.setClothes_down(-1);
+                                                MainActivity.setClothes_up(-1);
+                                                int pos = finalViewHolder.getAdapterPosition();
+                                                if (type == 1) {
+                                                    photoList1.remove(pos);
+                                                    File f = new File(BASE_DIR,
+                                                            "upClothes" +
+                                                                    File.separatorChar +
+                                                                    upFileName.get(pos));
+                                                    if (f.exists()) {
+                                                        f.delete();
+                                                        upFileName.remove(pos);
+                                                        upSeason.remove(pos);
+                                                    }
+                                                    notifyDataSetChanged();
+                                                } else if (type == 2) {
+                                                    photoList2.remove(pos);
+                                                    File f = new File(BASE_DIR,
+                                                            "downClothes" +
+                                                                    File.separatorChar +
+                                                                    downFileName.get(pos));
+                                                    if (f.exists()) {
+                                                        f.delete();
+                                                        downFileName.remove(pos);
+                                                        downSeason.remove(pos);
+                                                    }
+                                                    notifyDataSetChanged();
                                                 }
-                                                notifyDataSetChanged();
-                                            }else if(type==2){
-                                                photoList2.remove(pos);
-                                                File f=new File(BASE_DIR,
-                                                        "downClothes"+
-                                                                File.separatorChar+
-                                                                downFileName.get(pos));
-                                                if (f.exists()) {
-                                                    f.delete();
-                                                    downFileName.remove(pos);
-                                                    downSeason.remove(pos);
-                                                }
-                                                notifyDataSetChanged();
                                             }
-                                        }
-                                    }).show();
+                                        }).show();
+                    }
                     return false;
                      }
             });
