@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,7 +13,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Vibrator;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
@@ -512,6 +517,8 @@ public class MessageManager {
                         }
                     }
                 }
+                playRingTone();//提示音
+                playVibrate();//震动
                 //通知栏提示收到消息
                 NotificationCompat.Builder builder=new NotificationCompat.Builder(MainActivity.getInstance(),channelID);
                 PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.getInstance(),0,intent,0);
@@ -626,4 +633,23 @@ public class MessageManager {
             unReadMessageCount.put(userName,0);
         }
     }
+    /**
+     * 播放通知声音
+     */
+    public static void playRingTone() {
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone rt = RingtoneManager.getRingtone(MainActivity.getInstance(), uri);
+        rt.play();
+    }
+
+    /**
+     * 手机震动一下
+     */
+    public static void playVibrate() {
+        Vibrator vibrator = (Vibrator) MainActivity.getInstance().getSystemService(Service.VIBRATOR_SERVICE);
+        long[] vibrationPattern = new long[]{0, 180, 80, 120};
+        // 第一个参数为开关开关的时间，第二个参数是重复次数，振动需要添加权限
+        vibrator.vibrate(vibrationPattern, -1);
+    }
+
 }
