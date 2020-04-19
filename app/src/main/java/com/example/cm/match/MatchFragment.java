@@ -2,9 +2,13 @@ package com.example.cm.match;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -20,6 +24,8 @@ import com.example.cm.R;
 import com.example.cm.util.ClothesEstimater;
 import com.example.cm.util.Connect;
 import com.example.cm.wardrobe.WardrobeFragment;
+
+import java.io.InputStream;
 
 import static com.example.cm.MainActivity.setToolbarText;
 
@@ -67,6 +73,18 @@ public class MatchFragment extends Fragment {
         clothes_down = view.findViewById(R.id.clothes_down);
         clothes_up_model = view.findViewById(R.id.clothes_up_model);
         clothes_down_model = view.findViewById(R.id.clothes_down_model);
+        //处理在真机上不显示的背景图片
+        ConstraintLayout layout=view.findViewById(R.id.model);
+        InputStream is ;
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        opt.inPurgeable = true;
+        opt.inInputShareable = true;
+        opt.inSampleSize = 2;
+        is= getResources().openRawResource(+R.drawable.model_new);
+        Bitmap bm = BitmapFactory.decodeStream(is, null, opt);
+        BitmapDrawable bd = new BitmapDrawable(getResources(), bm);
+        layout.setBackgroundDrawable(bd);
         //选择上衣点击事件
         clothes_up.setOnClickListener(new View.OnClickListener() {
             @Override
