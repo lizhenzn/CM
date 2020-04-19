@@ -105,11 +105,17 @@ public class MatchFragment extends Fragment {
                 down=(int)(Math.random()*(clothes_down_count-1));
                 int i=up;
                 int j=down;
-                Log.d(TAG, "onClick: choose clothes_up="+up+",choose clothes_down="+down);
                 ClothesEstimater estimater=new ClothesEstimater(getContext());
                 do{
                     do {
-                        Log.d(TAG, "onClick: i="+i+",j="+j);
+                        int upSeason=WardrobeFragment.upSeason.get(i);
+                        int downSeason=WardrobeFragment.downSeason.get(j);
+                        if(upSeason!=WardrobeFragment.SEASON_DEFAULT&&downSeason!=WardrobeFragment.SEASON_DEFAULT){
+                            if(upSeason!=downSeason){
+                                j = (j + 1) % clothes_down_count;
+                                continue;
+                            }
+                        }
                         int result = estimater.estimateClothes(WardrobeFragment.photoList1.get(i), WardrobeFragment.photoList2.get(j));
                         if (result == 1) {
                             Toast.makeText(getContext(), "已给出智能搭配", Toast.LENGTH_LONG).show();
