@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import q.rorbin.badgeview.QBadgeView;
+
 import static com.example.cm.R.drawable.cm;
 
 public class ChatListAdapter extends BaseAdapter  {
@@ -68,6 +70,7 @@ public class ChatListAdapter extends BaseAdapter  {
             convertView= LayoutInflater.from(context).inflate(R.layout.chat_lv_item,null);
             viewHolder=new ViewHolder();
             //绑定布局
+            viewHolder.relativeLayout=convertView.findViewById(R.id.chat_lv_item_re);
             viewHolder.headImage=(ImageView)convertView.findViewById(R.id.chat_iv);
             viewHolder.nameTV=(TextView) convertView.findViewById(R.id.chat_XMtv);
 
@@ -100,6 +103,9 @@ public class ChatListAdapter extends BaseAdapter  {
         //viewHolder.headImage.setImageResource(cm);
         viewHolder.headImage.setImageBitmap(MessageManager.getFriendInfoList().get(position).getHeadBt());
         viewHolder.nameTV.setText(noteName);
+        QBadgeView qBadgeView=new QBadgeView(context);
+        qBadgeView.bindTarget(viewHolder.headImage);
+        qBadgeView.setBadgeNumber(MessageManager.getUnReadCountByName(userName));
         if(messageList.size()>=1) {
             viewHolder.mesTV.setText(messageList.get(messageList.size() - 1).getBody());  //设置为最后一条信息
             long time=messageList.get(messageList.size()-1).getDate();
@@ -113,6 +119,17 @@ public class ChatListAdapter extends BaseAdapter  {
             viewHolder.mesTV.setText(null);  //设置为最后一条信息//
             viewHolder.timeTV.setText("");
         }
+        viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                qBadgeView.setBadgeNumber(0);
+                Intent intent=new Intent(context,ChatActivity.class);
+                intent.putExtra("userName", MessageManager.getFriendInfoList().get(position).getUserName());
+                intent.putExtra("noteName",MessageManager.getFriendInfoList().get(position).getNoteName());
+                context.startActivity(intent);
+
+            }
+        });
 
 
         return convertView;
@@ -120,6 +137,7 @@ public class ChatListAdapter extends BaseAdapter  {
 
 
     class ViewHolder{
+        RelativeLayout relativeLayout;
         ImageView headImage;
         TextView  nameTV;
         TextView mesTV;

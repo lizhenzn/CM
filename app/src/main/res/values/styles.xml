@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colornew</item>             <!-- statusColor-->
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
     <style name="ActionSheetDialogStyle" parent="@android:style/Theme.Dialog">
         <!--Dialog的windowFrame框为无-->
         <item name="android:windowFrame">@null</item>
@@ -25,6 +26,7 @@
         <!--显示区域以外是否使用黑色半透明背景-->
         <item name="android:backgroundDimEnabled">true</item>
     </style>
+
     <style name="LoginConflictDialog">
         <!--设置dialog的背景，（#00000000）-->
         <item name="android:background">@android:color/transparent</item>
@@ -42,6 +44,18 @@
     <style name="DialogAnimation">
         <item name="android:windowEnterAnimation">@anim/in_from_right</item>
         <item name="android:windowExitAnimation">@anim/out_from_left</item>
+    </style>
+
+    <style name="FullscreenTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
     </style>
 
 </resources>

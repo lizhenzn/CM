@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +32,7 @@ import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
 import java.io.File;
+import java.util.TimerTask;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     private Button loginBtn,pswEnBtn;
@@ -123,13 +126,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.login:{
-                Log.d("点击LOGIN", "点击点击点击点击登录");
                 String user = String.valueOf(userET.getText());
-                Log.d("输入的登录名", "onClick: userName"+user);
                 File file=new File(AlbumUtil.FRIENDHEADFILEROAD+"/"+user);
                 if(!file.exists()){
                     file.mkdirs();
                 }
+                //开始倒计时
+
                 //TODO 判断是不是和上次登录用户一样 从而决定是否更换从数据库得到的联系人列表和聊天信息列表
                 new Thread(new Runnable() {
                     @RequiresApi(api = Build.VERSION_CODES.O)

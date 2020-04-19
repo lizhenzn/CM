@@ -88,6 +88,7 @@ public class ContantFragment extends Fragment {
                         @Override
                         public void run() {
                             if (MessageManager.isContantListChanged()) {
+                                Collections.sort(MessageManager.getContantFriendInfoList());
                                 sortAdapter.notifyDataSetChanged();
                                 MessageManager.setContantListChanged(false); ;
                             }

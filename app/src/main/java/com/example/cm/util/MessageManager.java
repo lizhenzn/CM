@@ -1,17 +1,31 @@
 package com.example.cm.util;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.cm.MainActivity;
+import com.example.cm.R;
 import com.example.cm.friend.AddFriend.AddFriendItem;
 import com.example.cm.friend.Cn2Spell;
+import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.Message;
+import com.example.cm.friend.fragment.FriendFragment;
+import com.example.cm.friend.fragment.SessionFragment;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.SmackUserInfo;
 import com.example.cm.myInfo.VCardManager;
@@ -30,14 +44,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 public class MessageManager {
     private  static SmackUserInfo smackUserInfo;
     private static boolean haveNewMessage;
     private static HashMap<String, List<Message>> messageMap;                            //会话列表String对应好友，List<Message>为对应此String好友聊天信息列表
+    private static HashMap<String,Integer> unReadMessageCount;         //未读消息计数
     private  static List<FriendInfo>   friendInfoList;                                                 //会话列表好友名列表
     private  static List<FriendInfo>   contantFriendInfoList;                                                 //联系人列表好友名列表
     private static List<AddFriendItem> addFriendItemList;                         //添加好友详情列表
@@ -48,12 +68,17 @@ public class MessageManager {
     private static SQLiteDatabase db;
     private static Bitmap bitmap=null;
     private static boolean contantListChanged;
+    private static NotificationManager mNotificationManager;
+    private final static String channelID="message";
+    private final static String channelDescription="message";
+    private static NotificationChannel channel;
     public final static String BASEURL="http://39.105.75.60/image-path/";         //远程图片资源路径公共前缀
     public static void initAllList(){//初始化所有的列表
         haveNewMessage=false;
         contantListChanged=false;
         ThemeColor.changed=true;
         messageMap=new HashMap<>();
+        unReadMessageCount=new HashMap<>();
         friendInfoList=new ArrayList<>();
         contantFriendInfoList=new ArrayList<>();
         addFriendItemList=new ArrayList<>();
@@ -61,6 +86,27 @@ public class MessageManager {
         addFriendItemListChanged=false;
         sharedPreferences= MainActivity.getInstance().getSharedPreferences("LoginedInfo",MODE_PRIVATE);
         editor=sharedPreferences.edit();
+
+        mNotificationManager = (NotificationManager) MainActivity.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            channel=new NotificationChannel(channelID,channelDescription,NotificationManager.IMPORTANCE_HIGH);
+            channel.enableLights(true);
+            channel.enableVibration(true);
+            mNotificationManager.createNotificationChannel(channel);
+        }
+
+
+        /*Notification.Builder builder = new Notification.Builder(MainActivity.getActivity());
+        Intent intent = new Intent(MainActivity.getActivity(),MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.getActivity(), 0, intent, 0);
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.drawable.cm);
+        builder.setLargeIcon(BitmapFactory.decodeResource(MainActivity.getInstance().getResources(), R.drawable.cm));
+        builder.setAutoCancel(true);
+        builder.setContentTitle("悬挂式通知");
+        builder.setFullScreenIntent(pendingIntent, true);
+        //mNotificationManager.notify(2, builder.build());*/
+
 
 
     }
@@ -116,6 +162,14 @@ public class MessageManager {
 
     public static void setHaveNewMessage(boolean haveNewMessage) {
         MessageManager.haveNewMessage = haveNewMessage;
+    }
+
+    public static void setUnReadMessageCount(HashMap<String, Integer> unReadMessageCount) {
+        MessageManager.unReadMessageCount = unReadMessageCount;
+    }
+
+    public static HashMap<String, Integer> getUnReadMessageCount() {
+        return unReadMessageCount;
     }
 
     public static List<FriendInfo> getFriendInfoList() {
@@ -358,6 +412,7 @@ public class MessageManager {
     public static void mergeMessage(org.jivesoftware.smack.packet.Message message){
         if (!TextUtils.isEmpty(message.getBody())) {
             try {
+                Intent intent = new Intent(MainActivity.getInstance(), ChatActivity.class);
                 //JSONObject object = new JSONObject(message.getBody());
                 //String type = object.getString("type");
                 //String data = object.getString("data");
@@ -410,6 +465,8 @@ public class MessageManager {
                     if(MessageManager.getFriendInfoList().get(i).getUserName().equals(userFrom)){     //会话列表包含此好友
                         MessageManager.getMessageMap().get(MessageManager.getFriendInfoList().get(i).getUserName()).add(message1);  //添加进聊天信息
                         contain=true;
+                        intent.putExtra("userName",userFrom);
+                        intent.putExtra("noteName",MessageManager.getFriendInfoList().get(i).getNoteName());
                         Log.d("接收到信息 包含", "processMessage: "+message.getFrom());
                         break;
                     }
@@ -422,6 +479,8 @@ public class MessageManager {
                         if(MessageManager.getContantFriendInfoList().get(j).getUserName().equals(userFrom)){
                             MessageManager.getContantFriendInfoList().get(j).setChated(1);//设置为正在聊天标记
                             friendInfo= MessageManager.getContantFriendInfoList().get(j);
+                            intent.putExtra("userName",userFrom);
+                            intent.putExtra("noteName",MessageManager.getContantFriendInfoList().get(j).getNoteName());
                             break;
                         }
                     }
@@ -433,6 +492,53 @@ public class MessageManager {
                     messageList.add(message1);
                     MessageManager.getMessageMap().put(userFrom,messageList);        //map新加一个
                 }
+                if(ChatActivity.currentFriendName==null) {
+                    if (unReadMessageCount.containsKey(userFrom)) {
+                        unReadMessageCount.put(userFrom, unReadMessageCount.get(userFrom) + 1);
+                    } else {//未读列表没有此键
+                        unReadMessageCount.put(userFrom, 1);
+                    }
+                }else{
+                    if(ChatActivity.currentFriendName.equalsIgnoreCase(userFrom)){
+                        android.os.Message newMessage= android.os.Message.obtain();
+                        newMessage.what=3;
+                        newMessage.setTarget(ChatActivity.handler);
+                        newMessage.sendToTarget();
+                    }else{
+                        if (unReadMessageCount.containsKey(userFrom)) {
+                            unReadMessageCount.put(userFrom, unReadMessageCount.get(userFrom) + 1);
+                        } else {//未读列表没有此键
+                            unReadMessageCount.put(userFrom, 1);
+                        }
+                    }
+                }
+                //通知栏提示收到消息
+                NotificationCompat.Builder builder=new NotificationCompat.Builder(MainActivity.getInstance(),channelID);
+                PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.getInstance(),0,intent,0);
+                builder.setContentIntent(pendingIntent);
+                builder.setContentTitle(message1.getFrom());
+                builder.setContentText(message1.getBody());
+                builder.setAutoCancel(true)
+                        .setSmallIcon(R.drawable.cm)
+                        .setWhen(System.currentTimeMillis())
+                        .setDefaults(NotificationCompat.DEFAULT_ALL)
+                        .setFullScreenIntent(pendingIntent,true)
+                        .setTicker(message1.getBody())
+                        .build();
+                mNotificationManager.notify(2,builder.build());
+                Log.e("", "mergeMessage: 通知栏显示之后" );
+                android.os.Message message2= android.os.Message.obtain();
+                message2.what=0;
+                message2.setTarget(MainActivity.myHandler);
+                message2.sendToTarget();
+                android.os.Message message3= android.os.Message.obtain();
+                message3.what=1;
+                message3.setTarget(FriendFragment.handler);
+                message3.sendToTarget();
+                android.os.Message message4= android.os.Message.obtain();
+                message4.what=2;
+                message4.setTarget(SessionFragment.handler);
+                message4.sendToTarget();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -447,11 +553,77 @@ public class MessageManager {
     public  static FriendInfo getFriendInfoFromContantList(String userName){
         FriendInfo friendInfo=null;
         for(int i=0;i<contantFriendInfoList.size();i++){
-            if(contantFriendInfoList.get(i).getUserName().equals(userName)){
+            if(contantFriendInfoList.get(i).getUserName().equalsIgnoreCase(userName)){
                 friendInfo=contantFriendInfoList.get(i);
                 break;
             }
         }
         return friendInfo;
+    }
+    /*
+    *对会话列表进行排序，按时间最新显示
+    * @param messageMap
+    */
+    public  static HashMap<String,List<Message>> sortMessageMap(HashMap<String,List<Message>> map){
+        //從HashMap中恢復entry集合，得到全部的鍵值對集合
+        Set<Map.Entry<String,List<Message>>> entey = map.entrySet();
+        //將Set集合轉為List集合，為了實用工具類的排序方法
+        List<Map.Entry<String,List<Message>>> list = new ArrayList<Map.Entry<String,List<Message>>>(entey);
+        //使用Collections工具類對list進行排序
+        Collections.sort(list, new Comparator<Map.Entry<String, List<Message>>>() {
+            @Override
+            public int compare(Map.Entry<String, List<Message>> o1, Map.Entry<String, List<Message>> o2) {
+                //倒敘排列
+                List<Message> o1List=map.get(o1.getKey());
+                List<Message> o2List=map.get(o2.getKey());
+                return (int) (o2List.get(o1List.size()-1).getDate()-o1List.get(o2List.size()-1).getDate());
+            }
+        });
+        //創建一個HashMap的子類LinkedHashMap集合
+        LinkedHashMap<String,List<Message>> linkedHashMap = new LinkedHashMap<String, List<Message>>();
+        //將list中的數據存入LinkedHashMap中
+        for(Map.Entry<String,List<Message>> entry:list){
+            linkedHashMap.put(entry.getKey(),entry.getValue());
+        }
+        return linkedHashMap;//赋值给map
+    }
+    /*
+    *获得某人的未读消息数目
+    * @param userName
+    * @return count
+    * */
+    public static int getUnReadCountByName(String userName){
+        int count=0;
+        if(unReadMessageCount.containsKey(userName)){
+            count=unReadMessageCount.get(userName);
+        }else{
+            count=0;
+        }
+        return count;
+    }
+    /*
+    * 获得未读消息数目
+    * @return count
+    * */
+    public static int getAllUnReadMessageCount(){
+        int count=0;
+        if(!unReadMessageCount.isEmpty()) {
+            Set<String> set = unReadMessageCount.keySet();
+            for (String s : set
+            ) {
+                count = count + getUnReadCountByName(s);
+            }
+        }
+        return count;
+    }
+    /*
+    *
+    * 未读消息清零
+    * @param userName
+    * */
+    public static void clearUnReadByName(String userName){
+        if(unReadMessageCount.containsKey(userName)){
+            unReadMessageCount.put(userName,0);
+        }
     }
 }
