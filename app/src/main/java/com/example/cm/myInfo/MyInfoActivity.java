@@ -167,6 +167,9 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                         gender="male";
                         xingBie_tv.setText("男");
                         Log.e("", "onClick: 点击"+"男" );
+                        VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"gender", gender);
+                        MessageManager.getSmackUserInfo().setSex(gender);
+                        Toast.makeText(MyInfoActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
                     }
                 }).addSheetItem("女", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
             @Override
@@ -174,6 +177,9 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                 gender="female";
                 xingBie_tv.setText("女");
                 Log.e("", "onClick: 点击"+"女" );
+                VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"gender", gender);
+                MessageManager.getSmackUserInfo().setSex(gender);
+                Toast.makeText(MyInfoActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
             }
         }).addSheetItem("保密", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog.OnSheetItemClickListener() {
             @Override
@@ -181,10 +187,12 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
                 gender="secrecy";
                 xingBie_tv.setText("保密");
                 Log.e("", "onClick: 点击"+"保密" );
+                VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"gender", gender);
+                MessageManager.getSmackUserInfo().setSex(gender);
+                Toast.makeText(MyInfoActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
             }
         }).show();
-        VCardManager.setSelfInfo(Connect.getXMPPTCPConnection(),"gender", gender);
-        MessageManager.getSmackUserInfo().setSex(gender);
+
     }
 
     private void openAlbum(){
