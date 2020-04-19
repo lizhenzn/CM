@@ -12,4 +12,6 @@
     <color name="colorStatBar">#BDBBBB</color>
     <color name="colorRed">#FF0000</color>
     <color name="actionsheet_normal">#C0C0C0</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

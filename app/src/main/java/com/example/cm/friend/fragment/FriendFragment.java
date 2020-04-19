@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -37,6 +39,8 @@ import static com.example.cm.MainActivity.setToolbarText;
 
 public class FriendFragment extends Fragment  implements View.OnClickListener {
     private boolean work;
+    public static final int UPDATE_UI=1;
+    public static FriendHandler handler;
     private ViewPager viewPager;
     private FriendPagerAdapter friendPagerAdapter;
     private List<Fragment> fragmentlist;
@@ -62,6 +66,8 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
         ft.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions();
     }
+        Log.e("", "onCreateView: Friend" );
+    handler=new FriendHandler();
     sessionQBadgeView=new QBadgeView(getActivity());
         newFriendQBadgeView=new QBadgeView(getActivity());
 
@@ -70,7 +76,6 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
         sessionTV=view.findViewById(R.id.session_tv);
         contantTV=view.findViewById(R.id.contant_tv);
         newFriendTV=view.findViewById(R.id.newFriend_tv);
-
         sessionTV.setOnClickListener(this);
         contantTV.setOnClickListener(this);
         newFriendTV.setOnClickListener(this);
@@ -85,6 +90,22 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
         viewPager.setAdapter(friendPagerAdapter);
         viewPager.setCurrentItem(0);
         setChoosed(0);
+        sessionQBadgeView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPager.setCurrentItem(0);
+                setChoosed(0);
+                Log.e("", "onClick: 点击会话提示" );
+            }
+        });
+        newFriendQBadgeView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPager.setCurrentItem(2);
+                setChoosed(2);
+                Log.e("", "onClick: 点击新朋友提示" );
+            }
+        });
    /*
         //长按显示置顶删除等
         chatLV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -179,17 +200,16 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        sessionQBadgeView.setBadgeNumber(MessageManager.getAllUnReadMessageCount());
         new Thread(new Runnable() {
             @Override
             public void run() {
                 while(work){
                     if(MessageManager.isHaveNewMessage()){
-                        sessionQBadgeView.setBadgeText("");
-                        naviQBadgeView.setBadgeText("");
+
                     }
                     if(MessageManager.isAddFriendItemListChanged()){
                         newFriendQBadgeView.setBadgeText("");
-                        naviQBadgeView.setBadgeText("");
                     }
                 }
                 try {
@@ -205,5 +225,17 @@ public class FriendFragment extends Fragment  implements View.OnClickListener {
     public void onStop() {
         super.onStop();
         work=false;
+    }
+    class FriendHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case UPDATE_UI:{
+                    Log.e("", "handleMessage: 更新会话数目UI");
+                    sessionQBadgeView.setBadgeNumber(MessageManager.getAllUnReadMessageCount());
+                }break;
+                default:break;
+            }
+        }
     }
 }

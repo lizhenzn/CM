@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -36,10 +37,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cm.MainActivity;
 import com.example.cm.R;
 import com.example.cm.friend.AccuseFriendActivity;
 import com.example.cm.friend.ChangeFriendNoteActivity;
 import com.example.cm.friend.FriendInfoActivity;
+import com.example.cm.friend.fragment.SessionFragment;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.theme.ThemeColor;
 import com.example.cm.util.ActionSheetDialog;
@@ -65,6 +68,8 @@ import q.rorbin.badgeview.QBadgeView;
 
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
+    public static String currentFriendName;
+    public static ChatHandler handler;
     private ListView chatItemLV;
     private LinearLayout chat_LL;
     private RecyclerView emoRecy;
@@ -99,7 +104,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         initData();
         work=true;
 
-            new Thread(new Runnable() {
+            /*new Thread(new Runnable() {
                 @Override
                 public void run() {
                     Log.d("test", "run: ");
@@ -123,13 +128,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 }
-            }).start();
+            }).start();*/
         }
 
 
     //初始化控件
     public void init(){
         work=true;
+        handler=new ChatHandler();
         changeBack=false;
         chat_LL=findViewById(R.id.chat_LL);
         String backBitmapPath=MessageManager.getSharedPreferences().getString("currentBackBitmapPath",null);
@@ -152,10 +158,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         addIB=(ImageButton)findViewById(R.id.addIB);
         sendBtn.setOnClickListener(this);
         emoIB.setOnClickListener(this);
+        emoIB.setVisibility(View.GONE);
         addIB.setOnClickListener(this);
         Intent intent=getIntent();
         userName=intent.getStringExtra("userName");
         noteName=intent.getStringExtra("noteName");
+        currentFriendName=userName;
         Log.d("聊天界面friendName", "init: "+userName);
         for(int i=0;i<MessageManager.getContantFriendInfoList().size();i++){//赋值给正在聊天的人
             if(MessageManager.getContantFriendInfoList().get(i).getUserName().equals(userName)){
@@ -178,6 +186,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }else{
             Toast.makeText(this,"未登录，无法发送消息",Toast.LENGTH_SHORT).show();
         }
+        MessageManager.clearUnReadByName(userName);
+        android.os.Message message= android.os.Message.obtain();
+        message.what=0;
+        message.setTarget(MainActivity.myHandler);
+        message.sendToTarget();
     }
     //设置数据
     public  void initData(){
@@ -422,7 +435,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         Log.d("test", "onDestroy: ");
         super.onDestroy();
+        currentFriendName=null;
         work=false;
+    }
+    private class ChatHandler extends Handler{
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what){
+                case 3:{
+                    chatAdapter.notifyDataSetChanged();
+                    chatItemLV.smoothScrollToPosition(MessageManager.getMessageMap().get(userName).size() - 1);
+                }break;
+                default:break;
+            }
+        }
     }
 
 }

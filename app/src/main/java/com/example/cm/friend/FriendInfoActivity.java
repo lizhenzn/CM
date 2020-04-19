@@ -1,9 +1,11 @@
 package com.example.cm.friend;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +20,7 @@ import com.example.cm.R;
 import com.example.cm.friend.AddFriend.AddFriendItem;
 import com.example.cm.friend.chat.ChatActivity;
 import com.example.cm.friend.chat.Message;
+import com.example.cm.friend.fragment.FriendFragment;
 import com.example.cm.myInfo.FriendInfo;
 import com.example.cm.myInfo.VCardManager;
 import com.example.cm.theme.ThemeColor;
@@ -65,28 +68,44 @@ public class FriendInfoActivity extends AppCompatActivity {
                             @Override
                             public void onClick(int which) {
                                 Log.e("", "onClick: 点击删除" );
-                                while (!Connect.getRoster().isLoaded()){
-                                    try {
-                                        Connect.getRoster().reload();
-                                    } catch (SmackException.NotLoggedInException e) {
-                                        e.printStackTrace();
-                                    } catch (SmackException.NotConnectedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                userName=userName+"@"+Connect.SERVERNAME;
-                                try {
-                                    Connect.getRoster().removeEntry(Connect.getRoster().getEntry(userName));
-                                    MessageManager.deleteFriend(userName);        //TODO 删除好友
-                                } catch (SmackException.NotLoggedInException e) {
-                                    e.printStackTrace();
-                                } catch (SmackException.NoResponseException e) {
-                                    e.printStackTrace();
-                                } catch (XMPPException.XMPPErrorException e) {
-                                    e.printStackTrace();
-                                } catch (SmackException.NotConnectedException e) {
-                                    e.printStackTrace();
-                                }
+                                AlertDialog builder=new AlertDialog.Builder(FriendInfoActivity.this)
+                                        .setTitle("删除好友警告")
+                                        .setMessage("您确定删除"+noteName+"吗？")
+                                        .setCancelable(true)
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                while (!Connect.getRoster().isLoaded()){
+                                                    try {
+                                                        Connect.getRoster().reload();
+                                                    } catch (SmackException.NotLoggedInException e) {
+                                                        e.printStackTrace();
+                                                    } catch (SmackException.NotConnectedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                                userName=userName+"@"+Connect.SERVERNAME;
+                                                try {
+                                                    Connect.getRoster().removeEntry(Connect.getRoster().getEntry(userName));
+                                                    MessageManager.deleteFriend(userName);        //TODO 删除好友
+                                                } catch (SmackException.NotLoggedInException e) {
+                                                    e.printStackTrace();
+                                                } catch (SmackException.NoResponseException e) {
+                                                    e.printStackTrace();
+                                                } catch (XMPPException.XMPPErrorException e) {
+                                                    e.printStackTrace();
+                                                } catch (SmackException.NotConnectedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                            }
+                                        })
+                                        .show();
                             }
                         }).addSheetItem("举报", ActionSheetDialog.SheetItemColor.Red, new ActionSheetDialog.OnSheetItemClickListener() {
                     @Override
@@ -151,6 +170,7 @@ public class FriendInfoActivity extends AppCompatActivity {
                             Connect.getRoster().reload();
                         }
                         Connect.getRoster().createEntry(userName+"@"+Connect.SERVERNAME,userName,new String[]{"Friends"});
+                        Toast.makeText(FriendInfoActivity.this, "申请发送成功", Toast.LENGTH_SHORT).show();
                         Log.e("ADD", "onClick: 申请发送成功");
                     } catch (Exception e) {//SmackException.NotConnectedException
                         e.printStackTrace();
@@ -176,7 +196,7 @@ public class FriendInfoActivity extends AppCompatActivity {
         userName=intent.getStringExtra("userName");
         curFriendInfo=MessageManager.getFriendInfoFromContantList(userName);
         position=intent.getIntExtra("position",-1);
-        if(curFriendInfo==null) {  //联系人界面调用，有此好友
+        if(curFriendInfo==null) {  //联系人界面调用，没有此好友
             curFriendInfo=VCardManager.getFriendInfo(userName);
             send_btn.setText("添加好友");
         }

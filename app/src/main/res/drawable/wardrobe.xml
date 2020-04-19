@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_selected="true" android:drawable="@drawable/ic_wardrobe_color"/>
-    <item android:drawable="@drawable/ic_wardrobe_black"/>
+    <item android:state_selected="true" android:drawable="@drawable/wardrobe_checked"/>
+    <item android:drawable="@drawable/wardrobe_unchecked"/>
 </selector>

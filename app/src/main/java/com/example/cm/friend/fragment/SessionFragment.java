@@ -3,6 +3,8 @@ package com.example.cm.friend.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -26,6 +28,7 @@ import static com.example.cm.MainActivity.setToolbarText;
 public class SessionFragment extends Fragment {
 private ListView sessionLV;
 private ChatListAdapter chatListAdapter;
+public static SessionHandler handler;
 private boolean work;
 
     public SessionFragment() {
@@ -41,15 +44,17 @@ private boolean work;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.e("", "onCreateView: Session" );
         View view=View.inflate(getActivity(),R.layout.session,null);
         sessionLV=view.findViewById(R.id.session_lv);
         chatListAdapter=new ChatListAdapter(getActivity());
         sessionLV.setAdapter(chatListAdapter);
         if(MessageManager.isHaveNewMessage()) {
+            //MessageManager.setMessageMap(MessageManager.sortMessageMap(MessageManager.getMessageMap()));
             chatListAdapter.notifyDataSetChanged();
             MessageManager.setHaveNewMessage(false);
         }
-        sessionLV.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        /*sessionLV.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -58,15 +63,18 @@ private boolean work;
                 intent.putExtra("noteName",MessageManager.getFriendInfoList().get(position).getNoteName());
                 startActivity(intent);
             }
-        });
+        });*/
+        handler=new SessionHandler();
+
         return view;
     }
     @Override
     public void onResume() {
         super.onResume();
         work=true;
+        chatListAdapter.notifyDataSetChanged();
         Log.d("test", "onResume: ");
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 Log.d("test", "run: ");
@@ -75,6 +83,7 @@ private boolean work;
                         @Override
                         public void run() {
                             if (MessageManager.isHaveNewMessage()||ChatActivity.isSend) {
+                                //MessageManager.setMessageMap(MessageManager.sortMessageMap(MessageManager.getMessageMap()));
                                 chatListAdapter.notifyDataSetChanged();
                                 MessageManager.setHaveNewMessage(false); ;
                                 ChatActivity.isSend=false;
@@ -91,8 +100,7 @@ private boolean work;
                     }
                 }
             }
-        }).start();
-        //chatListAdapter.notifyDataSetChanged();
+        }).start();*/
         setToolbarText("会话");
     }
 
@@ -101,6 +109,18 @@ private boolean work;
         super.onPause();
         work=false;
         Log.d("test", "onPause: ");
+    }
+
+    private class SessionHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 2:{
+                    chatListAdapter.notifyDataSetChanged();
+                }break;
+                default:break;
+            }
+        }
     }
 
 }

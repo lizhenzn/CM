@@ -12,7 +12,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -32,6 +34,7 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.example.cm.myInfo.ChangePasswordActivity;
 import com.example.cm.myInfo.LoginActivity;
@@ -75,6 +78,8 @@ public class MainActivity extends AppCompatActivity{
     private static final String TAG = "MainActivity";
     private View headerView;
     private boolean work;
+    private final int UPDATE_SESSION_UI=0;
+    public static MyHandler myHandler;
 
     private static int clothes_up=-1;
     private static int clothes_down=-1;
@@ -193,6 +198,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        Log.e(TAG, "onResume: " );
         if((ThemeColor.changed)&&(ThemeColor.backColorStr!=null)) {
             ThemeColor.setTheme(MainActivity.this,toolbar);
             headerView.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
@@ -277,12 +283,12 @@ public class MainActivity extends AppCompatActivity{
             }
         }).start();
         //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
+        myHandler=new MyHandler();//初始化
         if(MessageManager.getSharedPreferences().contains("userName")){  //有此userName键值，说明登陆过
             MessageManager.getSmackUserInfo().setUserName(MessageManager.getSharedPreferences().getString("userName",""));
             String nicName=MessageManager.getSharedPreferences().getString("NICKNAME","");
             if(nicName.equals("")){
                 MessageManager.getSmackUserInfo().setNiC(MessageManager.getSmackUserInfo().getUserName());
-
             }else{
                 MessageManager.getSmackUserInfo().setNiC(nicName);
 
@@ -324,7 +330,6 @@ public class MainActivity extends AppCompatActivity{
             MessageManager.getSmackUserInfo().setSex("secrecy");
         }
         setInfo();        //调用设置头像、昵称函数
-
     }
 
     //设置昵称、头像...
@@ -445,12 +450,19 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
+        Log.e(TAG, "onResumeFragments: " );
         if((ThemeColor.changed)&&(ThemeColor.backColorStr!=null)) {
             ThemeColor.setTheme(MainActivity.this,toolbar);
             headerView.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
             ThemeColor.changed=false;
         }
         setInfo();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e(TAG, "onStop: " );
     }
 
     @Override
@@ -512,5 +524,19 @@ public class MainActivity extends AppCompatActivity{
         else fileSizeString = df.format((double) fileS /1073741824) +"GB";
         return fileSizeString;
 
+    }
+    class MyHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case UPDATE_SESSION_UI:{
+                    Log.e(TAG, "handleMessage:接收到更新UI " );
+                    Log.e(TAG, "handleMessage: "+MessageManager.getAllUnReadMessageCount() );
+                    naviQBadgeView.setBadgeNumber(MessageManager.getAllUnReadMessageCount());
+                    //naviQBadgeView.setBadgeText("");
+                }break;
+                default:break;
+            }
+        }
     }
 }

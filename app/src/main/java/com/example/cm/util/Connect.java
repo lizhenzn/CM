@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Build;
@@ -21,6 +22,7 @@ import android.widget.Button;
 import com.example.cm.MainActivity;
 import com.example.cm.R;
 import com.example.cm.myInfo.VCardManager;
+import com.example.cm.theme.ThemeColor;
 
 
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -140,7 +142,7 @@ public class Connect {
                                         Dialog dialog = new Dialog(MainActivity.getInstance(), R.style.LoginConflictDialog);
                                         View view = View.inflate(MainActivity.getInstance(), R.layout.conflict, null);
                                         Button ensureBtn=(Button)view.findViewById(R.id.coflict_ensure_btn);
-
+                                        view.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr)); //设置背景颜色
                                         dialog.setContentView(view);
                                         dialog.setCanceledOnTouchOutside(false);
                                         view.setMinimumHeight((int) (height * 0.23f));
@@ -241,7 +243,7 @@ public class Connect {
     public static int login(String userName, String passwd){
         try {
             isLogined=false;
-            while(xmpptcpConnection==null){
+            if(xmpptcpConnection==null){
                 getXMPPTCPConnection();
                 Log.e("", "login: 连接服务器");
             }
@@ -398,7 +400,6 @@ public class Connect {
                            String mapKey = entry.getKey();
                            String mapValue = entry.getValue();
                            VCardManager.setSelfInfo(xmpptcpConnection,mapKey,mapValue);//设置注册信息
-                           System.out.println(mapKey+":"+mapValue);
                        }
                        VCardManager.setSelfInfo(xmpptcpConnection,"NICKNAME",user);
                        xmpptcpConnection.disconnect();//关闭连接
