@@ -196,7 +196,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public  void initData(){
         chatAdapter=new ChatAdapter(this,MessageManager.getMessageMap().get(userName),friendInfo);
         chatItemLV.setAdapter(chatAdapter);
-        initEmo();
+        //initEmo();
 
     }
     /**
@@ -264,6 +264,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                             //chatActivitymessageList.add(message);
                             inputET.setText("");              //设置输入框为空
                             isSend = true;
+                            //给UI线程发送更新消息
+                           android.os.Message message1= android.os.Message.obtain();
+                            message1.what=3;
+                            message1.setTarget(handler);
+                            message1.sendToTarget();
                         } catch (SmackException.NotConnectedException e) {
                             e.printStackTrace();
                             isSend = false;
@@ -373,7 +378,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                 message.setDate(date.getTime());
                                 MessageManager.getDataBaseHelp().addMessage(message);  //数据库添加聊天信息
                                 MessageManager.getMessageMap().get(userName).add(message);     //添加信息
-
+                                android.os.Message message1= android.os.Message.obtain();
+                                message1.what=3;
+                                message1.setTarget(handler);
+                                message1.sendToTarget();
                             }
                         }).start();
 
@@ -401,6 +409,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }break;
             default:break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        chatItemLV.smoothScrollToPosition(MessageManager.getMessageMap().get(userName).size() - 1);  //滑动到末尾
     }
 
     @Override

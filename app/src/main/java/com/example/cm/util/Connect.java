@@ -75,16 +75,17 @@ public class Connect {
             Log.d("XMPPTCP new 之后", ""+xmpptcpConnection);
             try {
                 xmpptcpConnection.connect();
-                //return xmpptcpConnection;
-
             } catch (SmackException e) {
                 e.printStackTrace();
+                xmpptcpConnection=null;
                 return null;
             } catch (IOException e) {
                 e.printStackTrace();
+                xmpptcpConnection=null;
                 return null;
             } catch (XMPPException e) {
                 e.printStackTrace();
+                xmpptcpConnection=null;
                 return null;
             }
         }
@@ -254,7 +255,7 @@ public class Connect {
                 signOut();//注销登录的
             }
 
-            if(getXMPPTCPConnection().isConnected()) {
+            if((getXMPPTCPConnection()!=null)&&(getXMPPTCPConnection().isConnected())) {
                 Presence presence1 = new Presence(Presence.Type.unavailable);
                 presence1.setStatus("OFFLINE");
                 Presence presence2 = new Presence(Presence.Type.available);

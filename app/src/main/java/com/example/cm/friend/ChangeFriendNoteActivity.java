@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
@@ -22,7 +23,7 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.roster.RosterEntry;
 
 public class ChangeFriendNoteActivity extends AppCompatActivity {
-private Button saveChangeNoteBtn;
+private TextView saveChangeNoteTV;
 private EditText changeNoteET;
 private String userName;
 private FriendInfo curFriendInfo;
@@ -42,11 +43,12 @@ private FriendInfo curFriendInfo;
         init();
     }
     public void init(){
-        saveChangeNoteBtn=findViewById(R.id.save_changeFriendNote_btn);
+        saveChangeNoteTV=findViewById(R.id.save_changeFriendNote_tv);
+        saveChangeNoteTV.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         changeNoteET=findViewById(R.id.changeFriendNote_et);
         userName=getIntent().getStringExtra("userName");
         curFriendInfo=MessageManager.getFriendInfoFromContantList(userName);
-        saveChangeNoteBtn.setOnClickListener(new View.OnClickListener() {
+        saveChangeNoteTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String note=changeNoteET.getText().toString().trim();

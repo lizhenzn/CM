@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity{
     private View headerView;
     private boolean work;
     private final int UPDATE_SESSION_UI=0;
+    private final int LOGIN_SUCCESS=6;
     public static MyHandler myHandler;
 
     private static int clothes_up=-1;
@@ -221,7 +222,6 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-
     //设置页面标题
     public static void setToolbarText(CharSequence title) {
         titleTV.setText(title);
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity{
         nichengTV=(TextView)headerView.findViewById(R.id.nicheng);
         titleTV=(TextView)findViewById(R.id.title_tv);
         toolbar.setTitle("");
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity{
                     }
                 });
             }
-        }).start();
+        }).start();*/
         //初始化登陆人信息，若此前登陆过，初始化聊天信息和好友信息
         myHandler=new MyHandler();//初始化
         if(MessageManager.getSharedPreferences().contains("userName")){  //有此userName键值，说明登陆过
@@ -309,12 +309,11 @@ public class MainActivity extends AppCompatActivity{
                 public void run() {
                     Connect.login(MessageManager.getSmackUserInfo().getUserName(), cachePasswd);
                     Log.e(TAG, "run: 上次登录启动自动登录："+MessageManager.getSmackUserInfo().getUserName()+cachePasswd );
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setInfo();
-                        }
-                    });
+                    //向UI线程发送更新信息
+                   Message message=Message.obtain();
+                    message.what=LOGIN_SUCCESS;
+                    message.setTarget(myHandler);
+                    message.sendToTarget();
                 }
             }).start();
 
@@ -322,6 +321,23 @@ public class MainActivity extends AppCompatActivity{
 
 
         }else{//此前没有登陆过
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2*1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            drawerLayout.setVisibility(View.VISIBLE);
+                            cmImageLayout.setVisibility(View.GONE);//3秒后切换
+                        }
+                    });
+                }
+            }).start();
             MessageManager.getSmackUserInfo().setUserName("点击登录");
             MessageManager.getSmackUserInfo().setNiC("点击登录");
             Bitmap bitmap=BitmapFactory.decodeResource(this.getResources(),R.drawable.unlogin);
@@ -405,7 +421,6 @@ public class MainActivity extends AppCompatActivity{
                 if(resultCode==RESULT_OK){
                     setInfo();
                 }
-
             }break;
             case AlbumUtil.OPEN_ALBUM:{
                 String photoRoad=AlbumUtil.getImageAbsolutePath(data,MainActivity.this);
@@ -534,6 +549,11 @@ public class MainActivity extends AppCompatActivity{
                     Log.e(TAG, "handleMessage: "+MessageManager.getAllUnReadMessageCount() );
                     naviQBadgeView.setBadgeNumber(MessageManager.getAllUnReadMessageCount());
                     //naviQBadgeView.setBadgeText("");
+                }break;
+                case LOGIN_SUCCESS:{
+                    drawerLayout.setVisibility(View.VISIBLE);
+                    cmImageLayout.setVisibility(View.GONE);//初始化成功后切换
+                    setInfo();
                 }break;
                 default:break;
             }

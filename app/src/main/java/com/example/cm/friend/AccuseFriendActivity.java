@@ -78,6 +78,7 @@ private int currentBitmap;
         currentBitmap=-1;
         userName=getIntent().getStringExtra("userName");
         progressDialog=new ProgressDialog(this);
+        submitBtn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
     }
 
     @Override
