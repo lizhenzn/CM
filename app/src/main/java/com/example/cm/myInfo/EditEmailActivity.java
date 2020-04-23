@@ -8,8 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cm.R;
@@ -18,17 +18,17 @@ import com.example.cm.util.Connect;
 import com.example.cm.util.MessageManager;
 
 public class EditEmailActivity extends AppCompatActivity implements View.OnClickListener{
-private Button save_email_btn;
+private TextView save_email_tv;
 private EditText email_et;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_edit_email);
-        save_email_btn=(Button)findViewById(R.id.save_email_btn);
-        save_email_btn.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
+        save_email_tv=findViewById(R.id.save_email_tv);
+        save_email_tv.setBackgroundColor(Color.parseColor(ThemeColor.backColorStr));
         email_et=(EditText)findViewById(R.id.edit_email);
-        save_email_btn.setOnClickListener(this);
+        save_email_tv.setOnClickListener(this);
         Toolbar toolbar=(Toolbar)findViewById(R.id.email_toolbar);
         ThemeColor.setTheme(EditEmailActivity.this,toolbar);
         setSupportActionBar(toolbar);
@@ -42,7 +42,7 @@ private EditText email_et;
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.save_email_btn:{
+            case R.id.save_email_tv:{
                 String email= String.valueOf(email_et.getText());
                 String reg="[\\w-]+(\\.[\\w-]+)*@([\\w-]+\\.)+[a-zA-Z]+$";
                 if(email.matches(reg)){

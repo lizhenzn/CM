@@ -19,8 +19,8 @@
             android:layout_centerInParent="true"
             android:layout_gravity="center"
             android:text="修改邮箱" />
-        <Button
-            android:id="@+id/save_email_btn"
+        <TextView
+            android:id="@+id/save_email_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="保存"
