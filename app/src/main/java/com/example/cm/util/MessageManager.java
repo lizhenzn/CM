@@ -278,6 +278,12 @@ public class MessageManager {
         while(!Connect.getRoster().isLoaded()){
             try {
                 Connect.getRoster().reload();
+                try {
+                    Thread.sleep(1000);
+                    Log.d("", "initFriend: 循环里等待");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 Log.d("重连Roster",Connect.getXMPPTCPConnection().getUser().toString());
 
             } catch (SmackException.NotLoggedInException e) {
